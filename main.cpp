@@ -12,7 +12,7 @@ void StringSpaceRemove(string &);
 string StringSplit(string, unsigned short, unsigned short);
 
 int main() {
-    string equation;
+    string equation, blank;
     unsigned short option;
     
     do {
@@ -23,6 +23,7 @@ int main() {
         cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] to integral the function.\n";
         cout << "=>\t";
         cin >> option;
+        cin.ignore();
         
         cout << "The result is...\n\n";
         
@@ -32,12 +33,16 @@ int main() {
             case 3: cout << ReadEquation(equation) << "\n\n"; break;
         }
         
+        cout << "Press Enter to continue...";
+        getline(cin, blank);
+        cout << endl;
+        
         cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] to integral the function.\n\t";
         cout << "[4] to try a new equation.\n\t[5] to end the program.\n";
         cout << "=>\t";
         cin >> option;
         
-    } while (option == 4);
+    } while (option != 4);
 
     return 0;
 }
@@ -71,7 +76,7 @@ string ReadEquation(string eq) {
     // process each term
     string result = "";
     for (unsigned short i = 0; i < termIndex; i++) {
-        // result += Derivative(term[i]);
+        result += Derivative(term[i]) + signs[i];
     }
     
     // re-arrange the result; cleaner result
@@ -82,10 +87,12 @@ string ReadEquation(string eq) {
 string Derivative(string term) {
     string result = "";
     unsigned short collectX = 0;
+    unsigned short collectXIndex[term.size()] = {};
+    double a;
     
     for (unsigned short i = 0; i < term.size(); i++) {
         if (term[i] == 'x') {
-            collectX++;
+            collectXIndex[collectX++] = i;
         }
     }
     
