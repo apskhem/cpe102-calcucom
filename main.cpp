@@ -10,6 +10,9 @@ string Integral(string);
 // HELPER FUNCTIONS
 void StringSpaceRemove(string &);
 string StringSplit(string, unsigned short, unsigned short);
+int ParseInt(string);
+float ParseFloat(string);
+bool isNumber(char);
 
 int main() {
     string equation, blank;
@@ -20,7 +23,7 @@ int main() {
         cout << "Enter f(x) = ";
         getline(cin, equation);
         
-        cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] to integral the function.\n";
+        cout << "Press: \t[1] to evaluate the function.\n\t[2] to derivative the function.\n\t[3] to integral the function.\n";
         cout << "=>\t";
         cin >> option;
         cin.ignore();
@@ -41,8 +44,9 @@ int main() {
         cout << "[4] to try a new equation.\n\t[5] to end the program.\n";
         cout << "=>\t";
         cin >> option;
+        cin.ignore();
         
-    } while (option != 4);
+    } while (option != 5);
 
     return 0;
 }
@@ -97,7 +101,34 @@ string Derivative(string term) {
     }
     
     if (collectX != 0) {
+        int n, a;
         
+        // reading 'x';
+        switch (term[collectXIndex[0] + 1]) {
+            case '^': {
+                unsigned short tpos = collectXIndex[0] + (term[collectXIndex[0] + 2] == '(' ? 3 : 2);
+                string strN = "";
+                a = ParseInt(StringSplit(term, 0, collectXIndex[0]));
+                n = ParseInt(StringSplit(term, tpos, term.size()));
+                
+                for (unsigned short i = tpos; i < term.size() && isNumber(term[i]); i++) {
+                    strN += term[i];
+                }
+                
+                if (n - 1 == 0) {
+                    result = to_string(a*n);
+                }
+                else {
+                    result = to_string(a*n) + "x^" + to_string(n-1);
+                }
+            } break;
+            case '(': {
+                
+            } break;
+            case '*': {
+                
+            } break;
+        }
     }
     
     return result;
@@ -121,4 +152,16 @@ string StringSplit(string t, unsigned short from, unsigned short to) {
     }
     
     return result;
+}
+
+int ParseInt(string t) {
+    return atoi(t.c_str());
+}
+
+float ParseFloat(string t) {
+    return atof(t.c_str());
+}
+
+bool isNumber(char t) {
+    return (t >= 46 && t <= 57);
 }
