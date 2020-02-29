@@ -36,7 +36,7 @@ int main() {
             case 3: cout << ReadEquation(equation) << "\n\n"; break;
         }
         
-        cout << "Press Enter to continue...";
+        cout << "Press 'enter' to continue...";
         getline(cin, blank);
         cout << endl;
         
@@ -52,7 +52,7 @@ int main() {
 }
 
 string ReadEquation(string eq) {
-    string term[eq.size()/2] = {};
+    string term[eq.size()] = {};
     string signs = "";
     
     unsigned short termIndex = 0;
@@ -66,7 +66,7 @@ string ReadEquation(string eq) {
     for (unsigned short i = 0; i < eq.size(); i++) {
         if (eq[i] == '(' || eq[i] == ')') numberOfParentheses++;
         
-        if ((eq[i] == '+' || eq[i] == '-') && numberOfParentheses % 2 == 0) {
+        if ((eq[i] == '+' || eq[i] == '-') && eq[i-1] != '^' && numberOfParentheses % 2 == 0) {
             term[termIndex++] = StringSplit(eq, splitIndex, i);
             signs += eq[i];
             splitIndex = i + 1;
@@ -78,7 +78,7 @@ string ReadEquation(string eq) {
     }
     
     // process each term
-    string result = "";
+    string result = "f'(x) = ";
     for (unsigned short i = 0; i < termIndex; i++) {
         result += Derivative(term[i]) + signs[i];
     }
@@ -104,30 +104,39 @@ string Derivative(string term) {
         int n, a;
         
         // reading 'x';
-        switch (term[collectXIndex[0] + 1]) {
-            case '^': {
-                unsigned short tpos = collectXIndex[0] + (term[collectXIndex[0] + 2] == '(' ? 3 : 2);
-                string strN = "";
-                a = ParseInt(StringSplit(term, 0, collectXIndex[0]));
-                n = ParseInt(StringSplit(term, tpos, term.size()));
-                
-                for (unsigned short i = tpos; i < term.size() && isNumber(term[i]); i++) {
-                    strN += term[i];
-                }
-                
-                if (n - 1 == 0) {
-                    result = to_string(a*n);
-                }
-                else {
-                    result = to_string(a*n) + "x^" + to_string(n-1);
-                }
-            } break;
-            case '(': {
-                
-            } break;
-            case '*': {
-                
-            } break;
+        if (term.size() > 1) {
+            switch (term[collectXIndex[0] + 1]) {
+                case '^': {
+                    unsigned short tpos = collectXIndex[0] + (term[collectXIndex[0] + 2] == '(' ? 3 : 2);
+                    
+                    a = collectXIndex[0] == 0 ? 1 : ParseInt(StringSplit(term, 0, collectXIndex[0]));
+                    n = ParseInt(StringSplit(term, tpos, term.size()));
+                    
+                    string strN = "";
+                    for (unsigned short i = tpos; i < term.size() && isNumber(term[i]); i++) {
+                        strN += term[i];
+                    }
+                    
+                    if (n - 1 == 0) {
+                        result = to_string(a*n);
+                    }
+                    else if (n - 1 == 1) {
+                        result = to_string(a*n) + "x";
+                    }
+                    else {
+                        result = to_string(a*n) + "x^" + to_string(n-1);
+                    }
+                } break;
+                case '(': {
+                    
+                } break;
+                case '*': {
+                    
+                } break;
+            }
+        }
+        else {
+            result = "1";
         }
     }
     
