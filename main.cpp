@@ -103,11 +103,12 @@ string Diff(string term) {
     vector<unsigned short> xIndex(0);
     
     for (unsigned short i = 0; i < term.size(); i++) {
+        // find (type): position and #of x
         if (term[i] == 'x') {
             xIndex.push_back(i);
         }
         
-        // find trigonometric function and collect 'u' function.
+        // find (type): trigonometric function.
         else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i+4<term.size()) {
             string tfunc = StringSplit(term, i, i+3);
             
@@ -118,7 +119,7 @@ string Diff(string term) {
                 trigonIndex.push_back(i);
                 string tempU = "";
                 
-                if (term[i+3] == '^') { /* sin^n(u) */
+                if (term[i+3] == '^') { // find: a*sin^n(u)
                     i+=4; // skip 'sin^'
                     while (IsNumber(term[i])) i++;
                     
@@ -133,7 +134,7 @@ string Diff(string term) {
                     
                     u.push_back(tfunc + tempU);
                 }
-                else { /* sin(u) */
+                else { // find: a*sin(u) or a*sin^1(u)
                     trigon.push_back(tfunc);
                     
                     i+=4; // skip 'sin('
@@ -148,7 +149,7 @@ string Diff(string term) {
             }
         }
         
-        // find logarithm function
+        // find (type): logarithm function
         else if (term[i] == 'l' && i+2<term.size()) {
             string l;
             if (StringSplit(term, i, i+3) == "lon") {
@@ -160,16 +161,13 @@ string Diff(string term) {
         }
     }
     
-    //cout << u[0];
-    //return "";
-    
     if (xIndex.size() == 0 && u.size() == 0) return "";
     if (term.size() == 1 && term[0] == 'x') return "1";
     
     string result = "";
     int n, a;
     
-    // reading 'x';
+    // main diff function in many cases below...
     if (u.size() == 0) {
         switch (term[xIndex[0] + 1]) {
             case '^': { // case: ax^n
@@ -234,7 +232,7 @@ string Diff(string term) {
         }
         else if (trigonIndex.size() > 0) { // case: a*sin^n(u)
             a = trigonIndex[0] == 0 ? 1 : ParseInt(term);
-            n = ParseInt(StringSplit(term, trigonIndex.size() + 3, term.size()));
+            n = ParseInt(StringSplit(term, trigonIndex[0] + 4, term.size()));
             string chainDiff = Diff(u[0]);
             
             unsigned short fisrtParPos = 0;
