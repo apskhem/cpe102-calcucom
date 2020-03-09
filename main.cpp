@@ -20,9 +20,13 @@ vector<string> ReadExpr(string);
 string Diff(string, char);
 
 // Leng's Functions
-string ImplicitDiff(string);
+void PrintResult(vector<string>, unsigned short);
+string ImplicitFunc(string);
+float cal(string, float);
+float implicit_cal(string, float, float);
 
 // Dan's Functions
+//graph
 
 // Mhee's Functions
 
@@ -70,12 +74,14 @@ void UserRequest(string expr, unsigned short option) {
     // ++ simplify each term
 
     string result = "";
+    float cal_equation = 0;
+
     switch (option) {
         case 1: { // Eval
-            result = "f'(x) = ";
-            for (unsigned short i = 0; i < terms.size(); i++) {
-                result += Diff(terms[i], 'x') + signs[i];
-            }
+            float x;
+            cout<<"Please enter x value : ";
+            cin>>x;
+            cout<<"f(x) = "<<cal(term,x);
         } break;
         case 2: { // Diff
             result = "f'(x) = ";
@@ -84,11 +90,24 @@ void UserRequest(string expr, unsigned short option) {
             }
         } break;
         case 3: { // Impl
-            result = "dx/dy = ";
+            result = "dy/dx = ";
             for (unsigned short i = 0; i < term.size(); i++) {      //not yet
                 result += Diff(terms[i], 'x') + terms[i];
             }
         } break;
+        case 4:{
+
+            result = "dx/dy = ";
+            for
+        }
+        case 5:{
+
+            float x,y;
+
+            cout<<"Please enter x and y values : ";
+            cin>>x>>y;
+            cout<<"f(x) = "<<implicit_cal(term,x,y);
+        }
     }
 
     // ++ re-arrange the result; cleaner result
@@ -278,6 +297,35 @@ string Diff(string term, char var) {
     return result;
 }
 
+float cal(string t, float x){
+
+    float cal_result = 0;
+
+    for(int i=0; i<t.size(); i++){
+
+        if(t[i] = "x") 
+            t[i] = x;
+
+        cal_result += ;
+    }
+    
+    return cal_result;
+}
+
+float implicit_cal(string t, float x, float y){
+
+    float cal_result = 0;
+
+    for(int i=0; i<t.size(); i++)
+        if(t[i] = "x")
+            t[i] = x;
+        if(t[i] = "y")
+            t[i] = y;
+    
+    cal_result +=   ;
+    
+}
+
 // UTILITY FUNCTIONS
 void StrRemoveSpace(string &t) {
     string result = "";
@@ -325,7 +373,7 @@ bool IsNumber(char t) {
     return (t >= 46 && t <= 57);
 }
 
-string ImplicitDiff(string t){
+string ImplicitFunc(string t){
 
     int choice;
     
