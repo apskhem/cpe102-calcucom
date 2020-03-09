@@ -1,16 +1,8 @@
+// Update: 6:35pm 9 Mar, 2020
 #include <iostream>
-#include <cmath>
 #include <string>
 #include <vector>
 using namespace std;
-
-string ReadEquation(string , int);
-string Diff(string);
-string Integral(string);
-string implicitFunc(string, int);
-string showResult(string, int);
-
-// Update: 8:00pm 3 Mar, 2020
 
 // UTILITY FUNCTIONS
 void StringSpaceRemove(string &);
@@ -20,26 +12,36 @@ int ParseInt(string);
 float ParseFloat(string);
 bool IsNumber(char);
 
+// Khem's Functiions
+void ReadExpr(string, string);
+string Diff(string, char);
+
+// Leng's Functions
+void PrintResult(vector<string>, int);
+string ImplicitFunc(string);
+
+// Dan's Functions
+
+// Mhee's Functions
+
 int main() {
     string equation, blank;
     unsigned short option;
     
     do {
-        
         cout << "Enter f(x) = ";
         getline(cin, equation);
         
         cout << "Press: \t[1] to evaluate the function.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
         cout << "=>\t";
-        cin >> option;
-        cin.ignore();
+        getline(cin, option);
         
         cout << "The result is...\n\n";
         
         switch (option) {
-            case 1: cout << ReadEquation(equation,1) << "\n\n"; break;
-            case 2: cout << ReadEquation(equation,2) << "\n\n"; break;
-            case 3: cout << ReadEquation(equation,3) << "\n\n"; break;
+            case 1: ReadExpr(equation, 1) << "\n\n"; break;
+            case 2: ReadExpr(equation, 2) << "\n\n"; break;
+            case 3: ReadExpr(equation, 3) << "\n\n"; break;
         }
         
         cout << "Press 'enter' to continue...";
@@ -49,81 +51,88 @@ int main() {
         cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n\t";
         cout << "[4] to try a new equation.\n\t[5] to end the program.\n";
         cout << "=>\t";
-        cin >> option;
-        cin.ignore();
+        getline(cin, option);
         
     } while (option != 5);
 
     return 0;
 }
 
-string ReadEquation(string eq) {
-    vector<string> term(0);
+void ReadExpr(string expr, string option) {
+    vector<string> term;
     string signs = "";
     
-    unsigned short leftPar = 0;
-    unsigned short rightPar = 0;
+    unsigned short leftPar = 0, rightPar = 0;
     
     // pre-reading process
-    StringSpaceRemove(eq);
+    StringSpaceRemove(expr);
     
     // reading equation process
     unsigned short splitIndex = 0;
-    for (unsigned short i = 0; i < eq.size(); i++) {
-        if (eq[i] == '(') leftPar++;
-        else if (eq[i] == ')') rightPar++;
+    for (unsigned short i = 0; i < expr.size(); i++) {
+        if (expr[i] == '(') leftPar++;
+        else if (expr[i] == ')') rightPar++;
         
-        if ((eq[i] == '+' || eq[i] == '-') && eq[i-1] != '^' && leftPar == rightPar) {
-            term.push_back(StringSplit(eq, splitIndex, i));
-            signs += eq[i];
+        if ((expr[i] == '+' || expr[i] == '-') && expr[i-1] != '^' && leftPar == rightPar) {
+            term.push_back(StringSplit(expr, splitIndex, i));
+            signs += expr[i];
             splitIndex = i + 1;
         }
         
-        if (i >= eq.size() - 1) {
-            term.push_back(StringSplit(eq, splitIndex, i + 1));
+        if (i >= expr.size() - 1) {
+            term.push_back(StringSplit(expr, splitIndex, expr.size()));
         }
     }
 
-    showResult(term, N);
+    // check for errors
+    if (leftPar != rightPar) throw "Bad arithmetic expression: no complete pair of parentheses ['()'].";
+
+    PrintResult(term, N);
 
     return result;
 }
 
-string showResult(string eq, int N){
+void PrintResult(vector<string> term, int N) {
 
-    if(N == 1){     //normal function
-        string result = "f'(x) = ";
-        for (unsigned short i = 0; i < term.size(); i++) {
-            result += Diff(term[i]) + signs[i];
-        }
-    }
-    else if(N == 2){       //dy/dx
-        string result = "dy/dx = ";
-        for (unsigned short i = 0; i < term.size(); i++) {      //not yet
-            result += Diff(term[i]) + signs[i]; 
-        }
-    }
-    else if(N==3){      //dx/dy
-        string result = "dx/dy = ";
-        for (unsigned short i = 0; i < term.size(); i++) {      //not yet
-            result += Diff(term[i]) + signs[i];
-        }
+    // ++ simplify each term
 
+    string result = "";
+    switch (N) {
+        case 1: {
+            result = "f'(x) = ";
+            for (unsigned short i = 0; i < term.size(); i++) {
+                result += Diff(term[i], 'x') + signs[i];
+            }
+        } break;
+        case 2: {
+            result = "f'(x) = ";
+            for (unsigned short i = 0; i < term.size(); i++) {
+                result += Diff(term[i], 'x') + signs[i];
+            }
+        } break;
+        case 3: {
+            result = "dx/dy = ";
+            for (unsigned short i = 0; i < term.size(); i++) {      //not yet
+                result += Diff(term[i], 'x') + signs[i];
+            }
+        } break;
     }
+
+    // ++ re-arrange the result; cleaner result
+
+    cout << result;
 }
 
 
 // main derivative function
-string Diff(string term) {
-    vector<string> u(0);
-    vector<string> trigon(0);
-    vector<unsigned short> trigonIndex(0);
-    vector<unsigned short> xIndex(0);
+string Diff(string term, char var) {
+    vector<string> u, trigon;
+    vector<unsigned short> trigonIndex, varIndex;
     
     for (unsigned short i = 0; i < term.size(); i++) {
         // find (type): position and #of x
-        if (term[i] == 'x') {
-            xIndex.push_back(i);
+        if (term[i] == var) {
+            varIndex.push_back(i);
         }
         
         // find (type): trigonometric function.
@@ -132,8 +141,7 @@ string Diff(string term) {
             
             if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot") {
                 
-                unsigned short leftPar = 0;
-                unsigned short rightPar  = 0;
+                unsigned short leftPar = 0, rightPar  = 0;
                 trigonIndex.push_back(i);
                 string tempU = "";
                 
@@ -179,19 +187,19 @@ string Diff(string term) {
         }
     }
     
-    if (xIndex.size() == 0 && u.size() == 0) return "";
-    if (term.size() == 1 && term[0] == 'x') return "1";
+    if (varIndex.size() == 0 && u.size() == 0) return "";
+    if (term.size() == 1 && term[0] == var) return "1";
     
     string result = "";
     int n, a;
     
     // main diff function in many cases below...
     if (u.size() == 0) {
-        switch (term[xIndex[0] + 1]) {
+        switch (term[varIndex[0] + 1]) {
             case '^': { // case: ax^n
-                unsigned short tpos = xIndex[0] + (term[xIndex[0] + 2] == '(' ? 3 : 2);
+                unsigned short tpos = varIndex[0] + (term[varIndex[0] + 2] == '(' ? 3 : 2);
                 
-                a = xIndex[0] == 0 ? 1 : ParseInt(StringSplit(term, 0, xIndex[0]));
+                a = varIndex[0] == 0 ? 1 : ParseInt(StringSplit(term, 0, varIndex[0]));
                 n = ParseInt(StringSplit(term, tpos, term.size()));
                 
                 string strN = "";
@@ -213,7 +221,7 @@ string Diff(string term) {
                 
             } break;
             default: { // case ax or ax^1
-                result = StringSplit(term, 0, xIndex[0]);
+                result = StringSplit(term, 0, varIndex[0]);
             }
         }
     }
@@ -228,7 +236,7 @@ string Diff(string term) {
             
             a = trigonIndex[0] == 0 ? 1 : ParseInt(term);
             
-            string chainDiff = Diff(u[0]);
+            string chainDiff = Diff(u[0], var);
             bool hasSign = false;
             bool hasXorU = false;
             
@@ -236,7 +244,7 @@ string Diff(string term) {
                 if (chainDiff[i] == '+' || chainDiff[i] == '-') {
                     hasSign = true;
                 }
-                else if (chainDiff[i] == 'x') {
+                else if (chainDiff[i] == var) {
                     hasXorU = true;
                 }
             }
@@ -251,7 +259,7 @@ string Diff(string term) {
         else if (trigonIndex.size() > 0) { // case: a*sin^n(u)
             a = trigonIndex[0] == 0 ? 1 : ParseInt(term);
             n = ParseInt(StringSplit(term, trigonIndex[0] + 4, term.size()));
-            string chainDiff = Diff(u[0]);
+            string chainDiff = Diff(u[0], var);
             
             unsigned short fisrtParPos = 0;
             for (unsigned short i = 0; i < u[0].size() && u[0][i] != '('; i++) { // find fisrt '(' pos
