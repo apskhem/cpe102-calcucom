@@ -19,8 +19,11 @@ string Diff(string, char);
 // Leng's Functions
 void PrintResult(vector<string>, unsigned short);
 string ImplicitFunc(string);
+float cal(string, float);
+float implicit_cal(string, float, float);
 
 // Dan's Functions
+//graph
 
 // Mhee's Functions
 
@@ -97,12 +100,16 @@ void PrintResult(vector<string> term, unsigned short option) {
     // ++ simplify each term
 
     string result = "";
+    float cal_equation = 0;
+
     switch (option) {
         case 1: { // Eval
-            result = "f'(x) = ";
-            for (unsigned short i = 0; i < term.size(); i++) {
-                result += Diff(term[i], 'x') + signs[i];
-            }
+            float x;
+
+            cout<<"Please enter x value : ";
+            cin>>x;
+            cout<<"f(x) = "<<cal(term,x);
+            
         } break;
         case 2: { // Diff
             result = "f'(x) = ";
@@ -111,11 +118,24 @@ void PrintResult(vector<string> term, unsigned short option) {
             }
         } break;
         case 3: { // Impl
-            result = "dx/dy = ";
+            result = "dy/dx = ";
             for (unsigned short i = 0; i < term.size(); i++) {      //not yet
                 result += Diff(term[i], 'x') + signs[i];
             }
         } break;
+        case 4:{
+
+            result = "dx/dy = ";
+            for
+        }
+        case 5:{
+
+            float x,y;
+
+            cout<<"Please enter x and y values : ";
+            cin>>x>>y;
+            cout<<"f(x) = "<<implicit_cal(term,x,y);
+        }
     }
 
     // ++ re-arrange the result; cleaner result
@@ -276,6 +296,35 @@ string Diff(string term, char var) {
     }
     
     return result;
+}
+
+float cal(string t, float x){
+
+    float cal_result = 0;
+
+    for(int i=0; i<t.size(); i++){
+
+        if(t[i] = "x") 
+            t[i] = x;
+
+        cal_result += ;
+    }
+    
+    return cal_result;
+}
+
+float implicit_cal(string t, float x, float y){
+
+    float cal_result = 0;
+
+    for(int i=0; i<t.size(); i++)
+        if(t[i] = "x")
+            t[i] = x;
+        if(t[i] = "y")
+            t[i] = y;
+    
+    cal_result +=   ;
+    
 }
 
 // UTILITY FUNCTIONS
