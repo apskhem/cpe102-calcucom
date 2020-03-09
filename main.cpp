@@ -4,9 +4,11 @@
 #include <vector>
 using namespace std;
 
-string ReadEquation(string eq);
+string ReadEquation(string , int);
 string Diff(string);
 string Integral(string);
+string implicitFunc(string, int);
+string showResult(string, int);
 
 // Update: 8:00pm 3 Mar, 2020
 
@@ -27,7 +29,7 @@ int main() {
         cout << "Enter f(x) = ";
         getline(cin, equation);
         
-        cout << "Press: \t[1] to evaluate the function.\n\t[2] to derivative the function.\n\t[3] to integral the function.\n";
+        cout << "Press: \t[1] to evaluate the function.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
         cout << "=>\t";
         cin >> option;
         cin.ignore();
@@ -35,16 +37,16 @@ int main() {
         cout << "The result is...\n\n";
         
         switch (option) {
-            case 1: cout << ReadEquation(equation) << "\n\n"; break;
-            case 2: cout << ReadEquation(equation) << "\n\n"; break;
-            case 3: cout << ReadEquation(equation) << "\n\n"; break;
+            case 1: cout << ReadEquation(equation,1) << "\n\n"; break;
+            case 2: cout << ReadEquation(equation,2) << "\n\n"; break;
+            case 3: cout << ReadEquation(equation,3) << "\n\n"; break;
         }
         
         cout << "Press 'enter' to continue...";
         getline(cin, blank);
         cout << endl;
         
-        cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] to integral the function.\n\t";
+        cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n\t";
         cout << "[4] to try a new equation.\n\t[5] to end the program.\n";
         cout << "=>\t";
         cin >> option;
@@ -81,19 +83,35 @@ string ReadEquation(string eq) {
             term.push_back(StringSplit(eq, splitIndex, i + 1));
         }
     }
-    
-    // ++ simplify each term
-    
-    // process each term
-    string result = "f'(x) = ";
-    for (unsigned short i = 0; i < term.size(); i++) {
-        result += Diff(term[i]) + signs[i];
-    }
-    
-    // ++ re-arrange the result; cleaner result
-    
+
+    showResult(term, N);
+
     return result;
 }
+
+string showResult(string eq, int N){
+
+    if(N == 1){     //normal function
+        string result = "f'(x) = ";
+        for (unsigned short i = 0; i < term.size(); i++) {
+            result += Diff(term[i]) + signs[i];
+        }
+    }
+    else if(N == 2){       //dy/dx
+        string result = "dy/dx = ";
+        for (unsigned short i = 0; i < term.size(); i++) {      //not yet
+            result += Diff(term[i]) + signs[i]; 
+        }
+    }
+    else if(N==3){      //dx/dy
+        string result = "dx/dy = ";
+        for (unsigned short i = 0; i < term.size(); i++) {      //not yet
+            result += Diff(term[i]) + signs[i];
+        }
+
+    }
+}
+
 
 // main derivative function
 string Diff(string term) {
@@ -291,4 +309,38 @@ float ParseFloat(string t) {
 
 bool IsNumber(char t) {
     return (t >= 46 && t <= 57);
+}
+
+string ImplicitFunc(string t){
+
+    int choice;
+    
+    cout<<"Press: \t[1] to evaluate dy/dx\n\t[2] to evaluate dx/dy\n";
+    cout << "=>\t";
+    cin>>choice;
+    cin.ignore();
+    
+    if(choice == 1){    // dy/dx
+        string result;
+
+        ReadEquation(t);
+
+        result = ;
+        
+        
+        return result;
+    }
+    
+    else if (choice == 2){      //dx/dy
+        
+        string result;
+        
+        result = ;
+        
+        
+        
+        return result;
+    }
+    
+    else    return "Please enter 1 or 2";
 }
