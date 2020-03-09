@@ -13,11 +13,11 @@ float ParseFloat(string);
 bool IsNumber(char);
 
 // Khem's Functiions
-void ReadExpr(string, string);
+void ReadExpr(string, unsigned short);
 string Diff(string, char);
 
 // Leng's Functions
-void PrintResult(vector<string>, int);
+void PrintResult(vector<string>, unsigned short);
 string ImplicitFunc(string);
 
 // Dan's Functions
@@ -25,23 +25,24 @@ string ImplicitFunc(string);
 // Mhee's Functions
 
 int main() {
-    string equation, blank;
+    string expr, blank;
     unsigned short option;
     
     do {
         cout << "Enter f(x) = ";
-        getline(cin, equation);
+        getline(cin, expr);
         
         cout << "Press: \t[1] to evaluate the function.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
         cout << "=>\t";
-        getline(cin, option);
+        cin >> option;
+        cin.ignore();
         
         cout << "The result is...\n\n";
         
         switch (option) {
-            case 1: ReadExpr(equation, 1) << "\n\n"; break;
-            case 2: ReadExpr(equation, 2) << "\n\n"; break;
-            case 3: ReadExpr(equation, 3) << "\n\n"; break;
+            case 1: ReadExpr(expr, 1); break;
+            case 2: ReadExpr(expr, 2); break;
+            case 3: ReadExpr(expr, 3); break;
         }
         
         cout << "Press 'enter' to continue...";
@@ -49,16 +50,17 @@ int main() {
         cout << endl;
         
         cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n\t";
-        cout << "[4] to try a new equation.\n\t[5] to end the program.\n";
+        cout << "[4] to try a new expression.\n\t[5] to end the program.\n";
         cout << "=>\t";
-        getline(cin, option);
+        cin >> option;
+        cin.ignore();
         
     } while (option != 5);
 
     return 0;
 }
 
-void ReadExpr(string expr, string option) {
+void ReadExpr(string expr, unsigned short option) {
     vector<string> term;
     string signs = "";
     
@@ -87,30 +89,28 @@ void ReadExpr(string expr, string option) {
     // check for errors
     if (leftPar != rightPar) throw "Bad arithmetic expression: no complete pair of parentheses ['()'].";
 
-    PrintResult(term, N);
-
-    return result;
+    PrintResult(term, option);
 }
 
-void PrintResult(vector<string> term, int N) {
+void PrintResult(vector<string> term, unsigned short option) {
 
     // ++ simplify each term
 
     string result = "";
-    switch (N) {
-        case 1: {
+    switch (option) {
+        case 1: { // Eval
             result = "f'(x) = ";
             for (unsigned short i = 0; i < term.size(); i++) {
                 result += Diff(term[i], 'x') + signs[i];
             }
         } break;
-        case 2: {
+        case 2: { // Diff
             result = "f'(x) = ";
             for (unsigned short i = 0; i < term.size(); i++) {
                 result += Diff(term[i], 'x') + signs[i];
             }
         } break;
-        case 3: {
+        case 3: { // Impl
             result = "dx/dy = ";
             for (unsigned short i = 0; i < term.size(); i++) {      //not yet
                 result += Diff(term[i], 'x') + signs[i];
@@ -120,7 +120,7 @@ void PrintResult(vector<string> term, int N) {
 
     // ++ re-arrange the result; cleaner result
 
-    cout << result;
+    cout << result << "\n\n";
 }
 
 
@@ -331,9 +331,9 @@ string ImplicitFunc(string t){
     if(choice == 1){    // dy/dx
         string result;
 
-        ReadEquation(t);
+        ReadExpr(t, 3);
 
-        result = ;
+        result = "";
         
         
         return result;
@@ -343,7 +343,7 @@ string ImplicitFunc(string t){
         
         string result;
         
-        result = ;
+        result = "";
         
         
         
