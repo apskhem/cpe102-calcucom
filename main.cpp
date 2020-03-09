@@ -5,20 +5,22 @@
 using namespace std;
 
 // UTILITY FUNCTIONS
-void StringSpaceRemove(string &);
-string StringSplit(string, unsigned short, unsigned short);
-string Num2Str(int);
-int ParseInt(string);
-float ParseFloat(string);
+string StrRemoveSpace(string &);
+string StrSplice(string, unsigned short, unsigned short);
+
+template<class number>
+string Stringify(number);
+
+double ParseNum(string);
 bool IsNumber(char);
 
 // Khem's Functiions
-void ReadExpr(string, unsigned short);
+void UserRequest(string, unsigned short);
+vector<string> ReadExpr(string);
 string Diff(string, char);
 
 // Leng's Functions
-void PrintResult(vector<string>, unsigned short);
-string ImplicitFunc(string);
+string ImplicitDiff(string);
 
 // Dan's Functions
 
@@ -40,9 +42,9 @@ int main() {
         cout << "The result is...\n\n";
         
         switch (option) {
-            case 1: ReadExpr(expr, 1); break;
-            case 2: ReadExpr(expr, 2); break;
-            case 3: ReadExpr(expr, 3); break;
+            case 1: Selection(expr, 1); break;
+            case 2: Selection(expr, 2); break;
+            case 3: Selection(expr, 3); break;
         }
         
         cout << "Press 'enter' to continue...";
@@ -60,39 +62,10 @@ int main() {
     return 0;
 }
 
-void ReadExpr(string expr, unsigned short option) {
-    vector<string> term;
-    string signs = "";
-    
-    unsigned short leftPar = 0, rightPar = 0;
-    
-    // pre-reading process
-    StringSpaceRemove(expr);
-    
-    // reading equation process
-    unsigned short splitIndex = 0;
-    for (unsigned short i = 0; i < expr.size(); i++) {
-        if (expr[i] == '(') leftPar++;
-        else if (expr[i] == ')') rightPar++;
-        
-        if ((expr[i] == '+' || expr[i] == '-') && expr[i-1] != '^' && leftPar == rightPar) {
-            term.push_back(StringSplit(expr, splitIndex, i));
-            signs += expr[i];
-            splitIndex = i + 1;
-        }
-        
-        if (i >= expr.size() - 1) {
-            term.push_back(StringSplit(expr, splitIndex, expr.size()));
-        }
-    }
+void UserRequest(string expr, unsigned short option) {
 
-    // check for errors
-    if (leftPar != rightPar) throw "Bad arithmetic expression: no complete pair of parentheses ['()'].";
-
-    PrintResult(term, option);
-}
-
-void PrintResult(vector<string> term, unsigned short option) {
+    vector<string> terms;
+    terms = ReadExpr(expr);
 
     // ++ simplify each term
 
@@ -100,20 +73,20 @@ void PrintResult(vector<string> term, unsigned short option) {
     switch (option) {
         case 1: { // Eval
             result = "f'(x) = ";
-            for (unsigned short i = 0; i < term.size(); i++) {
-                result += Diff(term[i], 'x') + signs[i];
+            for (unsigned short i = 0; i < terms.size(); i++) {
+                result += Diff(terms[i], 'x') + signs[i];
             }
         } break;
         case 2: { // Diff
             result = "f'(x) = ";
-            for (unsigned short i = 0; i < term.size(); i++) {
-                result += Diff(term[i], 'x') + signs[i];
+            for (unsigned short i = 0; i < terms.size(); i++) {
+                result += Diff(terms[i], 'x') + signs[i];
             }
         } break;
         case 3: { // Impl
             result = "dx/dy = ";
             for (unsigned short i = 0; i < term.size(); i++) {      //not yet
-                result += Diff(term[i], 'x') + signs[i];
+                result += Diff(terms[i], 'x') + terms[i];
             }
         } break;
     }
@@ -123,8 +96,38 @@ void PrintResult(vector<string> term, unsigned short option) {
     cout << result << "\n\n";
 }
 
+vector<string> ReadExpr(string expr) {
+    vector<string> terms;
+    string signs = "";
+    
+    unsigned short leftPar = 0, rightPar = 0;
+    
+    // pre-reading process
+    StrRemoveSpace(expr);
+    
+    // reading equation process
+    unsigned short splitIndex = 0;
+    for (unsigned short i = 0; i < expr.size(); i++) {
+        if (expr[i] == '(') leftPar++;
+        else if (expr[i] == ')') rightPar++;
+        
+        if ((expr[i] == '+' || expr[i] == '-') && expr[i-1] != '^' && leftPar == rightPar) {
+            terms.push_back(StrSplice(expr, splitIndex, i));
+            signs += expr[i];
+            splitIndex = i + 1;
+        }
+        
+        if (i >= expr.size() - 1) {
+            terms.push_back(StrSplice(expr, splitIndex, expr.size()));
+        }
+    }
 
-// main derivative function
+    // check for errors
+    if (leftPar != rightPar) throw "Bad arithmetic expression: no complete pair of parentheses ['()'].";
+
+    return terms;
+}
+
 string Diff(string term, char var) {
     vector<string> u, trigon;
     vector<unsigned short> trigonIndex, varIndex;
@@ -137,7 +140,7 @@ string Diff(string term, char var) {
         
         // find (type): trigonometric function.
         else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i+4<term.size()) {
-            string tfunc = StringSplit(term, i, i+3);
+            string tfunc = StrSplice(term, i, i+3);
             
             if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot") {
                 
@@ -178,10 +181,10 @@ string Diff(string term, char var) {
         // find (type): logarithm function
         else if (term[i] == 'l' && i+2<term.size()) {
             string l;
-            if (StringSplit(term, i, i+3) == "lon") {
+            if (StrSplice(term, i, i+3) == "lon") {
                 l = "lon";
             }
-            else if (StringSplit(term, i, i+2) == "ln") {
+            else if (StrSplice(term, i, i+2) == "ln") {
                 l = "ln";
             }
         }
@@ -191,16 +194,16 @@ string Diff(string term, char var) {
     if (term.size() == 1 && term[0] == var) return "1";
     
     string result = "";
-    int n, a;
+    double n = 1, a = 1;
     
     // main diff function in many cases below...
     if (u.size() == 0) {
         switch (term[varIndex[0] + 1]) {
-            case '^': { // case: ax^n
+            case '^': { // CASE: ax^n
                 unsigned short tpos = varIndex[0] + (term[varIndex[0] + 2] == '(' ? 3 : 2);
                 
-                a = varIndex[0] == 0 ? 1 : ParseInt(StringSplit(term, 0, varIndex[0]));
-                n = ParseInt(StringSplit(term, tpos, term.size()));
+                a = varIndex[0] == 0 ? 1 : ParseNum(StrSplice(term, 0, varIndex[0]));
+                n = ParseNum(StrSplice(term, tpos, term.size()));
                 
                 string strN = "";
                 for (unsigned short i = tpos; i < term.size() && IsNumber(term[i]); i++) {
@@ -208,57 +211,54 @@ string Diff(string term, char var) {
                 }
                 
                 if (n - 1 == 0)
-                    result = Num2Str(a*n);
+                    result = Stringify(a*n);
                 else if (n - 1 == 1)
-                    result = Num2Str(a*n) + "x";
+                    result = Stringify(a*n) + "x";
                 else
-                    result = Num2Str(a*n) + "x^" + to_string(n-1);
+                    result = Stringify(a*n) + "x^" + to_string(n-1);
             } break;
-            case '(': { // case: ax^(n)
+            case '(': { // CASE: ax^(n)
                 
             } break;
-            case '*': { // case: ax*(n) or ax*(u)
+            case '*': { // CASE: ax*(n) or ax*(u)
                 
             } break;
-            default: { // case ax or ax^1
-                result = StringSplit(term, 0, varIndex[0]);
+            default: { // CASE ax or ax^1
+                result = StrSplice(term, 0, varIndex[0]);
             }
         }
     }
     else {
-        if (trigon.size() > 0) { // case: a*sin(u) or a*sin^1(u)
-           if (trigon[0] == "sin") trigon[0] = "cos";
-            else if (trigon[0] == "cos") trigon[0] = "-sin";
+        if (trigon.size() > 0) { // CASE: a*sin(u) or a*sin^1(u)
+            if (trigon[0] == "sin") trigon[0] = "cos";
+            else if (trigon[0] == "cos") trigon[0] = "sin"; //-
             else if (trigon[0] == "tan") trigon[0] = "sec^2";
-            else if (trigon[0] == "csc") trigon[0] = "-csc()*cot()";
-            else if (trigon[0] == "sec") trigon[0] = "sec()*tan()";
-            else if (trigon[0] == "cot") trigon[0] = "-csc^2";
+            else if (trigon[0] == "csc") trigon[0] = "csc()cot()"; //-
+            else if (trigon[0] == "sec") trigon[0] = "sec()tan()";
+            else if (trigon[0] == "cot") trigon[0] = "csc^2"; //-
             
-            a = trigonIndex[0] == 0 ? 1 : ParseInt(term);
+            if (trigon[0] == "sin" || trigon[0] == "csc()*cot()" || trigon[0] == "csc^2") a = -1;
+            a *= trigonIndex[0] == 0 ? 1 : ParseNum(term);
             
             string chainDiff = Diff(u[0], var);
             bool hasSign = false;
             bool hasXorU = false;
             
             for (unsigned short i = 0; i < chainDiff.size(); i++) {
-                if (chainDiff[i] == '+' || chainDiff[i] == '-') {
-                    hasSign = true;
-                }
-                else if (chainDiff[i] == var) {
-                    hasXorU = true;
-                }
+                if (chainDiff[i] == '+' || chainDiff[i] == '-') hasSign = true;
+                else if (chainDiff[i] == var) hasXorU = true;
             }
             
             if (hasSign)
-                result = Num2Str(a) + trigon[0] + "(" + u[0]  + ")*(" + chainDiff + ")"; 
+                result = Stringify(a) + trigon[0] + "(" + u[0]  + ")*(" + chainDiff + ")"; 
             else if (hasXorU)
-                result = Num2Str(a) + trigon[0] + "(" + u[0]  + ")*" + chainDiff;
+                result = Stringify(a) + trigon[0] + "(" + u[0]  + ")*" + chainDiff;
             else
-                result = Num2Str(a*ParseInt(chainDiff)) + trigon[0] + "(" + u[0]  + ")";
+                result = Stringify(a*ParseNum(chainDiff)) + trigon[0] + "(" + u[0]  + ")";
         }
-        else if (trigonIndex.size() > 0) { // case: a*sin^n(u)
-            a = trigonIndex[0] == 0 ? 1 : ParseInt(term);
-            n = ParseInt(StringSplit(term, trigonIndex[0] + 4, term.size()));
+        else if (trigonIndex.size() > 0) { // CASE: a*sin^n(u)
+            a = trigonIndex[0] == 0 ? 1 : ParseNum(term);
+            n = ParseNum(StrSplice(term, trigonIndex[0] + 4, term.size()));
             string chainDiff = Diff(u[0], var);
             
             unsigned short fisrtParPos = 0;
@@ -267,10 +267,10 @@ string Diff(string term, char var) {
             }
             
             if (n-1 == 1)
-                result = Num2Str(a*n) + u[0] + "*" + chainDiff;
+                result = Stringify(a*n) + u[0] + "*" + chainDiff;
             else {
-                string tempBlock = StringSplit(u[0], fisrtParPos, u[0].size());
-                result = Num2Str(a*n) + StringSplit(u[0], 0, 3) + "^" + to_string(n-1) + tempBlock + "*" + chainDiff; 
+                string tempBlock = StrSplice(u[0], fisrtParPos, u[0].size());
+                result = Stringify(a*n) + StrSplice(u[0], 0, 3) + "^" + to_string(n-1) + tempBlock + "*" + chainDiff; 
             }
         }
     }
@@ -279,7 +279,7 @@ string Diff(string term, char var) {
 }
 
 // UTILITY FUNCTIONS
-void StringSpaceRemove(string &t) {
+void StrRemoveSpace(string &t) {
     string result = "";
     for (unsigned short i = 0; i < t.size(); i++) {
         if (t[i] != ' ')
@@ -289,7 +289,7 @@ void StringSpaceRemove(string &t) {
     t = result;
 }
 
-string StringSplit(string t, unsigned short from, unsigned short to) {
+string StrSplice(string t, unsigned short from, unsigned short to) {
     string result = "";
     for (unsigned short i = from; i < to; i++) {
         result += t[i];
@@ -298,28 +298,34 @@ string StringSplit(string t, unsigned short from, unsigned short to) {
     return result;
 }
 
-string Num2Str(int n) {
-    if (n == 1) {
-        return "";
-    }
-    else {
-        return to_string(n);
-    }
+template<class number>
+string Stringify(number n) {
+    return (n == 1 ? "" : to_string(n));
 }
 
-int ParseInt(string t) {
-    return atoi(t.c_str());
-}
-
-float ParseFloat(string t) {
-    return atof(t.c_str());
+double ParseNum(string t) {
+    unsigned short decimalPlace = 0;
+    bool passNumber = false;
+    short mul = 1;
+    string newT = "";
+    for (unsigned short i = 0; i < t.size(); i++) {
+        if (t[i] >= 46 && t[i] <= 57 && t[i] != '.') {
+            passNumber = true;
+            newT += t[i];
+        }
+        else if (t[i] == '-' && t[i+1] >= 46 && t[i+1] <= 57) mul = -1;
+        else if (t[i] == '.' && passNumber) decimalPlace = newT.size();
+        else if (passNumber) break;
+    }
+    
+    return (newT == "" ? 0 : stoi(newT.c_str()) / pow(10, newT.size() - decimalPlace) * mul);
 }
 
 bool IsNumber(char t) {
     return (t >= 46 && t <= 57);
 }
 
-string ImplicitFunc(string t){
+string ImplicitDiff(string t){
 
     int choice;
     
