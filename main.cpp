@@ -1,5 +1,6 @@
 // Update: 6:35pm 9 Mar, 2020
 #include <iostream>
+#include <cmath>
 #include <string>
 #include <vector>
 using namespace std;
@@ -46,9 +47,9 @@ int main() {
         cout << "The result is...\n\n";
         
         switch (option) {
-            case 1: Selection(expr, 1); break;
-            case 2: Selection(expr, 2); break;
-            case 3: Selection(expr, 3); break;
+            case 1: UserRequest(expr, 1); break;
+            case 2: UserRequest(expr, 2); break;
+            case 3: UserRequest(expr, 3); break;
         }
         
         cout << "Press 'enter' to continue...";
@@ -98,7 +99,6 @@ void UserRequest(string expr, unsigned short option) {
         case 4:{
 
             result = "dx/dy = ";
-            for
         }
         case 5:{
 
@@ -322,7 +322,7 @@ float implicit_cal(string t, float x, float y){
         if(t[i] = "y")
             t[i] = y;
     
-    cal_result +=   ;
+    cal_result +=  "";
     
 }
 
@@ -385,7 +385,7 @@ string ImplicitFunc(string t){
     if(choice == 1){    // dy/dx
         string result;
 
-        ReadExpr(t, 3);
+        ReadExpr(t);
 
         result = "";
         
