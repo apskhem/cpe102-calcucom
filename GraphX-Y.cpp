@@ -11,7 +11,7 @@ string axis = "- ", point = "o ", space = "  ";
 int main()
 {
 
-  int size = 10;
+  int size = 20;
   double step = (1.0 / 5);
 
   int *values = new int[size + size + 1];
@@ -22,7 +22,7 @@ int main()
     double x = (i - size);
     x = x * step; //Expanding
 
-    Y = pow(x, 2) ; // EQUATION
+    Y = sqrt(4-pow(x,2)) ; // EQUATION
 
     Y = Y / step; //Expanding Size
     values[i] = round(Y);
