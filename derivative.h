@@ -1,8 +1,8 @@
 string Diff(string term, char var) {
     vector<string> u, trigon;
-    vector<unsigned short> trigonIndex, varIndex;
+    vector<uint2> trigonIndex, varIndex;
 
-    for (unsigned short i = 0; i < term.size(); i++) {
+    for (uint2 i = 0; i < term.size(); i++) {
         // find (type): position and #of x
         if (term[i] == var)
             varIndex.push_back(i);
@@ -13,7 +13,7 @@ string Diff(string term, char var) {
 
             if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot") {
 
-                unsigned short leftPar = 0, rightPar = 0;
+                uint2 leftPar = 0, rightPar = 0;
                 trigonIndex.push_back(i);
                 string tempU = "";
 
@@ -76,13 +76,13 @@ string Diff(string term, char var) {
     if (u.size() == 0) {
         switch (term[varIndex[0] + 1]) {
             case '^': { // CASE: ax^n
-                unsigned short tpos = varIndex[0] + (term[varIndex[0] + 2] == '(' ? 3 : 2);
+                uint2 tpos = varIndex[0] + (term[varIndex[0] + 2] == '(' ? 3 : 2);
 
                 a = varIndex[0] == 0 ? 1 : ParseNum(StrSplice(term, 0, varIndex[0]));
                 n = ParseNum(StrSplice(term, tpos, term.size()));
 
                 string strN = "";
-                for (unsigned short i = tpos; i < term.size() && IsNumber(term[i]); i++) {
+                for (uint2 i = tpos; i < term.size() && IsNumber(term[i]); i++) {
                     strN += term[i];
                 }
 
@@ -126,7 +126,7 @@ string Diff(string term, char var) {
             bool hasSign = false;
             bool hasXorU = false;
 
-            for (unsigned short i = 0; i < chainDiff.size(); i++) {
+            for (uint2 i = 0; i < chainDiff.size(); i++) {
                 if (chainDiff[i] == '+' || chainDiff[i] == '-')
                     hasSign = true;
                 else if (chainDiff[i] == var)
@@ -145,8 +145,8 @@ string Diff(string term, char var) {
             n = ParseNum(StrSplice(term, trigonIndex[0] + 4, term.size()));
             string chainDiff = Diff(u[0], var);
 
-            unsigned short fisrtParPos = 0;
-            for (unsigned short i = 0; i < u[0].size() && u[0][i] != '('; i++) { // find fisrt '(' pos
+            uint2 fisrtParPos = 0;
+            for (uint2 i = 0; i < u[0].size() && u[0][i] != '('; i++) { // find fisrt '(' pos
                 fisrtParPos++;
             }
 

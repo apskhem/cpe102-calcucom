@@ -5,15 +5,25 @@
 
 using namespace std;
 
+typedef unsigned short uint2;
+typedef unsigned int uint4;
+typedef unsigned long long uint8;
+typedef short int2;
+typedef int int4;
+typedef long long int8;
+typedef float float4;
+typedef double float8;
+typedef long double float12;
+
 #include "utility.h"
 #include "derivative.h"
 
 // Khem's Functiions
-void UserRequest(string, unsigned short);
+void UserRequest(string, uint2);
 vector<string> ReadExpr(string);
 
 // Leng's Functions
-void PrintResult(vector<string>, unsigned short);
+void PrintResult(vector<string>, uint2);
 void ImplicitFunc(string);
 float cal(string, float);
 float implicit_cal(string, float, float);
@@ -24,7 +34,7 @@ float implicit_cal(string, float, float);
 
 int main() {
     string expr, blank;
-    unsigned short option;
+    uint2 option;
 
     do {
         cout << "Enter f(x) = ";
@@ -64,7 +74,7 @@ int main() {
     return 0;
 }
 
-void UserRequest(string expr, unsigned short option) {
+void UserRequest(string expr, uint2 option) {
     vector<string> terms = ReadExpr(expr);
 
     // ++ simplify each term
@@ -81,7 +91,10 @@ void UserRequest(string expr, unsigned short option) {
         } break;
         case 2: { // Diff
             result = "f'(x) = ";
-            for (unsigned short i = 0; i < terms.size(); i++) {
+            for (uint2 i = 0; i < terms.size(); i++) {
+                if (i > 0 && terms[i][0] != '-')
+                    result += "+";
+
                 result += Diff(terms[i], 'x');
             }
         } break;
@@ -109,14 +122,14 @@ void UserRequest(string expr, unsigned short option) {
 vector<string> ReadExpr(string expr) {
     vector<string> terms;
 
-    unsigned short leftPar = 0, rightPar = 0;
+    uint2 leftPar = 0, rightPar = 0;
 
     // pre-reading process
     StrRemoveSpace(expr);
 
     // reading equation process
-    unsigned short splitIndex = 0;
-    for (unsigned short i = 0; i < expr.size(); i++) {
+    uint2 splitIndex = 0;
+    for (uint2 i = 0; i < expr.size(); i++) {
         if (expr[i] == '(')
             leftPar++;
         else if (expr[i] == ')')

@@ -1,16 +1,21 @@
-void StrRemoveSpace(string &t) {
+string StrReplace(string t, string toReplace, string replaceWith) {
     string result = "";
-    for (unsigned short i = 0; i < t.size(); i++) {
-        if (t[i] != ' ')
+    for (uint2 i = 0; i < t.size(); i++) {
+        if (t[i] == toReplace[0]) {
+            if (replaceWith == "") continue;
+            result += replaceWith;
+        }
+        else {
             result += t[i];
+        }
     }
 
-    t = result;
+    return result;
 }
 
-string StrSplice(string t, unsigned short from, unsigned short to) {
+string StrSplice(string t, uint2 from, uint2 to) {
     string result = "";
-    for (unsigned short i = from; i < to; i++) {
+    for (uint2 i = from; i < to; i++) {
         result += t[i];
     }
 
@@ -23,11 +28,11 @@ string Stringify(number n) {
 }
 
 double ParseNum(string t) {
-    unsigned short decimalPlace = 0;
+    uint2 decimalPlace = 0;
     bool passNumber = false;
     short isMinus = 1;
     string newT = "";
-    for (unsigned short i = 0; i < t.size(); i++) {
+    for (uint2 i = 0; i < t.size(); i++) {
         if (t[i] >= 46 && t[i] <= 57 && t[i] != '.') {
             passNumber = true;
             newT += t[i];
