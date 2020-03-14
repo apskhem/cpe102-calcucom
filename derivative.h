@@ -55,8 +55,8 @@ string Diff(string term, char var) {
         // find (type): logarithm function
         else if (term[i] == 'l' && i + 2 < term.size()) {
             string l;
-            if (StrSplice(term, i, i + 3) == "lon") {
-                l = "lon";
+            if (StrSplice(term, i, i + 3) == "log") {
+                l = "log";
             }
             else if (StrSplice(term, i, i + 2) == "ln") {
                 l = "ln";
