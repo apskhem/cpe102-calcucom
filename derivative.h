@@ -1,7 +1,3 @@
-#include <string>
-#include <vector>
-using namespace std;
-
 string Diff(string term, char var) {
     vector<string> u, trigon;
     vector<unsigned short> trigonIndex, varIndex;

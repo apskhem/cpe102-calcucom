@@ -1,8 +1,3 @@
-#include <iostream>
-#include <cmath>
-
-using namespace std;
-
 double round(double number);
 void CreateGraph(int *values, int size);
 

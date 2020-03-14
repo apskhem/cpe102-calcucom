@@ -1,8 +1,3 @@
-#include <string>
-#include <vector>
-#include <cmath>
-using namespace std;
-
 void StrRemoveSpace(string &t) {
     string result = "";
     for (unsigned short i = 0; i < t.size(); i++) {

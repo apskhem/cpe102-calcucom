@@ -3,11 +3,10 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 #include "utility.h"
 #include "derivative.h"
-#include "graph.h"
-
-using namespace std;
 
 // Khem's Functiions
 void UserRequest(string, unsigned short);
