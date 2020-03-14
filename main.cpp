@@ -32,11 +32,13 @@ float implicit_cal(string, float, float);
 
 // Mhee's Functions
 
-int main() {
+int main()
+{
     string expr, blank;
     uint2 option;
 
-    do {
+    do
+    {
         cout << "Enter f(x) = ";
         getline(cin, expr);
 
@@ -47,16 +49,17 @@ int main() {
 
         cout << "The result is...\n\n";
 
-        switch (option) {
-            case 1:
-                UserRequest(expr, 1);
-                break;
-            case 2:
-                UserRequest(expr, 2);
-                break;
-            case 3:
-                UserRequest(expr, 3);
-                break;
+        switch (option)
+        {
+        case 1:
+            UserRequest(expr, 1);
+            break;
+        case 2:
+            UserRequest(expr, 2);
+            break;
+        case 3:
+            UserRequest(expr, 3);
+            break;
         }
 
         cout << "Press 'enter' to continue...";
@@ -80,15 +83,20 @@ void UserRequest(string expr, uint2 option) {
     // ++ simplify each term
 
     string result = "";
-    float cal_equation = 0;
+    double cal_equation = 0;
 
     switch (option) {
         case 1: { // Eval
             float x;
-            cout << "Please enter x value : ";
+            cout << "Please enter x value to evaluate : ";
             cin >> x;
-            cout << "f(x) = " << cal(terms, x);
-        } break;
+            for (unsigned short i = 0; i < term.size(); i++)
+            {
+                cal_equation += cal(terms[i], x);
+            }
+            cout << "f(x) = " << cal_equation;
+        }
+        break;
         case 2: { // Diff
             result = "f'(x) = ";
             for (uint2 i = 0; i < terms.size(); i++) {
@@ -97,10 +105,12 @@ void UserRequest(string expr, uint2 option) {
 
                 result += Diff(terms[i], 'x');
             }
-        } break;
+        }
+        break;
         case 3: { // Impl
             result = "dy/dx = ";
-        } break;
+        }
+        break;
         case 4: { //Implicit
             result = "dx/dy = ";
         }
@@ -119,7 +129,8 @@ void UserRequest(string expr, uint2 option) {
     cout << result << "\n\n";
 }
 
-vector<string> ReadExpr(string expr) {
+vector<string> ReadExpr(string expr)
+{
     vector<string> terms;
 
     uint2 leftPar = 0, rightPar = 0;
@@ -135,12 +146,14 @@ vector<string> ReadExpr(string expr) {
         else if (expr[i] == ')')
             rightPar++;
 
-        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar) {
+        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar)
+        {
             terms.push_back(StrSplice(expr, splitIndex, i));
             splitIndex = i + (expr[i] == '+' ? 1 : 0);
         }
 
-        if (i >= expr.size() - 1) {
+        if (i >= expr.size() - 1)
+        {
             terms.push_back(StrSplice(expr, splitIndex, expr.size()));
         }
     }
@@ -152,33 +165,32 @@ vector<string> ReadExpr(string expr) {
     return terms;
 }
 
-float cal(string t, float x)
+float cal(string term, float x)
 {
-    float cal_result = 0;
+    double result = 0;
 
-    for (int i = 0; i < t.size(); i++)
+    for (unsigned short i = 0; i < term.size(); i++)
     {
-
-        if (t[i] = "x")
-            t[i] = x;
-
-        cal_result += ;
+        if (term[i] == 'x')
+            term[i] = x;
+        else if (term[i] == 's' || term[i] == 'c' || term[i] == 't')
+        {
+            
+        }
     }
-
-    return cal_result;
+    return result;
 }
 
 float implicit_cal(string t, float x, float y)
 {
 
-    float cal_result = 0;
-
     for (int i = 0; i < t.size(); i++)
-        if (t[i] = "x")
+    {
+        if (t[i] == 'x')
             t[i] = x;
-    if (t[i] = "y")
-        t[i] = y;
-
+        if (t[i] == 'y')
+            t[i] = y;
+    }
     cal_result += "";
 }
 
@@ -203,5 +215,5 @@ void ImplicitFunc(string t)
         ReadExpr(t);
     }
     else
-        cout<<"Please enter 1 or 2";
+        cout << "Please enter 1 or 2";
 }
