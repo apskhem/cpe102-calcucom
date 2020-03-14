@@ -3,8 +3,7 @@ void CreateGraph(int *values, int size);
 
 string axis = "- ", point = "o ", space = "  ";
 
-int main()
-{
+int main() {
 
   int size = 20;
   double step = (1.0 / 5);
@@ -12,8 +11,7 @@ int main()
   int *values = new int[size + size + 1];
   double Y;
 
-  for (int i = 0; i < size + size + 1; ++i)
-  {
+  for (int i = 0; i < size + size + 1; ++i) {
     double x = (i - size);
     x = x * step; //Expanding
 
@@ -94,7 +92,6 @@ void CreateGraph(int *values, int size) //Function TABLE Graph :
   }
 }
 
-double round(double number)
-{
+double round(double number) {
   return number < 0.0 ? ceil(number - 0.5) : floor(number + 0.5);
 }

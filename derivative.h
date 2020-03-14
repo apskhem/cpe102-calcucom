@@ -1,6 +1,10 @@
+#ifndef DERIVATIVE_H
+#define DERIVATIVE_H
+
 string Diff(string term, char var) {
     vector<string> u, trigon;
     vector<uint2> trigonIndex, varIndex;
+    unit2 outerPair = 0; // for (...)(...)
 
     for (uint2 i = 0; i < term.size(); i++) {
         // find (type): position and #of x
@@ -17,18 +21,16 @@ string Diff(string term, char var) {
                 trigonIndex.push_back(i);
                 string tempU = "";
 
-                if (term[i + 3] == '^') {           // find: a*sin^n(u)
-                    i += 4; // skip 'sin^'
+                if (term[i + 3] == '^') { // find: a*sin^n(u)
+                    i += 4; // skip 'sin^...'
                     while (IsNumber(term[i]))
                         i++;
 
                     leftPar++;
                     tempU = term[i++];
                     while (i < term.size() && leftPar != rightPar) {
-                        if (term[i] == '(')
-                            leftPar++;
-                        else if (term[i] == ')')
-                            rightPar++;
+                        if (term[i] == '(') leftPar++;
+                        else if (term[i] == ')') rightPar++;
 
                         tempU += term[i++];
                     }
@@ -38,12 +40,10 @@ string Diff(string term, char var) {
                 else { // find: a*sin(u) or a*sin^1(u)
                     trigon.push_back(tfunc);
 
-                    i += 4; // skip 'sin('
+                    i += 4; // skip 'sin(...'
                     while (i < term.size() && (term[i] != ')' || leftPar != rightPar)) {
-                        if (term[i] == '(')
-                            leftPar++;
-                        else if (term[i] == ')')
-                            rightPar++;
+                        if (term[i] == '(') leftPar++;
+                        else if (term[i] == ')') rightPar++;
 
                         tempU += term[i++];
                     }
@@ -55,8 +55,8 @@ string Diff(string term, char var) {
         // find (type): logarithm function
         else if (term[i] == 'l' && i + 2 < term.size()) {
             string l;
-            if (StrSplice(term, i, i + 3) == "lon") {
-                l = "lon";
+            if (StrSplice(term, i, i + 3) == "log") {
+                l = "log";
             }
             else if (StrSplice(term, i, i + 2) == "ln") {
                 l = "ln";
@@ -161,3 +161,5 @@ string Diff(string term, char var) {
 
     return result;
 }
+
+#endif

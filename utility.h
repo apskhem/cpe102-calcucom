@@ -1,3 +1,6 @@
+#ifndef UTILITY_H
+#define UTILITY_H
+
 string StrReplace(string t, string toReplace, string replaceWith) {
     string result = "";
     for (uint2 i = 0; i < t.size(); i++) {
@@ -56,3 +59,5 @@ double ParseNum(string t) {
 bool IsNumber(char t) {
     return (t >= 46 && t <= 57);
 }
+
+#endif

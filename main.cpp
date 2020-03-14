@@ -49,17 +49,10 @@ int main()
 
         cout << "The result is...\n\n";
 
-        switch (option)
-        {
-        case 1:
-            UserRequest(expr, 1);
-            break;
-        case 2:
-            UserRequest(expr, 2);
-            break;
-        case 3:
-            UserRequest(expr, 3);
-            break;
+        switch (option) {
+            case 1: UserRequest(expr, 1); break;
+            case 2: UserRequest(expr, 2); break;
+            case 3: UserRequest(expr, 3); break;
         }
 
         cout << "Press 'enter' to continue...";
