@@ -2,8 +2,11 @@
 #include <cmath>
 #include <string>
 #include <vector>
+
 #include "utility.h"
 #include "derivative.h"
+#include "graph.h"
+
 using namespace std;
 
 // Khem's Functiions
@@ -20,13 +23,11 @@ float implicit_cal(string, float, float);
 
 // Mhee's Functions
 
-int main()
-{
+int main() {
     string expr, blank;
     unsigned short option;
 
-    do
-    {
+    do {
         cout << "Enter f(x) = ";
         getline(cin, expr);
 
@@ -37,8 +38,7 @@ int main()
 
         cout << "The result is...\n\n";
 
-        switch (option)
-        {
+        switch (option) {
             case 1:
                 UserRequest(expr, 1);
                 break;
@@ -65,54 +65,41 @@ int main()
     return 0;
 }
 
-void UserRequest(string expr, unsigned short option)
-{
-
-    vector<string> terms;
-    terms = ReadExpr(expr);
+void UserRequest(string expr, unsigned short option) {
+    vector<string> terms = ReadExpr(expr);
 
     // ++ simplify each term
 
     string result = "";
     float cal_equation = 0;
 
-    switch (option)
-    {
-        case 1:
-        { // Eval
+    switch (option) {
+        case 1: { // Eval
             float x;
             cout << "Please enter x value : ";
             cin >> x;
             cout << "f(x) = " << cal(terms, x);
-        }
-        break;
-        case 2:
-        { // Diff
+        } break;
+        case 2: { // Diff
             result = "f'(x) = ";
-            for (unsigned short i = 0; i < terms.size(); i++)
-            {
+            for (unsigned short i = 0; i < terms.size(); i++) {
                 result += Diff(terms[i], 'x') + signs[i];
             }
-        }
-        break;
-        case 3:
-        { // Impl
+        } break;
+        case 3: { // Impl
             result = "dy/dx = ";
-        }
-        break;
-        case 4:
-        { //Implicit
+        } break;
+        case 4: { //Implicit
             result = "dx/dy = ";
         }
-        case 5:
-        {
+        case 5: {
 
             float x, y;
 
             cout << "Please enter x and y values : ";
             cin >> x >> y;
             cout << "f(x) = " << implicit_cal(terms, x, y);
-    }
+        }
     }
 
     // ++ re-arrange the result; cleaner result
@@ -120,8 +107,7 @@ void UserRequest(string expr, unsigned short option)
     cout << result << "\n\n";
 }
 
-vector<string> ReadExpr(string expr)
-{
+vector<string> ReadExpr(string expr) {
     vector<string> terms;
     string signs = "";
 
@@ -132,22 +118,19 @@ vector<string> ReadExpr(string expr)
 
     // reading equation process
     unsigned short splitIndex = 0;
-    for (unsigned short i = 0; i < expr.size(); i++)
-    {
+    for (unsigned short i = 0; i < expr.size(); i++) {
         if (expr[i] == '(')
             leftPar++;
         else if (expr[i] == ')')
             rightPar++;
 
-        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar)
-        {
+        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar) {
             terms.push_back(StrSplice(expr, splitIndex, i));
             signs += expr[i];
             splitIndex = i + 1;
         }
 
-        if (i >= expr.size() - 1)
-        {
+        if (i >= expr.size() - 1) {
             terms.push_back(StrSplice(expr, splitIndex, expr.size()));
         }
     }
