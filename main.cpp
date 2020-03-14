@@ -83,7 +83,7 @@ void UserRequest(string expr, unsigned short option) {
         case 2: { // Diff
             result = "f'(x) = ";
             for (unsigned short i = 0; i < terms.size(); i++) {
-                result += Diff(terms[i], 'x') + signs[i];
+                result += Diff(terms[i], 'x');
             }
         } break;
         case 3: { // Impl
@@ -109,7 +109,6 @@ void UserRequest(string expr, unsigned short option) {
 
 vector<string> ReadExpr(string expr) {
     vector<string> terms;
-    string signs = "";
 
     unsigned short leftPar = 0, rightPar = 0;
 
@@ -126,8 +125,7 @@ vector<string> ReadExpr(string expr) {
 
         if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar) {
             terms.push_back(StrSplice(expr, splitIndex, i));
-            signs += expr[i];
-            splitIndex = i + 1;
+            splitIndex = i + (expr[i] == '+' ? 1 : 0);
         }
 
         if (i >= expr.size() - 1) {
