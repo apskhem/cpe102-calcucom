@@ -10,7 +10,7 @@ typedef class String {
     friend std::istream& operator>> (std::istream &, String &);
     friend std::istream& getline(std::istream &, String &);
     template <class number>
-    friend String toString(number);
+    friend String toCalStr(number);
     private:
         char *_proto_; // c-string data
         void assign(const char*);
@@ -35,6 +35,7 @@ typedef class String {
         String operator= (const char *);
         String operator= (const String &str);
         String operator+= (const char *);
+        String operator+= (const char);
         String operator+= (const String &str);
         bool operator== (const char *);
         bool operator== (const String &);
@@ -54,9 +55,9 @@ typedef class String {
         bool localeCompare();
         String match();
         int repeat();
-        String replace();
+        String replace(String, String);
         int search();
-        String slice();
+        String slice(unsigned, unsigned);
         String split();
         bool startsWith();
         String substr();
@@ -85,7 +86,7 @@ String::String(const String &str) {
 }
 
 String::~String() {
-    if (_proto_) delete[] _proto_;
+    delete[] _proto_;
 }
 
 /* call operators */
@@ -149,10 +150,25 @@ String String::operator= (const String &str) {
 
 String String::operator+= (const char *str) {
     string newT = this->concat(str);
-    
+
     this->assign((char*) newT);
     
     return newT;
+}
+
+String String::operator+= (const char chr) {
+    char *old = _proto_;
+    _proto_ = new char[++length];
+    
+    for (unsigned i = 0; i < length-1; i++) {
+        _proto_[i] = old[i];
+    }
+
+    _proto_[length-1] = chr;
+
+    string newStr(_proto_);
+
+    return newStr;
 }
 
 String String::operator+= (const String &str) {
@@ -213,6 +229,8 @@ String String::operator* (const unsigned mul) {
 
 /* class methods: PRIVATE */
 void String::assign(const char *str) {
+    //delete[] _proto_;
+
     length = strlen(str);
     _proto_ = new char[length];
     
@@ -222,11 +240,14 @@ void String::assign(const char *str) {
 }
 
 /* class methods: FRIEND */
+template <class number>
+String toCalStr(number) {
+    return (n == 1 ? "" : to_string(int(n)));
+}
 
 /* class methods: BUILT-IN */
 String String::concat(const String &t) {
-    int newLength = length + t.length;
-    char *newT = new char[newLength];
+    char newT[length + t.length];
     
     // concat
     for (unsigned i = 0; i < length; i++) {
@@ -244,7 +265,7 @@ String String::concat(const String &t) {
 
 String String::concat(const char *t) {
     int inLength = strlen(t);
-    char *newT = new char[length + inLength];
+    char newT[length + inLength];
     
     // concat
     for (unsigned i = 0; i < length; i++) {
@@ -258,6 +279,30 @@ String String::concat(const char *t) {
     String newTxt(newT);
 
     return newTxt;
+}
+
+String String::replace(String find, String replace) {
+    string result = "";
+    for (unsigned i = 0; i < length; i++) {
+        if (_proto_[i] == find[0]) {
+            if (replace == "") continue;
+            result += replace;
+        }
+        else {
+            result += _proto_[i];
+        }
+    }
+
+    return result;
+}
+
+string String::slice(unsigned from, unsigned to) {
+    string result = "";
+    for (unsigned i = from; i < to; i++) {
+        result += _proto_[i];
+    }
+
+    return result;
 }
 
 /* ### */

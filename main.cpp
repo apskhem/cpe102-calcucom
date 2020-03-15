@@ -1,10 +1,5 @@
 #include <iostream>
 #include <cmath>
-#include <vector>
-
-#include "klib.string.h"
-#include "klib.number.h"
-#include "klib.array.h"
 
 typedef unsigned short uint2;
 typedef unsigned int uint4;
@@ -16,15 +11,17 @@ typedef float float4;
 typedef double float8;
 typedef long double float12;
 
-#include "utility.h"
+#include "klib.string.h"
+#include "klib.number.h"
+#include "klib.array.h"
 #include "derivative.h"
 
 // Khem's Functiions
 void UserRequest(string, uint2);
-vector<string> ReadExpr(string);
+array<string> ReadExpr(string);
 
 // Leng's Functions
-void PrintResult(vector<string>, uint2);
+void PrintResult(array<string>, uint2);
 void ImplicitFunc(string);
 float cal(string, float);
 float implicit_cal(string, float, float);
@@ -70,7 +67,7 @@ int main() {
 }
 
 void UserRequest(string expr, uint2 option) {
-    vector<string> terms = ReadExpr(expr);
+    array<string> terms = ReadExpr(expr);
 
     // ++ simplify each term
 
@@ -82,7 +79,7 @@ void UserRequest(string expr, uint2 option) {
             float x;
             std::cout << "Please enter x value to evaluate : ";
             std::cin >> x;
-            for (unsigned short i = 0; i < term.size(); i++)
+            for (unsigned short i = 0; i < term.length; i++)
             {
                 cal_equation += cal(terms[i], x);
             }
@@ -91,7 +88,7 @@ void UserRequest(string expr, uint2 option) {
         break;
         case 2: { // Diff
             result = "f'(x) = ";
-            for (uint2 i = 0; i < terms.size(); i++) {
+            for (uint2 i = 0; i < terms.length; i++) {
                 if (i > 0 && terms[i][0] != '-')
                     result += "+";
 
@@ -121,30 +118,29 @@ void UserRequest(string expr, uint2 option) {
     std::cout << result << "\n\n";
 }
 
-vector<string> ReadExpr(string expr)
-{
-    vector<string> terms;
+array<string> ReadExpr(string expr) {
+    array<string> terms;
 
     uint2 leftPar = 0, rightPar = 0;
 
     // pre-reading process
-    StrRemoveSpace(expr);
+    expr = expr.replace(" ", "");
 
     // reading equation process
     uint2 splitIndex = 0;
-    for (uint2 i = 0; i < expr.size(); i++) {
+    for (uint2 i = 0; i < expr.length; i++) {
         if (expr[i] == '(')
             leftPar++;
         else if (expr[i] == ')')
             rightPar++;
 
         if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar) {
-            terms.push_back(StrSplice(expr, splitIndex, i));
+            terms.push_back(expr.slice(splitIndex, i));
             splitIndex = i + (expr[i] == '+' ? 1 : 0);
         }
 
-        if (i >= expr.size() - 1) {
-            terms.push_back(StrSplice(expr, splitIndex, expr.size()));
+        if (i >= expr.length - 1) {
+            terms.push_back(expr.slice(expr, splitIndex, expr.length));
         }
     }
 
@@ -157,13 +153,13 @@ vector<string> ReadExpr(string expr)
 
 float cal(string term, float x) {
     double result = 0;
-    float a = ParseNum(term);
+    float a = parseNum(term);
 
-    for (unsigned short i = 0; i < term.size(); i++) {
+    for (unsigned short i = 0; i < term.length; i++) {
         if (term[i] == 'x')
             term[i] = x;
-        else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.size()) {
-            string tfunc = StrSplice(term, i, i + 3);
+        else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) {
+            string tfunc = term.slice(i, i + 3);
 
             if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot") {
             }
@@ -182,7 +178,7 @@ float cal(string term, float x) {
 
 float implicit_cal(string t, float x, float y) {
 
-    for (int i = 0; i < t.size(); i++) {
+    for (int i = 0; i < t.length; i++) {
         if (t[i] == 'x')
             t[i] = x;
         if (t[i] == 'y')

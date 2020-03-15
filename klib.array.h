@@ -6,20 +6,20 @@ class Array {
     friend bool isArray();
     private:
         _type *_proto_;
-        void assign(const _type *, const _type *);
     public:
         unsigned length;
     
+        Array();
         Array(const std::initializer_list<_type>);
         Array(const Array<_type> &);
         ~Array();
         
-        char* operator*();
-        int* operator&();
-        char operator[] (const int);
+        _type operator*();
+        _type* operator&();
+        _type operator[] (const int);
         
-        bool operator= (const std::initializer_list<_type>);
-        bool operator= (const Array<_type> &);
+        Array<_type> operator= (const std::initializer_list<_type>);
+        Array<_type> operator= (const Array<_type> &);
         
         _type concat(const std::initializer_list<_type>);
         _type concat(const Array<_type> &);
@@ -58,6 +58,12 @@ class Array {
 
 /* constructor */
 template<class _type>
+Array<_type>::Array() {
+    length = 0;
+    _proto_ = NULL;
+}
+
+template<class _type>
 Array<_type>::Array(const std::initializer_list<_type> list) {
     length = list.size(); // list.end()-list.begin()
     _proto_ = new _type[length];
@@ -69,7 +75,7 @@ Array<_type>::Array(const std::initializer_list<_type> list) {
 
 template<class _type>
 Array<_type>::Array(const Array<_type> &list) {
-    length = list.length; // list.end()-list.begin()
+    length = list.length;
     _proto_ = new _type[length];
     
     for (unsigned i = 0; i < length; i++) {
@@ -79,20 +85,47 @@ Array<_type>::Array(const Array<_type> &list) {
 
 template<class _type>
 Array<_type>::~Array() {
-    if (_proto_) delete[] _proto_;
+    delete[] _proto_;
 }
 
 /* call operators */
+template<class _type>
+_type* Array<_type>::operator& () {return &_proto_[0];}
+template<class _type>
+_type Array<_type>::operator[] (const int index) {return _proto_[index];}
 
 /* processing operators: FRIEND */
 
 /* processing operators: OVERLOAD */
+template<class _type>
+Array<_type> Array<_type>::operator= (const std::initializer_list<_type> list) {
+    delete[] _proto_;
+
+    length = list.size();
+    _proto_ = new _type[length];
+
+    for (unsigned i = 0; i < length; i++) {
+        _proto_[i] = *(list.begin()+i);
+    }
+
+    return *this;
+}
+
+template<class _type>
+Array<_type> Array<_type>::operator= (const Array<_type> &list) {
+    delete[] _proto_;
+
+    length = list.length;
+    _proto_ = new _type[length];
+    
+    for (unsigned i = 0; i < length; i++) {
+        _proto_[i] = list._proto_[i];
+    }
+
+    return *this;
+}
 
 /* class methods: PRIVATE */
-template<class _type>
-void Array<_type>::assign(const _type *iterator_begin, const _type *iterator_end) {
-
-}
 
 /* class methods: FRIEND */
 
