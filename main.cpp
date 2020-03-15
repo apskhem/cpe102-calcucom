@@ -157,12 +157,24 @@ vector<string> ReadExpr(string expr)
 
 float cal(string term, float x) {
     double result = 0;
+    float a = ParseNum(term);
 
     for (unsigned short i = 0; i < term.size(); i++) {
         if (term[i] == 'x')
             term[i] = x;
-        else if (term[i] == 's' || term[i] == 'c' || term[i] == 't') {
-            
+        else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.size()) {
+            string tfunc = StrSplice(term, i, i + 3);
+
+            if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot") {
+            }
+        }
+        else if(term[i] == 'l'){
+            if(term[i+1] == 'n'){//ln
+                result = a*log()
+            }
+            else {//log
+                result = a*log
+            }
         }
     }
     return result;
