@@ -12,7 +12,7 @@ typedef class String {
     template <class number>
     friend String toString(number);
     private:
-        char *cstr;
+        char *_proto_; // c-string data
         void assign(const char*);
     public:
         unsigned length;
@@ -72,7 +72,7 @@ typedef class String {
 
 /* constructor */
 String::String() {
-    cstr = NULL;
+    _proto_ = NULL;
     length = 0;
 }
 
@@ -81,23 +81,23 @@ String::String(const char *str) {
 }
 
 String::String(const String &str) {
-    this->assign(str.cstr);
+    this->assign(str._proto_);
 }
 
 String::~String() {
-    if (cstr) delete[] cstr;
+    if (_proto_) delete[] _proto_;
 }
 
 /* call operators */
-String::operator char*() {return cstr;}
-String::operator const char* () {return cstr;}
-char * String::operator*() {return cstr;}
-int * String::operator&() {return (int*)&cstr[0];}
-char String::operator[] (const int index) {return cstr[index];}
+String::operator char*() {return _proto_;}
+String::operator const char* () {return _proto_;}
+char * String::operator*() {return _proto_;}
+int * String::operator&() {return (int*)&_proto_[0];}
+char String::operator[] (const int index) {return _proto_[index];}
 
 /* processing operators: FRIEND */
 std::ostream& operator<< (std::ostream &out, const String &str) {
-    out << str.cstr;
+    out << str._proto_;
     return out;
 }
 
@@ -141,7 +141,7 @@ String String::operator= (const char *str) {
 }
 
 String String::operator= (const String &str) {
-    this->assign(str.cstr);
+    this->assign(str._proto_);
     return *this;
 }
 
@@ -169,7 +169,7 @@ bool String::operator== (const String &str) {
     if (length != str.length) return false;
     
     for (unsigned i = 0; i < length; i++) {
-        if (cstr[i] != str.cstr[i]) return false;
+        if (_proto_[i] != str._proto_[i]) return false;
     }
     
     return true;
@@ -179,7 +179,7 @@ bool String::operator== (const char *str) {
     if (length != strlen(str)) return false;
     
     for (unsigned i = 0; i < length; i++) {
-        if (cstr[i] != str[i]) return false;
+        if (_proto_[i] != str[i]) return false;
     }
     
     return true;
@@ -189,7 +189,7 @@ bool String::operator!= (const String &str) {
     if (length != str.length) return true;
     
     for (unsigned i = 0; i < length; i++) {
-        if (cstr[i] != str.cstr[i]) return true;
+        if (_proto_[i] != str._proto_[i]) return true;
     }
     
     return false;
@@ -199,7 +199,7 @@ bool String::operator!= (const char *str) {
     if (length != strlen(str)) return true;
     
     for (unsigned i = 0; i < length; i++) {
-        if (cstr[i] != str[i]) return true;
+        if (_proto_[i] != str[i]) return true;
     }
     
     return false;
@@ -211,29 +211,30 @@ String String::operator* (const unsigned mul) {
     
 }
 
-/* class functions: BUILT-IN */
+/* class methods: PRIVATE */
 void String::assign(const char *str) {
     length = strlen(str);
-    cstr = new char[length];
+    _proto_ = new char[length];
     
     for (unsigned i = 0; i < length; i++) {
-        cstr[i] = str[i];
+        _proto_[i] = str[i];
     }
 }
 
-/* ### */
+/* class methods: FRIEND */
 
+/* class methods: BUILT-IN */
 String String::concat(const String &t) {
     int newLength = length + t.length;
     char *newT = new char[newLength];
     
     // concat
     for (unsigned i = 0; i < length; i++) {
-        newT[i] = cstr[i];
+        newT[i] = _proto_[i];
     }
     
     for (unsigned i = 0; i < t.length; i++) {
-        newT[length + i] = t.cstr[i];
+        newT[length + i] = t._proto_[i];
     }
     
     String newTxt(newT);
@@ -247,7 +248,7 @@ String String::concat(const char *t) {
     
     // concat
     for (unsigned i = 0; i < length; i++) {
-        newT[i] = cstr[i];
+        newT[i] = _proto_[i];
     }
     
     for (unsigned i = 0; i < inLength; i++) {
