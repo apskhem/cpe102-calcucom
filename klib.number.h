@@ -3,6 +3,7 @@ class Number {
     friend double parseNum(string);
     friend bool isNum(char);
 }
+
 double parseNum(string t) {
     unsigned decimalPlace = 0;
     bool passNumber = false;

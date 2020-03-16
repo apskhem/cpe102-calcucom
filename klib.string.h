@@ -24,19 +24,17 @@ typedef class String {
         
         operator char*();
         operator const char*();
-        operator String();
-        operator const String();
         
         char* operator*();
         int* operator&();
         char operator[] (const int);
         String operator+ (const char *);
-        String operator+ (const String &str);
+        String operator+ (const String &);
         String operator= (const char *);
-        String operator= (const String &str);
+        String operator= (const String &);
         String operator+= (const char *);
         String operator+= (const char);
-        String operator+= (const String &str);
+        String operator+= (const String &);
         bool operator== (const char *);
         bool operator== (const String &);
         bool operator!= (const char *);
@@ -49,13 +47,15 @@ typedef class String {
         String concat(const char *);
         bool endsWith();
         void fromCharCode();
-        bool includes();
+        template<class _type_string>
+        bool includes(const _type_string);
         int indexOf();
         int lastIndexOf();
         bool localeCompare();
         String match();
         int repeat();
-        String replace(String, String);
+        template<class _type_string1, class _type_string2>
+        String replace(const _type_string1, const _type_string2);
         int search();
         String slice(unsigned, unsigned);
         String split();
@@ -91,7 +91,7 @@ String::~String() {
 
 /* call operators */
 String::operator char*() {return _proto_;}
-String::operator const char* () {return _proto_;}
+String::operator const char*() {return _proto_;}
 char * String::operator*() {return _proto_;}
 int * String::operator&() {return (int*)&_proto_[0];}
 char String::operator[] (const int index) {return _proto_[index];}
@@ -111,7 +111,7 @@ std::istream& operator>> (std::istream &in, String &str) {
     return in;
 }
 
-std::istream &getline (std::istream &in, String &str) {
+std::istream& getline(std::istream &in, String &str) {
     std::string t;
     std::getline(std::cin, t);
     
@@ -241,22 +241,18 @@ void String::assign(const char *str) {
 
 /* class methods: FRIEND */
 template <class number>
-String toCalStr(number) {
-    return (n == 1 ? "" : to_string(int(n)));
+String toCalStr(number n) {
+    return (n == 1 ? "" : std::to_string(int(n)));
 }
 
 /* class methods: BUILT-IN */
 String String::concat(const String &t) {
     char newT[length + t.length];
     
-    // concat
-    for (unsigned i = 0; i < length; i++) {
+    for (unsigned i = 0; i < length; i++)
         newT[i] = _proto_[i];
-    }
-    
-    for (unsigned i = 0; i < t.length; i++) {
+    for (unsigned i = 0; i < t.length; i++)
         newT[length + i] = t._proto_[i];
-    }
     
     String newTxt(newT);
 
@@ -264,29 +260,46 @@ String String::concat(const String &t) {
 }
 
 String String::concat(const char *t) {
-    int inLength = strlen(t);
+    unsigned inLength = strlen(t);
     char newT[length + inLength];
     
-    // concat
-    for (unsigned i = 0; i < length; i++) {
+    for (unsigned i = 0; i < length; i++)
         newT[i] = _proto_[i];
-    }
-    
-    for (unsigned i = 0; i < inLength; i++) {
+    for (unsigned i = 0; i < inLength; i++)
         newT[length + i] = t[i];
-    }
     
     String newTxt(newT);
 
     return newTxt;
 }
 
-String String::replace(String find, String replace) {
+template<class _type_string>
+bool String::includes(const _type_string include) {
+    string t(include);
+
+    unsigned j = 0;
+    for (unsigned i = 0; i < length; i++) {
+        if (_proto_[i] == t[j]) {
+            if (++j == t.length)
+                return true;
+
+            continue;
+        }
+        j = 0;
+    }
+
+    return false;
+}
+
+template<class _type_string1, class _type_string2>
+String String::replace(const _type_string1 find, const _type_string2 replace) {
+    string nFind(find), nReplace(replace);
+
     string result = "";
     for (unsigned i = 0; i < length; i++) {
-        if (_proto_[i] == find[0]) {
+        if (_proto_[i] == nFind[0]) {
             if (replace == "") continue;
-            result += replace;
+            result += nReplace;
         }
         else {
             result += _proto_[i];
