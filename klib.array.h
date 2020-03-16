@@ -45,9 +45,9 @@ class Array {
         void toString();
         void values();
         
-        _type push(const std::initializer_list<_type>);
-        _type push(const Array<_type> &);
-        _type push(const _type);
+        unsigned push(const std::initializer_list<_type>);
+        unsigned push(const Array<_type> &);
+        unsigned push(const _type);
         _type pop();
         _type unshift(const std::initializer_list<_type>);
         _type unshift(const Array<_type> &);
@@ -130,6 +130,20 @@ Array<_type> Array<_type>::operator= (const Array<_type> &list) {
 /* class methods: FRIEND */
 
 /* class methods: BUILT-IN */
+template<class _type>
+unsigned Array<_type>::push(const _type item) {
+    _type *old = _proto_;
+    _proto_ = new _type[++length];
+
+    for (unsigned i = 0; i < length-1; i++) {
+        _proto_[i] = old[i];
+    }
+
+    _proto_[length-1] = item;
+    delete[] old;
+
+    return length;
+}
 
 template<class _type>
 using array = Array<_type>;

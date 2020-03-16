@@ -9,7 +9,7 @@ string Diff(string term, char var) {
     for (uint2 i = 0; i < term.length; i++) {
         // find (type): position and #of x
         if (term[i] == var)
-            varIndex.push_back(i);
+            varIndex.push(i);
 
         // find (type): trigonometric function.
         else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) {
@@ -18,7 +18,7 @@ string Diff(string term, char var) {
             if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot") {
 
                 uint2 leftPar = 0, rightPar = 0;
-                trigonIndex.push_back(i);
+                trigonIndex.push(i);
                 string tempU = "";
 
                 if (term[i + 3] == '^') { // find: a*sin^n(u)
@@ -35,10 +35,10 @@ string Diff(string term, char var) {
                         tempU += term[i++];
                     }
 
-                    u.push_back(tfunc + tempU);
+                    u.push(tfunc + tempU);
                 }
                 else { // find: a*sin(u) or a*sin^1(u)
-                    trigon.push_back(tfunc);
+                    trigon.push(tfunc);
 
                     i += 4; // skip 'sin(...'
                     while (i < term.length && (term[i] != ')' || leftPar != rightPar)) {
@@ -47,7 +47,7 @@ string Diff(string term, char var) {
 
                         tempU += term[i++];
                     }
-                    u.push_back(tempU);
+                    u.push(tempU);
                 }
             }
         }
