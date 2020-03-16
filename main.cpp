@@ -26,6 +26,13 @@ void classified_var(string);
 
 const double PI = 3.14159;
 
+struct variable{
+    string n;
+    string e;
+    string u;
+    string func;
+};
+
 int main()
 {
     string expr, blank;
@@ -87,7 +94,7 @@ void UserRequest(string expr, uint2 option)
         float x;
         std::cout << "Please enter x value to evaluate : ";
         std::cin >> x;
-        for (unsigned short i = 0; i < term.length; i++)
+        for (unsigned short i = 0; i < terms.length; i++)
         {
             cal_equation += cal(terms[i], x);
         }
@@ -170,7 +177,7 @@ array<string> ReadExpr(string expr)
 
 void classified_var(string term)
 {
-    string n = "", u = "";
+    string n = "", u = "", e = "";
     unsigned int leftPar = 0, rightPar = 0;
 
     for (unsigned int i = 0; i < term.length; i++)
@@ -217,7 +224,29 @@ void classified_var(string term)
                 i++;
             }
         }
+        if (term[i] == 'l')
+        {
+            if(term[i+1] == 'n')    //ln
+            {
+                i++;    //skip n
+                while(isNum(term[i]))
+                {
+                    e += term[i];
+                    i++;
+                }
+            }
+            else if(term[i+2] == 'g')   //log
+            {
+                i += 2; //skip og
+                while(isNum(term[i]))
+                {
+                    e += term[i];
+                    i++;
+                }
+            }
+        }
     }
+    variable value = {n,e,u};
 }
 
 float cal(string term, float x)
