@@ -1,0 +1,30 @@
+#include <iostream>
+#include <cstring>
+
+#include "array.h"
+#include "string.h"
+
+
+int main() {
+    //array<string> temp = {"test#1", "test#2"};
+    //array<int> type = {1, 5};
+    //temp = {"new#1", "new#2", "new#3"};
+    //temp[0] = "edited#1"; // problem
+    
+    string fck = "a";
+    string sht = "b";
+    string sample = "the club isn't the best place to find a lover.";
+    array<string> fary = sample.split(" ");
+    
+    unsigned a = -1;
+    
+    std::cout << sample.includes("club") << std::endl;
+    std::cout << sample.replace(" ", "") << std::endl;
+    std::cout << sample.slice(1, 3) << std::endl;
+    std::cout << fck << std::endl;
+    std::cout << (sht + fck) << std::endl;
+    std::cout << fary[1].toUpperCase() << std::endl;
+    std::cout << (a == -1) << std::endl;
+
+    return 0;
+}
