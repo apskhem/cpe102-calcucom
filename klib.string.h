@@ -52,6 +52,8 @@ typedef class String {
         String concat(const String &);
         /* The method is used to join two or more strings. */
         String concat(const char *);
+        /* The method retunrs the value of c-string. */
+        char * cstring();
         /* The method determines whether a string ends with the characters of a specified string. */
         template<class _type_string>
         bool endsWith(const _type_string, unsigned=-1);
@@ -282,7 +284,9 @@ void String::assign(const char *str) {
 /* class methods: FRIEND */
 template <class number>
 String toCalStr(number n) {
-    return (n == 1 ? "" : std::to_string(int(n)));
+    if (n == 1) return "";
+
+    return std::to_string(n).c_str();
 }
 
 /* class methods: BUILT-IN */
