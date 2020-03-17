@@ -364,10 +364,11 @@ double cal(string term, float x)
     return result;
 }
 
-float implicit_cal(string t, float x, float y) { ; }
+float implicit_cal(string t, float x, float y) {
 
-void ImplicitFunc(string t)
-{
+}
+
+void ImplicitFunc(string t) {
     int choice;
 
     std::cout << "Press: \t[1] to evaluate dy/dx\n\t[2] to evaluate dx/dy\n";
