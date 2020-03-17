@@ -30,7 +30,7 @@ typedef class String {
         operator char*();
         operator const char*();
 
-        char operator[] (const int);
+        char& operator[] (const int);
         String operator+ (const char *);
         String operator+ (const String &);
         String operator= (const char *);
@@ -52,6 +52,8 @@ typedef class String {
         String concat(const String &);
         /* The method is used to join two or more strings. */
         String concat(const char *);
+        /* The method retunrs the value of c-string. */
+        char * cstring();
         /* The method determines whether a string ends with the characters of a specified string. */
         template<class _type_string>
         bool endsWith(const _type_string, unsigned=-1);
@@ -131,7 +133,7 @@ String::~String() {
 /* call operators */
 String::operator char*() {return _proto_;}
 String::operator const char*() {return _proto_;}
-char String::operator[] (const int index) {return _proto_[index];}
+char& String::operator[] (const int index) {return _proto_[index];}
 
 /* processing operators: FRIEND */
 std::ostream& operator<< (std::ostream &out, const String &str) {
@@ -282,7 +284,9 @@ void String::assign(const char *str) {
 /* class methods: FRIEND */
 template <class number>
 String toCalStr(number n) {
-    return (n == 1 ? "" : std::to_string(int(n)));
+    if (n == 1) return "";
+
+    return std::to_string(n).c_str();
 }
 
 /* class methods: BUILT-IN */
@@ -516,7 +520,8 @@ String String::substring(unsigned start, unsigned end) {
 }
 
 String String::toLowerCase() {
-    char *str = _proto_;
+    char str[length+1];
+    str[length] = '\0';
 
     for (unsigned i = 0; i < length; i++) {
         str[i] = _proto_[i];
@@ -533,7 +538,8 @@ String String::toString() {
 }
 
 String String::toUpperCase() {
-    char *str = _proto_;
+    char str[length+1];
+    str[length] = '\0';
 
     for (unsigned i = 0; i < length; i++) {
         str[i] = _proto_[i];

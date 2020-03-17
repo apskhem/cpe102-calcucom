@@ -14,7 +14,7 @@ class Array {
         Array(const Array<_type> &);
         ~Array();
         
-        _type operator[] (const int);
+        _type& operator[] (const int);
         
         Array<_type> operator= (const std::initializer_list<_type>);
         Array<_type> operator= (const Array<_type> &);
@@ -88,7 +88,7 @@ Array<_type>::~Array() {
 
 /* call operators */
 template<class _type>
-_type Array<_type>::operator[] (const int index) {return _proto_[index];}
+_type& Array<_type>::operator[] (const int index) {return _proto_[index];}
 
 /* processing operators: FRIEND */
 
