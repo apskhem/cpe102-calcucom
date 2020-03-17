@@ -6,25 +6,25 @@
 #include "klib.number.h"
 #include "derivative.h"
 
-void UserRequest(string, unsigned);
-array<string> ReadExpr(string);
-void PrintResult(array<string>, unsigned);
-void ImplicitFunc(string);
+/* The method recieves user input from fisrt place */
+void userRequest(string &, unsigned);
+/* The method splits input expression into arrays of string */
+array<string> readExpr(string);
+/* The method calcalate the derivative value of implicit expression */
 double cal(string, float);
-float implicit_cal(string, float, float);
+void implFunc(string);
+float implCal(string, float, float);
 array<string> operation(string);
 
 const double PI = 3.14159;
 
-struct variable
-{
+struct termComponents {
     string n;
     string e;
     string u;
 
-    void classified_var(string term)
-    {
-        variable value = {};
+    void categorizeTerm(string term) {
+        termComponents value = {};
         string n = "", u = "", e = "";
         unsigned int leftPar = 0, rightPar = 0;
 
@@ -99,33 +99,31 @@ struct variable
 };
 
 int main() {
-    string expr, blank;
+    /* parts of user input variables */
+    string expr, numberOfDiff;
+
+    /* parts of program variables */
+    string blank;
     unsigned option;
+    bool isFirstPass = false;
 
     std::cout << "Enter f(x) = ";
     getline(std::cin, expr);
 
-    std::cout << "Press: \t[1] to evaluate the function.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
-    std::cout << "=>\t";
-    std::cin >> option;
-    std::cin.ignore();
-
-    std::cout << "The result is...\n\n";
-
-    switch (option) {
-        case 1: UserRequest(expr, 1); break;
-        case 2: UserRequest(expr, 2); break;
-        case 3: UserRequest(expr, 3); break;
-    }
-
     while (true) {
-        std::cout << "Press 'enter' to continue...";
-        
-        getline(std::cin, blank);
-        std::cout << "------------------------------------------\n";
+        if (isFirstPass) {
+            std::cout << "Press 'enter' to continue...";
+            
+            getline(std::cin, blank);
+            std::cout << "------------------------------------------\n";
+        }
 
-        std::cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n\t";
-        std::cout << "[4] to try a new expression.\n\t[5] to end the program.\n";
+        std::cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
+
+        if (isFirstPass) {
+            std::cout << "\t[4] to try a new expression.\n\t[5] to end the program.\n";
+        }
+        
         std::cout << "=>\t";
         std::cin >> option;
         std::cin.ignore();
@@ -134,85 +132,92 @@ int main() {
         std::cout << "The result is...\n\n";
 
         switch (option) {
-            case 1: UserRequest(expr, 1); break;
-            case 2: UserRequest(expr, 2); break;
-            case 3: UserRequest(expr, 3); break;
-            case 4: UserRequest(expr, 4); break;
+            case 1: userRequest(expr, 1); break;
+            case 2: userRequest(expr, 2); break;
+            case 3: userRequest(expr, 3); break;
+            case 4: {
+                std::cout << "Enter f(x) = ";
+                getline(std::cin, expr);
+                continue;
+            } break;
         }
+
+        if (option == 2) std::cout << "f" + numberOfDiff + "(x)";
+        std::cout << expr << "\n\n";
+
+        isFirstPass = true;
     }
 
     return 0;
 }
 
-void UserRequest(string expr, unsigned option)
+void userRequest(string &expr, unsigned option)
 {
-    array<string> terms = ReadExpr(expr);
+    array<string> terms = readExpr(expr);
 
     // ++ simplify each term
 
     string result = "";
     double cal_equation = 0;
 
-    switch (option)
-    {
-    case 1:
-    { // Eval
-        float x;
-        std::cout << "Please enter x value to evaluate : ";
-        std::cin >> x;
-        for (unsigned short i = 0; i < terms.length; i++)
-        {
-            // if (operation[i] == '+')
-            // {
-            //     classified_var(terms[i]);
-            //     cal_equation += cal(terms[i], x);
-            // }
-            // else if (operation[i] == '-')
-            // {
-            //     classified_var(terms[i]);
-            //     cal_equation -= cal(terms[i], x);
-            // }
+    switch (option) {
+        case 1:
+        { // Eval
+            float x;
+            std::cout << "Please enter x value to evaluate : ";
+            std::cin >> x;
+            for (unsigned short i = 0; i < terms.length; i++)
+            {
+                // if (operation[i] == '+')
+                // {
+                //     categorizeTerm(terms[i]);
+                //     cal_equation += cal(terms[i], x);
+                // }
+                // else if (operation[i] == '-')
+                // {
+                //     categorizeTerm(terms[i]);
+                //     cal_equation -= cal(terms[i], x);
+                // }
+            }
+            std::cout << "f(x) = " << cal_equation;
         }
-        std::cout << "f(x) = " << cal_equation;
-    }
-    break;
-    case 2:
-    { // Diff
-        result = "f'(x) = ";
-        for (unsigned i = 0; i < terms.length; i++)
-        {
-            if (i > 0 && terms[i][0] != '-')
-                result += "+";
+        break;
+        case 2:
+        { // Diff
+            result = "f'(x) = ";
+            for (unsigned i = 0; i < terms.length; i++)
+            {
+                if (i > 0 && terms[i][0] != '-')
+                    result += "+";
 
-            result += Diff(terms[i], 'x');
+                result += Diff(terms[i], 'x');
+            }
         }
-    }
-    break;
-    case 3:
-    { // Impl
-        result = "dy/dx = ";
-    }
-    break;
-    case 4:
-    { //Implicit
-        result = "dx/dy = ";
-    }
-    case 5:
-    { //implicit cal
+        break;
+        case 3:
+        { // Impl
+            result = "dy/dx = ";
+        }
+        break;
+        case 4:
+        { //Implicit
+            result = "dx/dy = ";
+        }
+        case 5:
+        { //implicit cal
 
-        float x, y;
+            float x, y;
 
-        std::cout << "Please enter x and y values : ";
-        std::cin >> x >> y;
-        std::cout << "f(x) = ";
-    }
+            std::cout << "Please enter x and y values : ";
+            std::cin >> x >> y;
+            std::cout << "f(x) = ";
+        }
     }
     // ++ re-arrange the result; cleaner result
-    std::cout << result << "\n\n";
+    expr = result;
 }
 
-array<string> ReadExpr(string expr)
-{
+array<string> readExpr(string expr) {
     array<string> terms;
     array<string> operation;
 
@@ -223,15 +228,13 @@ array<string> ReadExpr(string expr)
 
     // reading equation process
     unsigned splitIndex = 0;
-    for (unsigned i = 0; i < expr.length; i++)
-    {
+    for (unsigned i = 0; i < expr.length; i++) {
         if (expr[i] == '(')
             leftPar++;
         else if (expr[i] == ')')
             rightPar++;
 
-        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar)
-        {
+        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar) {
             terms.push(expr.slice(splitIndex, i));
             splitIndex = i + (expr[i] == '+' ? 1 : 0);
 
@@ -241,8 +244,7 @@ array<string> ReadExpr(string expr)
                 operation.push("-");
         }
 
-        if (i >= expr.length - 1)
-        {
+        if (i >= expr.length - 1) {
             terms.push(expr.slice(splitIndex, expr.length));
         }
     }
@@ -288,8 +290,8 @@ array<string> operation(string term)
 
 double cal(string term, float x)
 {
-    variable var;
-    var.classified_var(term);
+    termComponents var;
+    var.categorizeTerm(term);
     double result = 0, func_sum = 0;
     array<string> term_sep = operation(term);
     double a = parseNum(term);
@@ -365,11 +367,11 @@ double cal(string term, float x)
     return result;
 }
 
-float implicit_cal(string t, float x, float y) {
+float implCal(string t, float x, float y) {
 
 }
 
-void ImplicitFunc(string t) {
+void implFunc(string t) {
     int choice;
 
     std::cout << "Press: \t[1] to evaluate dy/dx\n\t[2] to evaluate dx/dy\n";
@@ -380,13 +382,13 @@ void ImplicitFunc(string t) {
     if (choice == 1)
     { // dy/dx
         string result = "";
-        ReadExpr(t);
+        readExpr(t);
     }
 
     else if (choice == 2)
     { //dx/dy
         string result = "";
-        ReadExpr(t);
+        readExpr(t);
     }
     else
         std::cout << "Please enter 1 or 2";

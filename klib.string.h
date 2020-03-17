@@ -30,7 +30,7 @@ typedef class String {
         operator char*();
         operator const char*();
 
-        char operator[] (const int);
+        char& operator[] (const int);
         String operator+ (const char *);
         String operator+ (const String &);
         String operator= (const char *);
@@ -133,7 +133,7 @@ String::~String() {
 /* call operators */
 String::operator char*() {return _proto_;}
 String::operator const char*() {return _proto_;}
-char String::operator[] (const int index) {return _proto_[index];}
+char& String::operator[] (const int index) {return _proto_[index];}
 
 /* processing operators: FRIEND */
 std::ostream& operator<< (std::ostream &out, const String &str) {
@@ -520,7 +520,8 @@ String String::substring(unsigned start, unsigned end) {
 }
 
 String String::toLowerCase() {
-    char *str = _proto_;
+    char str[length+1];
+    str[length] = '\0';
 
     for (unsigned i = 0; i < length; i++) {
         str[i] = _proto_[i];
@@ -537,7 +538,8 @@ String String::toString() {
 }
 
 String String::toUpperCase() {
-    char *str = _proto_;
+    char str[length+1];
+    str[length] = '\0';
 
     for (unsigned i = 0; i < length; i++) {
         str[i] = _proto_[i];
