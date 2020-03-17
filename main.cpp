@@ -10,7 +10,7 @@ void UserRequest(string, unsigned);
 array<string> ReadExpr(string);
 void PrintResult(array<string>, unsigned);
 void ImplicitFunc(string);
-float cal(string, float);
+double cal(string, float);
 float implicit_cal(string, float, float);
 void classified_var(string);
 array<string> operation(string);
@@ -124,18 +124,16 @@ void UserRequest(string expr, unsigned option)
         result = "dx/dy = ";
     }
     case 5:
-    {
+    {   //implicit cal
 
         float x, y;
 
         std::cout << "Please enter x and y values : ";
         std::cin >> x >> y;
-        std::cout << "f(x) = " << implicit_cal(terms, x, y);
+        std::cout << "f(x) = ";
     }
     }
-
     // ++ re-arrange the result; cleaner result
-
     std::cout << result << "\n\n";
 }
 
@@ -182,7 +180,7 @@ array<string> ReadExpr(string expr)
     return terms;
 }
 
-array<string> operation(string term)
+array<string> operation (string term)
 {
     array<string> term_sep;
     int leftPar = 0, rightPar = 0;
@@ -217,6 +215,7 @@ array<string> operation(string term)
 
 void classified_var(string term)
 {
+    variable value = {};
     string n = "", u = "", e = "";
     unsigned int leftPar = 0, rightPar = 0;
 
@@ -289,18 +288,17 @@ void classified_var(string term)
     variable value = {n, e, u};
 }
 
-float cal(string term, float x)
+double cal(string term, float x)
 {
     double result = 0, func_sum = 0;
     array <string> term_sep = operation(term);
-    float a = parseNum(term);
-    float a_n = parseNum(n);
-    float a_u = parseNum(u);
+    double a = parseNum(term);
+    double a_n = parseNum(n);
+    double a_u = parseNum(u);
 
     for (unsigned short i = 0; i < n.length; i++)
     {
-        if (n[i] == 'x' ){
-            
+        if (n[i] == 'x'){
         }
 
         else if(n[i] == 'x'){
@@ -356,11 +354,11 @@ float cal(string term, float x)
         {
             if (term[i + 1] == 'n')
             { //ln
-                result = a * log()
+                result = a * log(u);
             }
             else
             { //log
-                result = a * log
+                result = a * loge(u);
             }
         }
     }
@@ -370,7 +368,6 @@ float cal(string term, float x)
 
 float implicit_cal(string t, float x, float y)
 {
-
     for (int i = 0; i < t.length; i++)
     {
         if (t[i] == 'x')
@@ -378,7 +375,6 @@ float implicit_cal(string t, float x, float y)
         if (t[i] == 'y')
             t[i] = y;
     }
-    cal_result += "";
 }
 
 void ImplicitFunc(string t)
