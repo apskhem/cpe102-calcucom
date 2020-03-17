@@ -32,7 +32,7 @@ int main()
     do
     {
         std::cout << "Enter f(x) = ";
-        std::getline(std::cin, expr);
+        getline(std::cin, expr);
 
         std::cout << "Press: \t[1] to evaluate the function.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
         std::cout << "=>\t";
@@ -55,7 +55,7 @@ int main()
         }
 
         std::cout << "Press 'enter' to continue...";
-        std::getline(std::cin, blank);
+        getline(std::cin, blank);
         std::cout << "\n";
 
         std::cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n\t";
@@ -159,18 +159,18 @@ array<string> ReadExpr(string expr)
 
         if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar)
         {
-            terms.push_back(expr.slice(splitIndex, i));
+            terms.push(expr.slice(splitIndex, i));
             splitIndex = i + (expr[i] == '+' ? 1 : 0);
 
             if (expr[i] == '+')
-                operation.push_back("+");
+                operation.push("+");
             if (expr[i] == '-')
-                operation.push_back("-");
+                operation.push("-");
         }
 
         if (i >= expr.length - 1)
         {
-            terms.push_back(expr.slice(expr, splitIndex, expr.length));
+            terms.push(expr.slice(splitIndex, expr.length));
         }
     }
 

@@ -1,9 +1,9 @@
 class Mathf {
     friend double powInt(double, const int);
-}
+};
 
 double powInt(double base, const int n) {
-    double inverse = 1;
+    double result = base, inverse = 1;
     if (n == 0) {
         return 1;
     }
@@ -12,13 +12,15 @@ double powInt(double base, const int n) {
     }
     else if (n > 0) {
         for (int i = 1; i < n; i++) {
-            base *= base;
+            result *= base;
         }
+        return result;
     }
     else if (n < 0) {
         for (int i = 0; i > n; i--) {
             inverse /= base;
         }
+        return inverse;
     }
 }
 
@@ -47,13 +49,13 @@ double parseNum(string t) {
     
     if (parseText == "") return 0;
 
-    int parseResult = 0;
-    for (unsigned i = parseText.length-1; i >= 0; i--) {
-        parseResult = parseText[i] * powInt(10, parseText.length-1-i);
+    double parseResult = 0;
+    for (int i = parseText.length-1; i >= 0; i--) {
+        parseResult += (parseText[i]-48) * powInt(10, parseText.length-1-i);
     }
     
     if (!decimalPlace)
-        return parseResult;
+        return parseResult * isMinus;
     else
         return parseResult / powInt(10, parseText.length - decimalPlace) * isMinus;
 }

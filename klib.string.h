@@ -23,6 +23,7 @@ typedef class String {
         
         String();
         String(const char *str);
+        String(const char);
         String(const String &str);
         ~String();
         
@@ -108,6 +109,15 @@ String::String() {
 
 String::String(const char *str) {
     this->assign(str);
+}
+
+String::String(const char c) {
+    length = 1;
+
+    _proto_ = new char[2];
+
+    _proto_[0] = c;
+    _proto_[1] = '\0';
 }
 
 String::String(const String &str) {

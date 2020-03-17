@@ -4,7 +4,7 @@
 string Diff(string term, char var) {
     array<string> u, trigon;
     array<unsigned> trigonIndex, varIndex;
-    unit2 outerPair = 0; // for (...)(...)
+    unsigned outerPair = 0; // for (...)(...)
 
     for (unsigned i = 0; i < term.length; i++) {
         // find (type): position and #of x
