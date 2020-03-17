@@ -329,8 +329,9 @@ float cal(string term, float x)
             }
         }
     }
+    return result;
 }
-return result;
+
 
 float implicit_cal(string t, float x, float y)
 {
