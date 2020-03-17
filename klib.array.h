@@ -19,29 +19,38 @@ class Array {
         Array<_type> operator= (const std::initializer_list<_type>);
         Array<_type> operator= (const Array<_type> &);
         
-        _type concat(const std::initializer_list<_type>);
-        _type concat(const Array<_type> &);
-        void copyWithin(unsigned, unsigned, unsigned);
-        void entries();
-        void every();
-        void fill();
-        void filter();
-        void find();
-        void findIndex();
-        void includes();
-        void indexOf();
-        void isArray();
-        void join();
-        void keys();
-        void lastIndexOf();
-        void map();
-        void reduce();
-        void reduceRight();
-        void reverse();
-        void slice();
-        void sort();
-        void toString();
-        void values();
+        /* The method is used to join two or more arrays. */
+        Array<_type> concat(const std::initializer_list<_type>);
+        /* The method is used to join two or more arrays. */
+        Array<_type> concat(const Array<_type> &);
+        /* The method copies array elements to another position in the array, overwriting the existing values. */
+        /* Note: this method overwrites the original array. */
+        Array<_type> copyWithin(unsigned, const unsigned=0, unsigned=-1);
+        /* The method fills the specified elements in an array with a static value. */
+        Array<_type> fill(const _type, const unsigned=0, unsigned=-1);
+        /* The method determines whether an array contains a specified element. */
+        bool includes(const _type, const unsigned=0);
+        /* The method searches the array for the specified item, and returns its position. */
+        int indexOf(const _type, const unsigned=0);
+        /* The method returns the array as a string. */
+        char* join(const char *="'");
+        /* The method returns an Array Iterator object with the keys of an array. */
+        Array<unsigned> keys();
+        /* The method searches the array for the specified item, and returns its position. */
+        int lastIndexOf(const char *, unsigned=-1);
+        /* The method reverses the order of the elements in an array. */
+        Array<_type> reverse();
+        /* The method returns the selected elements in an array, as a new array object. */
+        Array<_type> slice(const unsigned=0, unsigned=-1);
+        /* The method sorts the items of an array. */
+        Array<_type> sort();
+        /* The method adds/removes items to/from an array, and returns the removed item(s). */
+        /* Note: This method changes the original array. */
+        void splice(const unsigned, const unsigned=0, const std::initializer_list<_type>);
+        /* The method returns a string with all the array values, separated by commas. */
+        char* toString();
+        /* method returns the array. */
+        Array<_type> values();
         
         unsigned push(const std::initializer_list<_type>);
         unsigned push(const Array<_type> &);

@@ -48,6 +48,8 @@ typedef class String {
         char charAt(const unsigned);
         /* The method returns the Unicode of the character at the specified index in a string. */
         int charCodeAt(const unsigned);
+        /* The method returns a non-negative integer that is the Unicode code point value. */
+        unsigned codePointAt(const unsigned);
         /* The method is used to join two or more strings. */
         template<class _type_string>
         String concat(const _type_string);
@@ -70,8 +72,19 @@ typedef class String {
         int localeCompare(const _type_string);
         /* The method searches a string for a match against a regular expression, and returns the matches, as an Array object. */
         String match();
+        /* method pads the current string with a given string (repeated, if needed) so that the resulting string reaches a given length. */
+        String matchAll();
+        /* The method returns the Unicode Normalization Form of the string. */
+        template<class _type_string>
+        String normalize(const _type_string);
+        /* The method pads the current string with another string (multiple times, if needed) until the resulting string reaches the given length */
+        template<class _type_string>
+        String padEnd(const unsigned, const _type_string);
+        /* The method pads the current string with another string (multiple times, if needed) until the resulting string reaches the given length */
+        template<class _type_string>
+        String padStart(const unsigned, const _type_string);
         /* The method returns a new string with a specified number of copies of the string it was called on. */
-        int repeat();
+        String repeat(const unsigned);
         /* The method searches a string for a specified value, or a regular expression, and returns a new string where the specified values are replaced. */
         template<class _type_string1, class _type_string2>
         String replace(const _type_string1, const _type_string2);
@@ -98,6 +111,14 @@ typedef class String {
         String toUpperCase();
         /* The method removes whitespace from both sides of a string. */
         String trim();
+        /* The method removes whitespace from the beginning of the string. */
+        String trimStart();
+        /* The method removes whitespace from the beginning of the string. */
+        String trimLeft();
+        /* The method removes whitespace from the end of the string. */
+        String trimEnd();
+        /* The method removes whitespace from the end of the string. */
+        String trimRight();
         /* The method returns the primitive value of a String object. */
         String valueOf();
 } string;
