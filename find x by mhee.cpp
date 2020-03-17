@@ -1,6 +1,10 @@
 #include<iostream>
 #include<cmath>
 #include<string>
+#include<windows.h>
+
+
+
 
 using namespace std;
 
@@ -19,6 +23,18 @@ int main(){
 	x2=xn(a,b,c);
 	
 	cout<<" x = "<<x1<<","<<x2<<endl;
+	
+	system("pause");
+	system("cls");
+	
+	cout<<" _______   ___     ___        ____         ___     ___    ___   ___     "<<endl;
+	cout<<"[__   __] [   |   [   ]      [    ]       [   ]   [   ]  [   ] /   ]    "<<endl;
+	cout<<"   [ ]    [   |___[   ]     [  []  ]      [    ]  [   ]  [   ]/   ]     "<<endl;
+	cout<<"   [ ]    [           ]    [  [__]  ]     [     ] [   ]  [      ]      "<<endl;
+	cout<<"   [ ]    [    ___    ]   [  _____   ]    [   ]] ][   ]  [      ]      "<<endl;
+	cout<<"   [ ]    [   ]   [   ]  [  ]      [  ]   [   ] ]     ]  [   ][   ]     "<<endl;
+	cout<<"   [_]    [___]   [___] [__]        [__]  [___]  ]____]  [___] [___]    "<<endl;
+	
 	
 }
 
