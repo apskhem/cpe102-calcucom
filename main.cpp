@@ -161,16 +161,16 @@ void UserRequest(string expr, unsigned option)
         std::cin >> x;
         for (unsigned short i = 0; i < terms.length; i++)
         {
-            if (operation[i] == "+")
-            {
-                classified_var(terms[i]);
-                cal_equation += cal(terms[i], x);
-            }
-            else if (operation[i] == "-")
-            {
-                classified_var(terms[i]);
-                cal_equation -= cal(terms[i], x);
-            }
+            // if (operation[i] == '+')
+            // {
+            //     classified_var(terms[i]);
+            //     cal_equation += cal(terms[i], x);
+            // }
+            // else if (operation[i] == '-')
+            // {
+            //     classified_var(terms[i]);
+            //     cal_equation -= cal(terms[i], x);
+            // }
         }
         std::cout << "f(x) = " << cal_equation;
     }
@@ -287,65 +287,66 @@ array<string> operation(string term)
 
 double cal(string term, float x)
 {
-    variable.clssified_var(term);
+    variable var;
+    var.classified_var(term);
     double result = 0, func_sum = 0;
     array<string> term_sep = operation(term);
     double a = parseNum(term);
-    double a_n = parseNum(n);
-    double a_u = parseNum(u);
+    double a_n = parseNum(var.n);
+    double a_u = parseNum(var.u);
 
-    for (unsigned short i = 0; i < n.length; i++)
+    for (unsigned short i = 0; i < var.n.length; i++)
     {
-        if (n[i] == 'x')
+        if (var.n[i] == 'x')
         {
         }
 
-        else if (n[i] == 'x')
+        else if (var.n[i] == 'x')
         {
-            n[i] = a_n * x;
+            // var.n[i] = a_n * x; // later-error
         }
     }
 
-    for (unsigned short i = 0; i < u.length; i++)
+    for (unsigned short i = 0; i < var.u.length; i++)
     {
 
-        if (u[i] == 'x')
+        if (var.u[i] == 'x')
         {
-            u[i] = a_u * x
+            //var.u[i] = a_u * x // later-error
         }
     }
 
     for (unsigned short i = 0; i < term.length; i++)
     {
-        if (term[i] == 'x')
-            term[i] = x;
-
+        if (term[i] == 'x') {
+            // term[i] = x; // later-error
+        }
         else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) //trigon
         {
             string tfunc = term.slice(i, i + 3);
             if (tfunc == "sin")
             {
-                result = a * sin(u * 180 / PI);
+                result = a * sin(parseNum(var.u) * 180 / PI);
             }
             else if (tfunc == "cos")
             {
-                result = a * cos(u * 180 / PI);
+                result = a * cos(parseNum(var.u) * 180 / PI);
             }
             else if (tfunc == "tan")
             {
-                result = a * tan(u * 180 / PI);
+                result = a * tan(parseNum(var.u) * 180 / PI);
             }
             else if (tfunc == "cot")
             {
-                result = a / tan(u * 180 / PI);
+                result = a / tan(parseNum(var.u) * 180 / PI);
             }
             else if (tfunc == "sec")
             {
-                result = a / cos(u * 180 / PI);
+                result = a / cos(parseNum(var.u) * 180 / PI);
             }
             else if (tfunc == "csc")
             {
-                result = a / sin(u * 180 / PI);
+                result = a / sin(parseNum(var.u) * 180 / PI);
             }
         }
         else if (term[i] == 'l')
