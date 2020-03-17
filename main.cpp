@@ -98,39 +98,31 @@ struct variable
     }
 };
 
-int main()
-{
+int main() {
     string expr, blank;
     unsigned option;
 
-    do
-    {
-        std::cout << "Enter f(x) = ";
-        getline(std::cin, expr);
+    std::cout << "Enter f(x) = ";
+    getline(std::cin, expr);
 
-        std::cout << "Press: \t[1] to evaluate the function.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
-        std::cout << "=>\t";
-        std::cin >> option;
-        std::cin.ignore();
+    std::cout << "Press: \t[1] to evaluate the function.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
+    std::cout << "=>\t";
+    std::cin >> option;
+    std::cin.ignore();
 
-        std::cout << "The result is...\n\n";
+    std::cout << "The result is...\n\n";
 
-        switch (option)
-        {
-        case 1:
-            UserRequest(expr, 1);
-            break;
-        case 2:
-            UserRequest(expr, 2);
-            break;
-        case 3:
-            UserRequest(expr, 3);
-            break;
-        }
+    switch (option) {
+        case 1: UserRequest(expr, 1); break;
+        case 2: UserRequest(expr, 2); break;
+        case 3: UserRequest(expr, 3); break;
+    }
 
+    while (true) {
         std::cout << "Press 'enter' to continue...";
+        
         getline(std::cin, blank);
-        std::cout << "\n";
+        std::cout << "------------------------------------------\n";
 
         std::cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n\t";
         std::cout << "[4] to try a new expression.\n\t[5] to end the program.\n";
@@ -138,7 +130,16 @@ int main()
         std::cin >> option;
         std::cin.ignore();
 
-    } while (option != 5);
+        if (option == 5) break;
+        std::cout << "The result is...\n\n";
+
+        switch (option) {
+            case 1: UserRequest(expr, 1); break;
+            case 2: UserRequest(expr, 2); break;
+            case 3: UserRequest(expr, 3); break;
+            case 4: UserRequest(expr, 4); break;
+        }
+    }
 
     return 0;
 }
