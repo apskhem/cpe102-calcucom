@@ -5,7 +5,7 @@
 #include <string> // for iostream
 
 typedef class String {
-    friend String operator+ (const char *, const String &);
+    friend String operator+ (const char *, String &);
     friend std::ostream& operator<< (std::ostream &, const String &);
     friend std::istream& operator>> (std::istream &, String &);
     friend std::istream& getline(std::istream &, String &);
@@ -33,11 +33,11 @@ typedef class String {
         char& operator[] (const int);
         String operator+ (const char *);
         String operator+ (const String &);
-        String operator= (const char *);
-        String operator= (const String &);
         String operator+= (const char *);
         String operator+= (const char);
         String operator+= (const String &);
+        String operator= (const char *);
+        String operator= (const String &);
         bool operator== (const char *);
         bool operator== (const String &);
         bool operator!= (const char *);
@@ -49,9 +49,8 @@ typedef class String {
         /* The method returns the Unicode of the character at the specified index in a string. */
         int charCodeAt(const unsigned);
         /* The method is used to join two or more strings. */
-        String concat(const String &);
-        /* The method is used to join two or more strings. */
-        String concat(const char *);
+        template<class _type_string>
+        String concat(const _type_string);
         /* The method retunrs the value of c-string. */
         char * cstring();
         /* The method determines whether a string ends with the characters of a specified string. */
@@ -160,17 +159,105 @@ std::istream& getline(std::istream &in, String &str) {
 }
 
 /* processing operators: OVERLOAD */
-String operator+ (const char *lstr, const String &rstr) {
-    String t(lstr);
-    return t.concat(rstr);
+String operator+ (const char *lstr, String &rstr) {
+    unsigned llength = strlen(lstr);
+
+    char result[llength+rstr.length+1];
+    result[llength+rstr.length] = '\0';
+
+    for (unsigned i = 0; i < llength; i++)
+        result[i] = lstr[i];
+    for (unsigned i = 0; i < rstr.length; i++)
+        result[rstr.length+i] = rstr._proto_[i];
+
+    rstr._proto_ = result;
+    rstr.length += llength;
+
+    return result;
 }
 
 String String::operator+ (const char *str) {
-    return this->concat(str);
+    unsigned inlength = strlen(str);
+
+    char *old = _proto_;
+    _proto_ = new char[length+inlength+1];
+    _proto_[length+inlength] = '\0';
+
+    for (unsigned i = 0; i < length; i++)
+        _proto_[i] = old[i];
+    for (unsigned i = 0; i < inlength; i++)
+        _proto_[length+i] = str[i];
+
+    delete[] old;
+    length += inlength;
+    
+    return _proto_;
 }
 
 String String::operator+ (const String &str) {
-    return this->concat(str);
+    char *old = _proto_;
+    _proto_ = new char[length+str.length+1];
+    _proto_[length+str.length] = '\0';
+
+    for (unsigned i = 0; i < length; i++)
+        _proto_[i] = old[i];
+    for (unsigned i = 0; i < str.length; i++)
+        _proto_[length+i] = str._proto_[i];
+
+    delete[] old;
+    length += str.length;
+    
+    return _proto_;
+}
+
+/* ### */
+
+String String::operator+= (const char *str) {
+    unsigned inlength = strlen(str);
+
+    char *old = _proto_;
+    _proto_ = new char[length+inlength+1];
+    _proto_[length+inlength] = '\0';
+
+    for (unsigned i = 0; i < length; i++)
+        _proto_[i] = old[i];
+    for (unsigned i = 0; i < inlength; i++)
+        _proto_[length+i] = str[i];
+
+    delete[] old;
+    length += inlength;
+    
+    return _proto_;
+}
+
+String String::operator+= (const char chr) {
+    char *old = _proto_;
+    _proto_ = new char[(++length)+1];
+    _proto_[length-1] = chr;
+    _proto_[length] = '\0';
+    
+    for (unsigned i = 0; i < length-1; i++)
+        _proto_[i] = old[i];
+    
+    delete[] old;
+
+    return _proto_;
+}
+
+String String::operator+= (const String &str) {
+    char *old = _proto_;
+    _proto_ = new char[length+str.length+1];
+    _proto_[length+str.length] = '\0';
+
+    for (unsigned i = 0; i < length; i++)
+        _proto_[i] = old[i];
+    for (unsigned i = 0; i < str.length; i++)
+        _proto_[length+i] = str._proto_[i];
+
+    delete[] old;
+    length += str.length;
+    
+    return _proto_;
 }
 
 /* ### */
@@ -183,39 +270,6 @@ String String::operator= (const char *str) {
 String String::operator= (const String &str) {
     this->assign(str._proto_);
     return *this;
-}
-
-/* ### */
-
-String String::operator+= (const char *str) {
-    string newT = this->concat(str);
-
-    this->assign((char*) newT);
-    
-    return newT;
-}
-
-String String::operator+= (const char chr) {
-    char *old = _proto_;
-    _proto_ = new char[(++length)+1];
-    
-    for (unsigned i = 0; i < length-1; i++) {
-        _proto_[i] = old[i];
-    }
-
-    _proto_[length-1] = chr;
-    _proto_[length] = '\0';
-    delete[] old;
-
-    return _proto_;
-}
-
-String String::operator+= (const String &str) {
-    string newT = this->concat(str);
-    
-    this->assign((char*) newT);
-    
-    return newT;
 }
 
 /* ### */
@@ -285,8 +339,9 @@ void String::assign(const char *str) {
 template <class number>
 String toCalStr(number n) {
     if (n == 1) return "";
+    if (n == -1) return "-";
 
-    return std::to_string(n).c_str();
+    return std::to_string(int(n)).c_str();
 }
 
 /* class methods: BUILT-IN */
@@ -298,29 +353,19 @@ int String::charCodeAt(const unsigned index) {
     return _proto_[index];
 }
 
-String String::concat(const String &t) {
-    char newT[length + t.length];
+template <class _type_string>
+String String::concat(const _type_string string1) {
+    string str(string1);
+
+    char result[length+str.length+1];
+    result[length+str.length] = '\0';
     
     for (unsigned i = 0; i < length; i++)
-        newT[i] = _proto_[i];
-    for (unsigned i = 0; i < t.length; i++)
-        newT[length + i] = t._proto_[i];
+        result[i] = _proto_[i];
+    for (unsigned i = 0; i < str.length; i++)
+        result[length + i] = str._proto_[i];
 
-    return newT;
-}
-
-String String::concat(const char *t) {
-    unsigned inLength = strlen(t);
-    char newT[length+inLength+1];
-    
-    for (unsigned i = 0; i < length; i++)
-        newT[i] = _proto_[i];
-    for (unsigned i = 0; i < inLength; i++)
-        newT[length + i] = t[i];
-    
-    newT[length+inLength] = '\0';
-
-    return newT;
+    return result;
 }
 
 template <class _type_string>

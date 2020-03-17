@@ -7,7 +7,7 @@
 #include "derivative.h"
 
 /* The method recieves user input from fisrt place */
-void userRequest(string &, unsigned);
+void userRequest(string &, string &, unsigned);
 /* The method splits input expression into arrays of string */
 array<string> readExpr(string);
 /* The method calcalate the derivative value of implicit expression */
@@ -100,7 +100,7 @@ struct termComponents {
 
 int main() {
     /* parts of user input variables */
-    string expr, numberOfDiff;
+    string expr = "", numberOfDiff = "";
 
     /* parts of program variables */
     string blank;
@@ -132,9 +132,9 @@ int main() {
         std::cout << "The result is...\n\n";
 
         switch (option) {
-            case 1: userRequest(expr, 1); break;
-            case 2: userRequest(expr, 2); break;
-            case 3: userRequest(expr, 3); break;
+            case 1: userRequest(expr, numberOfDiff, 1); break;
+            case 2: userRequest(expr, numberOfDiff, 2); break;
+            case 3: userRequest(expr, numberOfDiff, 3); break;
             case 4: {
                 std::cout << "Enter f(x) = ";
                 getline(std::cin, expr);
@@ -142,7 +142,7 @@ int main() {
             } break;
         }
 
-        if (option == 2) std::cout << "f" + numberOfDiff + "(x)";
+        if (option == 2) std::cout << "f" << numberOfDiff << "(x) = ";
         std::cout << expr << "\n\n";
 
         isFirstPass = true;
@@ -151,7 +151,7 @@ int main() {
     return 0;
 }
 
-void userRequest(string &expr, unsigned option)
+void userRequest(string &expr, string &numberOfDiff, unsigned option)
 {
     array<string> terms = readExpr(expr);
 
@@ -182,11 +182,9 @@ void userRequest(string &expr, unsigned option)
             std::cout << "f(x) = " << cal_equation;
         }
         break;
-        case 2:
-        { // Diff
-            result = "f'(x) = ";
-            for (unsigned i = 0; i < terms.length; i++)
-            {
+        case 2:{ // Diff   
+            numberOfDiff += "'";
+            for (unsigned i = 0; i < terms.length; i++){
                 if (i > 0 && terms[i][0] != '-')
                     result += "+";
 
