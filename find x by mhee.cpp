@@ -41,7 +41,7 @@ int main(){
 double xp(double A,double B,double C){
 	double ans1;
 	double t1 = sqrt(pow(B,2)-(4*A*C));
-	ans1=((-1*B)+t1)/2;
+	ans1=((-1*B)+t1)/(2*A);
 	
 	return ans1;
 }
@@ -49,7 +49,7 @@ double xp(double A,double B,double C){
 double xn(double D,double E,double F){
 	double ans2;
 	double t1 = sqrt(pow(E,2)-(4*D*F));
-	ans2=((-1*E)-t1)/2;
+	ans2=((-1*E)-t1)/(2*D);
 	
 	return ans2;
 }
