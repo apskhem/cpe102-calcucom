@@ -28,9 +28,7 @@ typedef class String {
         
         operator char*();
         operator const char*();
-        
-        char* operator*();
-        int* operator&();
+
         char operator[] (const int);
         String operator+ (const char *);
         String operator+ (const String &);
@@ -123,8 +121,6 @@ String::~String() {
 /* call operators */
 String::operator char*() {return _proto_;}
 String::operator const char*() {return _proto_;}
-char * String::operator*() {return _proto_;}
-int * String::operator&() {return (int*)&_proto_[0];}
 char String::operator[] (const int index) {return _proto_[index];}
 
 /* processing operators: FRIEND */
@@ -319,7 +315,7 @@ bool String::endsWith(const _type_string searchvalue, unsigned atlength) {
     string t(searchvalue);
 
     unsigned j = length-1;
-    for (unsigned i = j; i >= 0; i++) {
+    for (unsigned i = j; i >= 0; i--) {
         if (t[j] == _proto_[i]) {
             if (++j == t.length)
                 return true;
@@ -373,7 +369,7 @@ int String::lastIndexOf(const _type_string searchvalue, unsigned start) {
     string t(searchvalue);
 
     unsigned j = length-1;
-    for (unsigned i = j; i >= 0; i++) {
+    for (unsigned i = j; i >= 0; i--) {
         if (t[j] == _proto_[i]) {
             if (++j == t.length)
                 return i;
@@ -510,8 +506,7 @@ String String::substring(unsigned start, unsigned end) {
 }
 
 String String::toLowerCase() {
-    char str[length+1];
-    str[length] = '\0';
+    char *str = _proto_;
 
     for (unsigned i = 0; i < length; i++) {
         str[i] = _proto_[i];
@@ -528,8 +523,7 @@ String String::toString() {
 }
 
 String String::toUpperCase() {
-    char str[length+1];
-    str[length] = '\0';
+    char *str = _proto_;
 
     for (unsigned i = 0; i < length; i++) {
         str[i] = _proto_[i];
@@ -550,7 +544,7 @@ String String::trim() {
         }
     }
 
-    for (unsigned i = length-1; i >= 0; i++) {
+    for (unsigned i = length-1; i >= 0; i--) {
         if (_proto_[i] != ' ') {
             indexRight = i+1;
             break;

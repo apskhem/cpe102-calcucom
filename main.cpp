@@ -1,24 +1,14 @@
 #include <iostream>
 #include <cmath>
 
-typedef unsigned short uint2;
-typedef unsigned int uint4;
-typedef unsigned long long uint8;
-typedef short int2;
-typedef int int4;
-typedef long long int8;
-typedef float float4;
-typedef double float8;
-typedef long double float12;
-
+#include "klib.array.h"
 #include "klib.string.h"
 #include "klib.number.h"
-#include "klib.array.h"
 #include "derivative.h"
 
-void UserRequest(string, uint2);
+void UserRequest(string, unsigned);
 array<string> ReadExpr(string);
-void PrintResult(array<string>, uint2);
+void PrintResult(array<string>, unsigned);
 void ImplicitFunc(string);
 float cal(string, float);
 float implicit_cal(string, float, float);
@@ -37,7 +27,7 @@ struct variable
 int main()
 {
     string expr, blank;
-    uint2 option;
+    unsigned option;
 
     do
     {
@@ -79,7 +69,7 @@ int main()
     return 0;
 }
 
-void UserRequest(string expr, uint2 option)
+void UserRequest(string expr, unsigned option)
 {
     array<string> terms = ReadExpr(expr);
 
@@ -114,7 +104,7 @@ void UserRequest(string expr, uint2 option)
     case 2:
     { // Diff
         result = "f'(x) = ";
-        for (uint2 i = 0; i < terms.length; i++)
+        for (unsigned i = 0; i < terms.length; i++)
         {
             if (i > 0 && terms[i][0] != '-')
                 result += "+";
@@ -153,14 +143,14 @@ array<string> ReadExpr(string expr)
     array<string> terms;
     array<string> operation;
 
-    uint2 leftPar = 0, rightPar = 0;
+    unsigned leftPar = 0, rightPar = 0;
 
     // pre-reading process
     expr = expr.replace(" ", "");
 
     // reading equation process
-    uint2 splitIndex = 0;
-    for (uint2 i = 0; i < expr.length; i++)
+    unsigned splitIndex = 0;
+    for (unsigned i = 0; i < expr.length; i++)
     {
         if (expr[i] == '(')
             leftPar++;
