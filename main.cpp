@@ -12,7 +12,6 @@ void PrintResult(array<string>, unsigned);
 void ImplicitFunc(string);
 double cal(string, float);
 float implicit_cal(string, float, float);
-void classified_var(string);
 array<string> operation(string);
 
 const double PI = 3.14159;
@@ -22,7 +21,80 @@ struct variable
     string n;
     string e;
     string u;
-    string func;
+    
+    void classified_var(string term){
+        variable value = {};
+        string n = "", u = "", e = "";
+        unsigned int leftPar = 0, rightPar = 0;
+
+        for (unsigned int i = 0; i < term.length; i++)
+        {
+            if (term[i] == '^') //x^
+            {
+                if (term[i + 1] != '(') //x^328
+                {
+                    i++; //skip ^
+                    while (isNum(term[i]))
+                    {
+                        n += term[i];
+                        i++;
+                    }
+                }
+                else //x^(328)
+                {
+                    i += 2; //skip ^(
+                    leftPar++;
+                    while (leftPar != rightPar)
+                    {
+                        if (term[i] == '(')
+                            leftPar++;
+                        if (term[i] == ')')
+                            rightPar++;
+
+                        n += term[i];
+                        i++;
+                    }
+                }
+            }
+            else if (term[i] == '(')
+            {
+                i++; //skip (
+                leftPar++;
+                while (leftPar != rightPar)
+                {
+                    if (term[i] == '(')
+                        leftPar++;
+                    if (term[i] == ')')
+                        rightPar++;
+
+                    u += term[i];
+                    i++;
+                }
+            }
+            if (term[i] == 'l')
+            {
+                if (term[i + 1] == 'n') //ln
+                {
+                    i++; //skip n
+                    while (isNum(term[i]))
+                    {
+                        e += term[i];
+                        i++;
+                    }
+                }
+                else if (term[i + 2] == 'g') //log
+                {
+                    i += 2; //skip og
+                    while (isNum(term[i]))
+                    {
+                        e += term[i];
+                        i++;
+                    }
+                }
+            }
+        }
+        value = {n,e,u};
+    }
 };
 
 int main()
@@ -212,86 +284,9 @@ array<string> operation (string term)
     return term_sep;
 }
 
-
-void classified_var(string term)
-{
-    variable value = {};
-    string n = "", u = "", e = "";
-    unsigned int leftPar = 0, rightPar = 0;
-
-    for (unsigned int i = 0; i < term.length; i++)
-    {
-        if (term[i] == '^') //x^
-        {
-            if (term[i + 1] != '(') //x^328
-            {
-                i++; //skip ^
-                while (isNum(term[i]))
-                {
-                    n += term[i];
-                    i++;
-                }
-            }
-            else //x^(328)
-            {
-                i += 2; //skip ^(
-                leftPar++;
-                while (leftPar != rightPar)
-                {
-                    if (term[i] == '(')
-                        leftPar++;
-                    if (term[i] == ')')
-                        rightPar++;
-
-                    n += term[i];
-                    i++;
-                }
-            }
-        }
-        else if (term[i] == '(')
-        {
-            i++; //skip (
-            leftPar++;
-            while (leftPar != rightPar)
-            {
-                if (term[i] == '(')
-                    leftPar++;
-                if (term[i] == ')')
-                    rightPar++;
-
-                u += term[i];
-                i++;
-            }
-        }
-        if (term[i] == 'l')
-        {
-            if (term[i + 1] == 'n') //ln
-            {
-                i++; //skip n
-                while (isNum(term[i]))
-                {
-                    e += term[i];
-                    i++;
-                }
-            }
-            else if (term[i + 2] == 'g') //log
-            {
-                i += 2; //skip og
-                while (isNum(term[i]))
-                {
-                    e += term[i];
-                    i++;
-                }
-            }
-        }
-    }
-    variable value = {n, e, u};
-}
-
 double cal(string term, float x)
 {
-    int n = 0;
-    string u;
+    variable.clssified_var(term);
     double result = 0, func_sum = 0;
     array <string> term_sep = operation(term);
     double a = parseNum(term);
@@ -356,11 +351,11 @@ double cal(string term, float x)
         {
             if (term[i + 1] == 'n')
             { //ln
-                result = a * log(u);
+                ;
             }
             else
             { //log
-                result = a * loge(u);
+                ;
             }
         }
     }
@@ -368,16 +363,8 @@ double cal(string term, float x)
 }
 
 
-float implicit_cal(string t, float x, float y)
-{
-    for (int i = 0; i < t.length; i++)
-    {
-        if (t[i] == 'x')
-            t[i] = x;
-        if (t[i] == 'y')
-            t[i] = y;
-    }
-}
+float implicit_cal(string t, float x, float y){;}
+
 
 void ImplicitFunc(string t)
 {
