@@ -13,6 +13,7 @@ void ImplicitFunc(string);
 float cal(string, float);
 float implicit_cal(string, float, float);
 void classified_var(string);
+array<string> operation(string);
 
 const double PI = 3.14159;
 
@@ -180,6 +181,40 @@ array<string> ReadExpr(string expr)
 
     return terms;
 }
+
+array<string> operation(string term)
+{
+    array<string> term_sep;
+    int leftPar = 0, rightPar = 0;
+
+    for (int i = 0; i < term.length; i++)
+    {
+        if (term[i] == '(')     // (x+2)
+        {
+            i++;            //skip (
+            leftPar++;
+            while (leftPar != rightPar)
+            {
+                if (term[i] == '+')
+                    term_sep.push("+");
+                if (term[i] == '-')
+                    term_sep.push("+");
+                if (term[i] == '*' || term[i] == '(')
+                {
+                    term_sep.push("*");
+                    leftPar++;
+                }
+                if (term[i] == '/')
+                    term_sep.push("/");
+                if (term[i] == ')')
+                    rightPar++;
+            }
+            return term_sep;
+        }
+        else 
+    }
+}
+
 
 void classified_var(string term)
 {
