@@ -257,6 +257,8 @@ void classified_var(string term)
 
 float cal(string term, float x)
 {
+    int n = 0;
+    string u;
     double result = 0, func_sum = 0;
     float a = parseNum(term);
     float a_n = parseNum(n);
@@ -285,7 +287,7 @@ float cal(string term, float x)
         if (term[i] == 'x')
             term[i] = x;
         else if (term[i] == '+')
-            result = ;
+            result = 0;
         else if (term[i] == '-')
             else if (term[i] == '*') else if (term[i] == '/')
 
@@ -343,7 +345,6 @@ float implicit_cal(string t, float x, float y)
         if (t[i] == 'y')
             t[i] = y;
     }
-    cal_result += "";
 }
 
 void ImplicitFunc(string t)
