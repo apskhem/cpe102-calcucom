@@ -3,10 +3,10 @@
 
 string Diff(string term, char var) {
     array<string> u, trigon;
-    array<unsigned> trigonIndex, varIndex;
-    unsigned outerPair = 0; // for (...)(...)
+    array<uint2> trigonIndex, varIndex;
+    unit2 outerPair = 0; // for (...)(...)
 
-    for (unsigned i = 0; i < term.length; i++) {
+    for (uint2 i = 0; i < term.length; i++) {
         // find (type): position and #of x
         if (term[i] == var)
             varIndex.push(i);
@@ -17,7 +17,7 @@ string Diff(string term, char var) {
 
             if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot") {
 
-                unsigned leftPar = 0, rightPar = 0;
+                uint2 leftPar = 0, rightPar = 0;
                 trigonIndex.push(i);
                 string tempU = "";
 
@@ -76,13 +76,13 @@ string Diff(string term, char var) {
     if (u.length == 0) {
         switch (term[varIndex[0] + 1]) {
             case '^': { // CASE: ax^n
-                unsigned tpos = varIndex[0] + (term[varIndex[0] + 2] == '(' ? 3 : 2);
+                uint2 tpos = varIndex[0] + (term[varIndex[0] + 2] == '(' ? 3 : 2);
 
                 a = varIndex[0] == 0 ? 1 : parseNum(term.slice(0, varIndex[0]));
                 n = parseNum(term.slice(tpos, term.length));
 
                 string strN = "";
-                for (unsigned i = tpos; i < term.length && isNum(term[i]); i++) {
+                for (uint2 i = tpos; i < term.length && isNum(term[i]); i++) {
                     strN += term[i];
                 }
 
@@ -126,7 +126,7 @@ string Diff(string term, char var) {
             bool hasSign = false;
             bool hasXorU = false;
 
-            for (unsigned i = 0; i < chainDiff.length; i++) {
+            for (uint2 i = 0; i < chainDiff.length; i++) {
                 if (chainDiff[i] == '+' || chainDiff[i] == '-')
                     hasSign = true;
                 else if (chainDiff[i] == var)
@@ -145,8 +145,8 @@ string Diff(string term, char var) {
             n = parseNum(term.slice(trigonIndex[0] + 4, term.length));
             string chainDiff = Diff(u[0], var);
 
-            unsigned fisrtParPos = 0;
-            for (unsigned i = 0; i < u[0].length && u[0][i] != '('; i++) { // find fisrt '(' pos
+            uint2 fisrtParPos = 0;
+            for (uint2 i = 0; i < u[0].length && u[0][i] != '('; i++) { // find fisrt '(' pos
                 fisrtParPos++;
             }
 
