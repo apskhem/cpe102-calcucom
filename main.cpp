@@ -90,12 +90,12 @@ void UserRequest(string expr, unsigned option)
         {
             if (operation[i] == "+")
             {
-                classified_var(terms);
+                classified_var(terms[i]);
                 cal_equation += cal(terms[i], x);
             }
             else if (operation[i] == "-")
             {
-                classified_var(terms);
+                classified_var(terms[i]);
                 cal_equation -= cal(terms[i], x);
             }
         }
@@ -198,7 +198,7 @@ array<string> operation(string term)
                 if (term[i] == '+')
                     term_sep.push("+");
                 if (term[i] == '-')
-                    term_sep.push("+");
+                    term_sep.push("-");
                 if (term[i] == '*' || term[i] == '(')
                 {
                     term_sep.push("*");
@@ -209,10 +209,9 @@ array<string> operation(string term)
                 if (term[i] == ')')
                     rightPar++;
             }
-            return term_sep;
         }
-        else 
     }
+    return term_sep;
 }
 
 
@@ -293,6 +292,7 @@ void classified_var(string term)
 float cal(string term, float x)
 {
     double result = 0, func_sum = 0;
+    array <string> term_sep = operation(term);
     float a = parseNum(term);
     float a_n = parseNum(n);
     float a_u = parseNum(u);
