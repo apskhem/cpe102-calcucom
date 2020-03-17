@@ -26,7 +26,8 @@ void classified_var(string);
 
 const double PI = 3.14159;
 
-struct variable{
+struct variable
+{
     string n;
     string e;
     string u;
@@ -96,7 +97,16 @@ void UserRequest(string expr, uint2 option)
         std::cin >> x;
         for (unsigned short i = 0; i < terms.length; i++)
         {
-            cal_equation += cal(terms[i], x);
+            if (operation[i] == "+")
+            {
+                classified_var(terms);
+                cal_equation += cal(terms[i], x);
+            }
+            else if (operation[i] == "-")
+            {
+                classified_var(terms);
+                cal_equation -= cal(terms[i], x);
+            }
         }
         std::cout << "f(x) = " << cal_equation;
     }
@@ -141,6 +151,7 @@ void UserRequest(string expr, uint2 option)
 array<string> ReadExpr(string expr)
 {
     array<string> terms;
+    array<string> operation;
 
     uint2 leftPar = 0, rightPar = 0;
 
@@ -160,6 +171,11 @@ array<string> ReadExpr(string expr)
         {
             terms.push_back(expr.slice(splitIndex, i));
             splitIndex = i + (expr[i] == '+' ? 1 : 0);
+
+            if (expr[i] == '+')
+                operation.push_back("+");
+            if (expr[i] == '-')
+                operation.push_back("-");
         }
 
         if (i >= expr.length - 1)
@@ -226,19 +242,19 @@ void classified_var(string term)
         }
         if (term[i] == 'l')
         {
-            if(term[i+1] == 'n')    //ln
+            if (term[i + 1] == 'n') //ln
             {
-                i++;    //skip n
-                while(isNum(term[i]))
+                i++; //skip n
+                while (isNum(term[i]))
                 {
                     e += term[i];
                     i++;
                 }
             }
-            else if(term[i+2] == 'g')   //log
+            else if (term[i + 2] == 'g') //log
             {
                 i += 2; //skip og
-                while(isNum(term[i]))
+                while (isNum(term[i]))
                 {
                     e += term[i];
                     i++;
@@ -246,13 +262,33 @@ void classified_var(string term)
             }
         }
     }
-    variable value = {n,e,u};
+    variable value = {n, e, u};
 }
 
 float cal(string term, float x)
 {
     double result = 0, func_sum = 0;
     float a = parseNum(term);
+    float a_n = parseNum(n);
+    float a_u = parseNum(u);
+
+    for (unsigned short i = 0; i < n.length; i++)
+    {
+        if (n[i] == 'x' ){
+            
+        }
+
+        else if(n[i] == 'x'){
+            n[i] = a_n * x;
+        }
+    }
+
+    for(unsigned short i = 0; i< u.length; i++){
+
+        if (u[i] == 'x'){
+            u[i] = a_u * x
+        }
+    }
 
     for (unsigned short i = 0; i < term.length; i++)
     {
@@ -266,28 +302,41 @@ float cal(string term, float x)
                 else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) //trigon
             {
                 string tfunc = term.slice(i, i + 3);
-                uint2 leftPar = 0, rightPar = 0;
-                string n = "", u = "";
-                array<string> equation;
-
                 if (tfunc == "sin")
                 {
-                    result = a * sin(u * 180 / PI)
+                    result = a * sin(u * 180 / PI);
+                }
+                else if (tfunc == "cos")
+                {
+                    result = a * cos(u * 180 / PI);
+                }
+                else if (tfunc == "tan")
+                {
+                    result = a * tan(u * 180 / PI);
+                }
+                else if (tfunc == "cot")
+                {
+                    result = a / tan(u * 180 / PI);
+                }
+                else if (tfunc == "sec")
+                {
+                    result = a / cos(u * 180 / PI);
+                }
+                else if (tfunc == "csc")
+                {
+                    result = a / sin(u * 180 / PI);
                 }
             }
-        else // a*sin()
+        else if (term[i] == 'l')
         {
-        }
-    }
-    else if (term[i] == 'l')
-    {
-        if (term[i + 1] == 'n')
-        { //ln
-            result = a * log()
-        }
-        else
-        { //log
-            result = a * log
+            if (term[i + 1] == 'n')
+            { //ln
+                result = a * log()
+            }
+            else
+            { //log
+                result = a * log
+            }
         }
     }
 }
