@@ -21,8 +21,9 @@ struct variable
     string n;
     string e;
     string u;
-    
-    void classified_var(string term){
+
+    void classified_var(string term)
+    {
         variable value = {};
         string n = "", u = "", e = "";
         unsigned int leftPar = 0, rightPar = 0;
@@ -93,7 +94,7 @@ struct variable
                 }
             }
         }
-        value = {n,e,u};
+        value = {n, e, u};
     }
 };
 
@@ -196,7 +197,7 @@ void UserRequest(string expr, unsigned option)
         result = "dx/dy = ";
     }
     case 5:
-    {   //implicit cal
+    { //implicit cal
 
         float x, y;
 
@@ -252,16 +253,16 @@ array<string> ReadExpr(string expr)
     return terms;
 }
 
-array<string> operation (string term)
+array<string> operation(string term)
 {
     array<string> term_sep;
     int leftPar = 0, rightPar = 0;
 
     for (int i = 0; i < term.length; i++)
     {
-        if (term[i] == '(')     // (x+2)
+        if (term[i] == '(') // (x+2)
         {
-            i++;            //skip (
+            i++; //skip (
             leftPar++;
             while (leftPar != rightPar)
             {
@@ -288,24 +289,28 @@ double cal(string term, float x)
 {
     variable.clssified_var(term);
     double result = 0, func_sum = 0;
-    array <string> term_sep = operation(term);
+    array<string> term_sep = operation(term);
     double a = parseNum(term);
     double a_n = parseNum(n);
     double a_u = parseNum(u);
 
     for (unsigned short i = 0; i < n.length; i++)
     {
-        if (n[i] == 'x'){
+        if (n[i] == 'x')
+        {
         }
 
-        else if(n[i] == 'x'){
+        else if (n[i] == 'x')
+        {
             n[i] = a_n * x;
         }
     }
 
-    for(unsigned short i = 0; i< u.length; i++){
+    for (unsigned short i = 0; i < u.length; i++)
+    {
 
-        if (u[i] == 'x'){
+        if (u[i] == 'x')
+        {
             u[i] = a_u * x
         }
     }
@@ -314,39 +319,35 @@ double cal(string term, float x)
     {
         if (term[i] == 'x')
             term[i] = x;
-        else if (term[i] == '+')
-            result = 0;
-        else if (term[i] == '-')
-            else if (term[i] == '*') else if (term[i] == '/')
 
-                else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) //trigon
+        else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) //trigon
+        {
+            string tfunc = term.slice(i, i + 3);
+            if (tfunc == "sin")
             {
-                string tfunc = term.slice(i, i + 3);
-                if (tfunc == "sin")
-                {
-                    result = a * sin(u * 180 / PI);
-                }
-                else if (tfunc == "cos")
-                {
-                    result = a * cos(u * 180 / PI);
-                }
-                else if (tfunc == "tan")
-                {
-                    result = a * tan(u * 180 / PI);
-                }
-                else if (tfunc == "cot")
-                {
-                    result = a / tan(u * 180 / PI);
-                }
-                else if (tfunc == "sec")
-                {
-                    result = a / cos(u * 180 / PI);
-                }
-                else if (tfunc == "csc")
-                {
-                    result = a / sin(u * 180 / PI);
-                }
+                result = a * sin(u * 180 / PI);
             }
+            else if (tfunc == "cos")
+            {
+                result = a * cos(u * 180 / PI);
+            }
+            else if (tfunc == "tan")
+            {
+                result = a * tan(u * 180 / PI);
+            }
+            else if (tfunc == "cot")
+            {
+                result = a / tan(u * 180 / PI);
+            }
+            else if (tfunc == "sec")
+            {
+                result = a / cos(u * 180 / PI);
+            }
+            else if (tfunc == "csc")
+            {
+                result = a / sin(u * 180 / PI);
+            }
+        }
         else if (term[i] == 'l')
         {
             if (term[i + 1] == 'n')
@@ -362,9 +363,7 @@ double cal(string term, float x)
     return result;
 }
 
-
-float implicit_cal(string t, float x, float y){;}
-
+float implicit_cal(string t, float x, float y) { ; }
 
 void ImplicitFunc(string t)
 {
