@@ -12,10 +12,9 @@ void userRequest(string &, string &, unsigned);
 /* The method splits input expression into arrays of string */
 array<string> readExpr(string);
 /* The method calcalate the derivative value of implicit expression */
-double cal(string, float);
 void implFunc(string);
-float implCal(string, float, float);
 array<string> operation(string);
+/* The method classify what operation btw each term*/
 
 const double PI = 3.14159;
 

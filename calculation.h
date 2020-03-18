@@ -13,7 +13,7 @@ double cal(string term, float x)
     double result = 0, n = 0, u = 0, e = 0;
     double a = parseNum(term);
 
-    for (unsigned short i = 0; i < var.n.length; i++) //n
+    for (unsigned short i = 0; i < var.n.length; i++) // 3x^2sin(3x)
     {
         double a_n = parseNum(var.n);
         string n_n = "";
