@@ -5,6 +5,7 @@
 #include "klib.string.h"
 #include "klib.number.h"
 #include "derivative.h"
+#include "calculation.h"
 
 /* The method recieves user input from fisrt place */
 void userRequest(string &, string &, unsigned);
@@ -21,7 +22,7 @@ const double PI = 3.14159;
 struct termComponents
 {
     string n;
-    string e;
+    string b;
     string u;
 
     void categorizeTerm(string term)
@@ -81,7 +82,7 @@ struct termComponents
                     i++; //skip n
                     while (isNum(term[i]))
                     {
-                        e += term[i];
+                        b += term[i];
                         i++;
                     }
                 }
@@ -90,13 +91,13 @@ struct termComponents
                     i += 2; //skip og
                     while (isNum(term[i]))
                     {
-                        e += term[i];
+                        b += term[i];
                         i++;
                     }
                 }
             }
         }
-        value = {n, e, u};
+        value = {n, b, u};
     }
 };
 
@@ -302,124 +303,26 @@ array<string> operation(string term)
     return term_sep;
 }
 
-double cal(string term, float x)
-{
-    termComponents var;
-    var.categorizeTerm(term);
-
-    array<string> term_sep = operation(term); //operation between each term
-
-    array<string> n_sep = operation(var.n); //operation between each n
-
-    double result = 0, n = 0, u = 0, e = 0;
-    double a = parseNum(term);
-
-    for (unsigned short i = 0; i < var.n.length; i++) //n
+    void implFunc(string t)
     {
-        double a_n = parseNum(var.n);
-        string n_n = "";
-        array<string> n_operate = operation(var.n); //ดูก่อน
+        int choice;
 
-        if(var.n[i] == 'x' && var.n[i + 1] == '^')
-        {
-            int sliceStart = i + 2; // number next to '^'
-            i++;
-            while (isNum(term[++i]));
+        std::cout << "Press: \t[1] to evaluate dy/dx\n\t[2] to evaluate dx/dy\n";
+        std::cout << "=>\t";
+        std::cin >> choice;
+        std::cin.ignore();
 
-            string power_of_n = term.slice(sliceStart, i);
-            double n_n = parseNum(power_of_n);
-
-            n = a_n * pow(x, n_n);
+        if (choice == 1)
+        { // dy/dx
+            string result = "";
+            readExpr(t);
         }
 
-        else if (var.n[i] == 'x')
-        {
-            // var.n[i] = a_n * x; // later-error
+        else if (choice == 2)
+        { //dx/dy
+            string result = "";
+            readExpr(t);
         }
+        else
+            std::cout << "Please enter 1 or 2";
     }
-
-    for (unsigned short i = 0; i < var.u.length; i++)
-    {
-
-        if (var.u[i] == 'x')
-        {
-            //var.u[i] = a_u * x // later-error
-        }
-    }
-
-    for (unsigned short i = 0; i < term.length; i++)
-    {
-        if (term[i] == 'x')
-        {
-            // term[i] = x; // later-error
-        }
-        else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) //trigon
-        {
-            string tfunc = term.slice(i, i + 3);
-            if (tfunc == "sin")
-            {
-                result = a * sin(parseNum(var.u) * 180 / PI);
-            }
-            else if (tfunc == "cos")
-            {
-                result = a * cos(parseNum(var.u) * 180 / PI);
-            }
-            else if (tfunc == "tan")
-            {
-                result = a * tan(parseNum(var.u) * 180 / PI);
-            }
-            else if (tfunc == "cot")
-            {
-                result = a / tan(parseNum(var.u) * 180 / PI);
-            }
-            else if (tfunc == "sec")
-            {
-                result = a / cos(parseNum(var.u) * 180 / PI);
-            }
-            else if (tfunc == "csc")
-            {
-                result = a / sin(parseNum(var.u) * 180 / PI);
-            }
-        }
-        else if (term[i] == 'l')
-        {
-            if (term[i + 1] == 'n')
-            { //ln
-                ;
-            }
-            else
-            { //log
-                ;
-            }
-        }
-    }
-    return result;
-}
-
-float implCal(string t, float x, float y)
-{
-}
-
-void implFunc(string t)
-{
-    int choice;
-
-    std::cout << "Press: \t[1] to evaluate dy/dx\n\t[2] to evaluate dx/dy\n";
-    std::cout << "=>\t";
-    std::cin >> choice;
-    std::cin.ignore();
-
-    if (choice == 1)
-    { // dy/dx
-        string result = "";
-        readExpr(t);
-    }
-
-    else if (choice == 2)
-    { //dx/dy
-        string result = "";
-        readExpr(t);
-    }
-    else
-        std::cout << "Please enter 1 or 2";
-}
