@@ -18,12 +18,14 @@ array<string> operation(string);
 
 const double PI = 3.14159;
 
-struct termComponents {
+struct termComponents
+{
     string n;
     string e;
     string u;
 
-    void categorizeTerm(string term) {
+    void categorizeTerm(string term)
+    {
         termComponents value = {};
         string n = "", u = "", e = "";
         unsigned int leftPar = 0, rightPar = 0;
@@ -35,7 +37,7 @@ struct termComponents {
                 if (term[i + 1] != '(') //x^328
                 {
                     i++; //skip ^
-                    while (isNum(term[i]))
+                    while (isNum(term[i]) || term[i] == 'x')
                     {
                         n += term[i];
                         i++;
@@ -57,7 +59,7 @@ struct termComponents {
                     }
                 }
             }
-            else if (term[i] == '(')
+            else if (term[i] == '(') //sin(u)
             {
                 i++; //skip (
                 leftPar++;
@@ -98,7 +100,8 @@ struct termComponents {
     }
 };
 
-int main() {
+int main()
+{
     /* parts of user input variables */
     string expr = "", numberOfDiff = "";
 
@@ -110,39 +113,53 @@ int main() {
     std::cout << "Enter f(x) = ";
     getline(std::cin, expr);
 
-    while (true) {
-        if (isFirstPass) {
+    while (true)
+    {
+        if (isFirstPass)
+        {
             std::cout << "Press 'enter' to continue...";
-            
+
             getline(std::cin, blank);
             std::cout << "------------------------------------------\n";
         }
 
         std::cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
 
-        if (isFirstPass) {
+        if (isFirstPass)
+        {
             std::cout << "\t[4] to try a new expression.\n\t[5] to end the program.\n";
         }
-        
+
         std::cout << "=>\t";
         std::cin >> option;
         std::cin.ignore();
 
-        if (option == 5) break;
+        if (option == 5)
+            break;
         std::cout << "The result is...\n\n";
 
-        switch (option) {
-            case 1: userRequest(expr, numberOfDiff, 1); break;
-            case 2: userRequest(expr, numberOfDiff, 2); break;
-            case 3: userRequest(expr, numberOfDiff, 3); break;
-            case 4: {
-                std::cout << "Enter f(x) = ";
-                getline(std::cin, expr);
-                continue;
-            } break;
+        switch (option)
+        {
+        case 1:
+            userRequest(expr, numberOfDiff, 1);
+            break;
+        case 2:
+            userRequest(expr, numberOfDiff, 2);
+            break;
+        case 3:
+            userRequest(expr, numberOfDiff, 3);
+            break;
+        case 4:
+        {
+            std::cout << "Enter f(x) = ";
+            getline(std::cin, expr);
+            continue;
+        }
+        break;
         }
 
-        if (option == 2) std::cout << "f" << numberOfDiff << "(x) = ";
+        if (option == 2)
+            std::cout << "f^(" << numberOfDiff << ")(x) = ";
         std::cout << expr << "\n\n";
 
         isFirstPass = true;
@@ -154,68 +171,70 @@ int main() {
 void userRequest(string &expr, string &numberOfDiff, unsigned option)
 {
     array<string> terms = readExpr(expr);
+    array<string> expr_sep = operation(expr); //more edit
 
     // ++ simplify each term
-
     string result = "";
     double cal_equation = 0;
 
-    switch (option) {
-        case 1:
-        { // Eval
-            float x;
-            std::cout << "Please enter x value to evaluate : ";
-            std::cin >> x;
-            for (unsigned short i = 0; i < terms.length; i++)
-            {
-                // if (operation[i] == '+')
-                // {
-                //     categorizeTerm(terms[i]);
-                //     cal_equation += cal(terms[i], x);
-                // }
-                // else if (operation[i] == '-')
-                // {
-                //     categorizeTerm(terms[i]);
-                //     cal_equation -= cal(terms[i], x);
-                // }
-            }
-            std::cout << "f(x) = " << cal_equation;
+    switch (option)
+    {
+    case 1:
+    { // Eval
+        float x;
+        std::cout << "Please enter x value to evaluate : ";
+        std::cin >> x;
+        for (unsigned short i = 0; i < terms.length; i++)
+        {
+            if (expr_sep[i] == '+')
+                cal_equation += cal(terms[i], x);
+            else if (expr_sep[i] == '-')
+                cal_equation -= cal(terms[i], x);
+            else if (expr_sep[i] == '*')
+                cal_equation *= cal(terms[i], x);
+            else if (expr_sep[i] == '/')
+                cal_equation /= cal(terms[i], x);
         }
-        break;
-        case 2:{ // Diff   
-            numberOfDiff += "'";
-            for (unsigned i = 0; i < terms.length; i++){
-                if (i > 0 && terms[i][0] != '-')
-                    result += "+";
+        std::cout << "f(x) = " << cal_equation;
+    }
+    break;
+    case 2:
+    { // Diff
+        numberOfDiff += "'";
+        for (unsigned i = 0; i < terms.length; i++)
+        {
+            if (i > 0 && terms[i][0] != '-')
+                result += "+";
 
-                result += Diff(terms[i], 'x');
-            }
+            result += Diff(terms[i], 'x');
         }
-        break;
-        case 3:
-        { // Impl
-            result = "dy/dx = ";
-        }
-        break;
-        case 4:
-        { //Implicit
-            result = "dx/dy = ";
-        }
-        case 5:
-        { //implicit cal
+    }
+    break;
+    case 3:
+    { // Impl
+        result = "dy/dx = ";
+    }
+    break;
+    case 4:
+    { //Implicit
+        result = "dx/dy = ";
+    }
+    case 5:
+    { //implicit cal
 
-            float x, y;
+        float x, y;
 
-            std::cout << "Please enter x and y values : ";
-            std::cin >> x >> y;
-            std::cout << "f(x) = ";
-        }
+        std::cout << "Please enter x and y values : ";
+        std::cin >> x >> y;
+        std::cout << "f(x) = ";
+    }
     }
     // ++ re-arrange the result; cleaner result
     expr = result;
 }
 
-array<string> readExpr(string expr) {
+array<string> readExpr(string expr)
+{
     array<string> terms;
     array<string> operation;
 
@@ -226,13 +245,15 @@ array<string> readExpr(string expr) {
 
     // reading equation process
     unsigned splitIndex = 0;
-    for (unsigned i = 0; i < expr.length; i++) {
+    for (unsigned i = 0; i < expr.length; i++)
+    {
         if (expr[i] == '(')
             leftPar++;
         else if (expr[i] == ')')
             rightPar++;
 
-        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar) {
+        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar)
+        {
             terms.push(expr.slice(splitIndex, i));
             splitIndex = i + (expr[i] == '+' ? 1 : 0);
 
@@ -242,7 +263,8 @@ array<string> readExpr(string expr) {
                 operation.push("-");
         }
 
-        if (i >= expr.length - 1) {
+        if (i >= expr.length - 1)
+        {
             terms.push(expr.slice(splitIndex, expr.length));
         }
     }
@@ -261,26 +283,20 @@ array<string> operation(string term)
 
     for (int i = 0; i < term.length; i++)
     {
-        if (term[i] == '(') // (x+2)
+        if (term[i] == ')')
+                rightPar++;
+            if(term [i] == '(')
+                leftPar++;
+        if (leftPar == rightPar)
         {
-            i++; //skip (
-            leftPar++;
-            while (leftPar != rightPar)
-            {
-                if (term[i] == '+')
-                    term_sep.push("+");
-                if (term[i] == '-')
-                    term_sep.push("-");
-                if (term[i] == '*' || term[i] == '(')
-                {
-                    term_sep.push("*");
-                    leftPar++;
-                }
-                if (term[i] == '/')
-                    term_sep.push("/");
-                if (term[i] == ')')
-                    rightPar++;
-            }
+            if (term[i] == '+')
+                term_sep.push("+");
+            if (term[i] == '-')
+                term_sep.push("-");
+            if (term[i] == '*')
+                term_sep.push("*");
+            if (term[i] == '/')
+                term_sep.push("/");
         }
     }
     return term_sep;
@@ -290,7 +306,7 @@ double cal(string term, float x)
 {
     termComponents var;
     var.categorizeTerm(term);
-    double result = 0, func_sum = 0;
+    double result = 0;
     array<string> term_sep = operation(term);
     double a = parseNum(term);
     double a_n = parseNum(var.n);
@@ -319,7 +335,8 @@ double cal(string term, float x)
 
     for (unsigned short i = 0; i < term.length; i++)
     {
-        if (term[i] == 'x') {
+        if (term[i] == 'x')
+        {
             // term[i] = x; // later-error
         }
         else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) //trigon
@@ -365,11 +382,12 @@ double cal(string term, float x)
     return result;
 }
 
-float implCal(string t, float x, float y) {
-
+float implCal(string t, float x, float y)
+{
 }
 
-void implFunc(string t) {
+void implFunc(string t)
+{
     int choice;
 
     std::cout << "Press: \t[1] to evaluate dy/dx\n\t[2] to evaluate dx/dy\n";
