@@ -1,6 +1,88 @@
 #ifndef CALCULATION_H
 #define CALCULATION_H
 
+struct termComponents
+{
+    string n;
+    string b;
+    string u;
+
+    void categorizeTerm(string term)
+    {
+        termComponents value = {};
+        string n = "", u = "", e = "";
+        unsigned int leftPar = 0, rightPar = 0;
+
+        for (unsigned int i = 0; i < term.length; i++)
+        {
+            if (term[i] == '^') //x^
+            {
+                if (term[i + 1] != '(') //x^328
+                {
+                    i++; //skip ^
+                    while (isNum(term[i]) || term[i] == 'x')
+                    {
+                        n += term[i];
+                        i++;
+                    }
+                }
+                else //x^(328)
+                {
+                    i += 2; //skip ^(
+                    leftPar++;
+                    while (leftPar != rightPar)
+                    {
+                        if (term[i] == '(')
+                            leftPar++;
+                        if (term[i] == ')')
+                            rightPar++;
+
+                        n += term[i];
+                        i++;
+                    }
+                }
+            }
+            else if (term[i] == '(') //sin(u)
+            {
+                i++; //skip (
+                leftPar++;
+                while (leftPar != rightPar)
+                {
+                    if (term[i] == '(')
+                        leftPar++;
+                    if (term[i] == ')')
+                        rightPar++;
+
+                    u += term[i];
+                    i++;
+                }
+            }
+            if (term[i] == 'l')
+            {
+                if (term[i + 1] == 'n') //ln
+                {
+                    i++; //skip n
+                    while (isNum(term[i]))
+                    {
+                        b += term[i];
+                        i++;
+                    }
+                }
+                else if (term[i + 2] == 'g') //log
+                {
+                    i += 2; //skip og
+                    while (isNum(term[i]))
+                    {
+                        b += term[i];
+                        i++;
+                    }
+                }
+            }
+        }
+        value = {n, b, u};
+    }
+};
+
 double cal(string term, float x)
 {
     termComponents var;
