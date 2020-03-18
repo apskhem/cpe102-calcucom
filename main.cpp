@@ -284,9 +284,9 @@ array<string> operation(string term)
     for (int i = 0; i < term.length; i++)
     {
         if (term[i] == ')')
-                rightPar++;
-            if(term [i] == '(')
-                leftPar++;
+            rightPar++;
+        if (term[i] == '(')
+            leftPar++;
         if (leftPar == rightPar)
         {
             if (term[i] == '+')
@@ -306,16 +306,30 @@ double cal(string term, float x)
 {
     termComponents var;
     var.categorizeTerm(term);
-    double result = 0;
-    array<string> term_sep = operation(term);
-    double a = parseNum(term);
-    double a_n = parseNum(var.n);
-    double a_u = parseNum(var.u);
 
-    for (unsigned short i = 0; i < var.n.length; i++)
+    array<string> term_sep = operation(term); //operation between each term
+
+    array<string> n_sep = operation(var.n); //operation between each n
+
+    double result = 0, n = 0, u = 0, e = 0;
+    double a = parseNum(term);
+
+    for (unsigned short i = 0; i < var.n.length; i++) //n
     {
-        if (var.n[i] == 'x')
+        double a_n = parseNum(var.n);
+        string n_n = "";
+        array<string> n_operate = operation(var.n); //ดูก่อน
+
+        if(var.n[i] == 'x' && var.n[i + 1] == '^')
         {
+            int sliceStart = i + 2; // number next to '^'
+            i++;
+            while (isNum(term[++i]));
+
+            string power_of_n = term.slice(sliceStart, i);
+            double n_n = parseNum(power_of_n);
+
+            n = a_n * pow(x, n_n);
         }
 
         else if (var.n[i] == 'x')
