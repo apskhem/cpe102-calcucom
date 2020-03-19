@@ -54,7 +54,7 @@ typedef class String {
         template<class _type_string>
         String concat(const _type_string);
         /* The method retunrs the value of c-string. */
-        char * cstring();
+        char* cstring();
         /* The method determines whether a string ends with the characters of a specified string. */
         template<class _type_string>
         bool endsWith(const _type_string, unsigned=-1);
