@@ -90,6 +90,14 @@ struct var_storage{
 
 const double PI = 3.14159265358979323846;
 
+double log_func(double b, double u){
+    int log_value = 0;
+
+    log_value = log10(u) / log10(b);
+
+    return log_value;
+}
+
 double cal(string term, float x)
 {
     termComponents var;
@@ -192,7 +200,7 @@ double cal(string term, float x)
                         u_value *= x;
                 }
 
-                n = a_n * logb_value(u_value);
+                n = a_n * log_func(b_value,u_value);
             }
 
             else if (term[i + 1] == 'n') //x^{ln(5x)}
@@ -268,44 +276,55 @@ double cal(string term, float x)
     
     var_storage var_value = {n,u};
 
-    for (unsigned short i = 0; i < term.length; i++)
+    for (unsigned short i = 0; i < term.length; i++)        //3sin(2x)
     {
         if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) //trigon
         {
-            string tfunc = term.slice(i, i + 3);        // 3sin
+            string tfunc = term.slice(i, i + 3);        // 3sin(2x)
             if (tfunc == "sin")
-                result = a * sin(parseNum(var.u) * 180 / PI);   
+                result = a * sin(var_value.u);   
             else if (tfunc == "cos")
             {
-                result = a * cos(parseNum(var.u) * 180 / PI);
+                result = a * cos(var_value.u);
             }
             else if (tfunc == "tan")
             {
-                result = a * tan(parseNum(var.u) * 180 / PI);
+                result = a * tan(var_value.u);
             }
             else if (tfunc == "cot")
             {
-                result = a / tan(parseNum(var.u) * 180 / PI);
+                result = a / tan(var_value.u);
             }
             else if (tfunc == "sec")
             {
-                result = a / cos(parseNum(var.u) * 180 / PI);
+                result = a / cos(var_value.u);
             }
             else if (tfunc == "csc")
             {
-                result = a / sin(parseNum(var.u) * 180 / PI);
+                result = a / sin(var_value.u);
             }
         }
-        else if (term[i] == 'l')
+        else if (term[i] == 'l')        
         {
-            if (term[i + 1] == 'n')
-            { //ln
-                ;
+            if (term[i + 1] == 'n') //3ln(2x)
+            { 
+                result = a * log(var_value.u);
             }
-            else
-            { //log
-                ;
+            else if (term[i+1] == 'o')      //3log10(2x)
+            { 
+                string base = "";
+                i += 2; //skip og
+                while(term[i] != '(')
+                    base += term[i];
+                
+                double base_value = parseNum(base);
+
+                result = a * log_func(base_value, var_value.u);
             }
+        }
+        else if (term[i] == 'x' && term[i+1] == '^')        // 3x^2x
+        {
+            
         }
     }
     return result;
