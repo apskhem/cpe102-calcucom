@@ -121,7 +121,6 @@ double cal(string term, float x)
     var.categorizeTerm(term);
 
     array<string> term_sep = operation(term); //operation between each term
-
     array<string> n_sep = operation(var.n); //operation between each n
 
     double result = 0, n = 0, u = 0;
@@ -165,7 +164,7 @@ double cal(string term, float x)
                 i++;
             }
 
-            double u_value = parseNum(u_n);
+            double u_value = parseNum(u_n); //3
 
             for (unsigned short i = 0; i < u_n.length; i++)
             {
@@ -240,7 +239,6 @@ double cal(string term, float x)
                     if (u_n[i] == 'x')
                         u_value *= x;
                 }
-
                 n = a_n * log(u_value);
             }
         }
