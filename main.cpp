@@ -16,8 +16,6 @@ void implFunc(string);
 array<string> operation(string);
 /* The method classify what operation btw each term*/
 
-const double PI = 3.14159;
-
 int main()
 {
     /* parts of user input variables */
@@ -146,9 +144,9 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option)
         std::cin >> x >> y;
         std::cout << "f(x) = ";
     }
+        // ++ re-arrange the result; cleaner result
+        expr = result;
     }
-    // ++ re-arrange the result; cleaner result
-    expr = result;
 }
 
 array<string> readExpr(string expr)
@@ -220,26 +218,26 @@ array<string> operation(string term)
     return term_sep;
 }
 
-    void implFunc(string t)
-    {
-        int choice;
+void implFunc(string t)
+{
+    int choice;
 
-        std::cout << "Press: \t[1] to evaluate dy/dx\n\t[2] to evaluate dx/dy\n";
-        std::cout << "=>\t";
-        std::cin >> choice;
-        std::cin.ignore();
+    std::cout << "Press: \t[1] to evaluate dy/dx\n\t[2] to evaluate dx/dy\n";
+    std::cout << "=>\t";
+    std::cin >> choice;
+    std::cin.ignore();
 
-        if (choice == 1)
-        { // dy/dx
-            string result = "";
-            readExpr(t);
-        }
-
-        else if (choice == 2)
-        { //dx/dy
-            string result = "";
-            readExpr(t);
-        }
-        else
-            std::cout << "Please enter 1 or 2";
+    if (choice == 1)
+    { // dy/dx
+        string result = "";
+        readExpr(t);
     }
+
+    else if (choice == 2)
+    { //dx/dy
+        string result = "";
+        readExpr(t);
+    }
+    else
+        std::cout << "Please enter 1 or 2";
+}
