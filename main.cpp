@@ -87,31 +87,32 @@ int main()
 void userRequest(string &expr, string &numberOfDiff, unsigned option)
 {
     array<string> terms = readExpr(expr);
-    array<string> expr_sep = operation(expr); //more edit
+    array<string> terms_sep = operation(expr);
 
     // ++ simplify each term
     string result = "";
-    double cal_equation = 0;
 
     switch (option)
     {
     case 1:
-    { // Eval
-        float x;
+    {             // Eval
+        double x; //3x^2 + 2x^3 + 3x^5
         std::cout << "Please enter x value to evaluate : ";
         std::cin >> x;
-        for (unsigned short i = 0; i < terms.length; i++)
+
+        double answer = cal(terms[0], x);
+        for (unsigned short i = 0; i < terms_sep.length; i++)
         {
-            if (expr_sep[i] == '+')
-                cal_equation += cal(terms[i], x);
-            else if (expr_sep[i] == '-')
-                cal_equation -= cal(terms[i], x);
-            else if (expr_sep[i] == '*')
-                cal_equation *= cal(terms[i], x);
-            else if (expr_sep[i] == '/')
-                cal_equation /= cal(terms[i], x);
+            if (terms_sep[i] == '+')
+                answer += cal(terms[i + 1], x);
+            else if (terms_sep[i] == '-')
+                answer -= cal(terms[i + 1], x);
+            else if (terms_sep[i] == '*')
+                answer *= cal(terms[i + 1], x);
+            else if (terms_sep[i] == '/')
+                answer /= cal(terms[i + 1], x);
         }
-        std::cout << "f(x) = " << cal_equation;
+        std::cout << "f(x) = " << answer;
     }
     break;
     case 2:
@@ -197,7 +198,7 @@ array<string> operation(string term)
     array<string> term_sep;
     int leftPar = 0, rightPar = 0;
 
-    for (int i = 0; i < term.length; i++)
+    for (int i = 0; i < term.length; i++) //(2x^2)*3
     {
         if (term[i] == ')')
             rightPar++;
@@ -209,8 +210,15 @@ array<string> operation(string term)
                 term_sep.push("+");
             if (term[i] == '-')
                 term_sep.push("-");
-            if (term[i] == '*')
+            if (term[i] == '*' || term[i] == '(' || term[i] == ')') // 2(2x+3)
+            {
+                if(term[i] == '(')
+                    leftPar++;
+                if(term[i] == ')')
+                    rightPar++;
+                    
                 term_sep.push("*");
+            }
             if (term[i] == '/')
                 term_sep.push("/");
         }

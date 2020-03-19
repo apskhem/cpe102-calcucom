@@ -83,11 +83,6 @@ struct termComponents
     }
 };
 
-struct var_storage{
-    double n;
-    double u;
-};
-
 const double PI = 3.14159265358979323846;
 
 double log_func(double b, double u){
@@ -274,41 +269,39 @@ double cal(string term, float x)
         }
     }
     
-    var_storage var_value = {n,u};
-
     for (unsigned short i = 0; i < term.length; i++)        //3sin(2x)
     {
         if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) //trigon
         {
             string tfunc = term.slice(i, i + 3);        // 3sin(2x)
             if (tfunc == "sin")
-                result = a * sin(var_value.u);   
+                result = a * sin(u);   
             else if (tfunc == "cos")
             {
-                result = a * cos(var_value.u);
+                result = a * cos(u);
             }
             else if (tfunc == "tan")
             {
-                result = a * tan(var_value.u);
+                result = a * tan(u);
             }
             else if (tfunc == "cot")
             {
-                result = a / tan(var_value.u);
+                result = a / tan(u);
             }
             else if (tfunc == "sec")
             {
-                result = a / cos(var_value.u);
+                result = a / cos(u);
             }
             else if (tfunc == "csc")
             {
-                result = a / sin(var_value.u);
+                result = a / sin(u);
             }
         }
         else if (term[i] == 'l')        
         {
             if (term[i + 1] == 'n') //3ln(2x)
             { 
-                result = a * log(var_value.u);
+                result = a * log(u);
             }
             else if (term[i+1] == 'o')      //3log10(2x)
             { 
@@ -319,12 +312,15 @@ double cal(string term, float x)
                 
                 double base_value = parseNum(base);
 
-                result = a * log_func(base_value, var_value.u);
+                result = a * log_func(base_value, u);
             }
         }
         else if (term[i] == 'x' && term[i+1] == '^')        // 3x^2x
         {
+            if(term[i] == 'x')
+                a *= x;
             
+            result = pow(a,n);
         }
     }
     return result;
