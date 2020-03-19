@@ -138,8 +138,8 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option)
     }
     case 5:
     { //implicit cal
-
-        float x, y;
+        double x, y;
+        double answer;
 
         std::cout << "Please enter x and y values : ";
         std::cin >> x >> y;
@@ -210,13 +210,13 @@ array<string> operation(string term)
                 term_sep.push("+");
             if (term[i] == '-')
                 term_sep.push("-");
-            if (term[i] == '*' || term[i] == '(' || term[i] == ')') // 2(2x+3)
+            if (term[i] == '*' || term[i] == '(' || term[i] == ')')     // 2(2x+3)
             {
                 if(term[i] == '(')
                     leftPar++;
                 if(term[i] == ')')
                     rightPar++;
-                    
+
                 term_sep.push("*");
             }
             if (term[i] == '/')
