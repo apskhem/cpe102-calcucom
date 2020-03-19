@@ -10,23 +10,53 @@ struct termComponents
     void categorizeTerm(string term)
     {
         termComponents value = {};
-        string n = "", u = "", e = "";
+
         unsigned int leftPar = 0, rightPar = 0;
 
         for (unsigned short i = 0; i < term.length; i++)
         {
             if (term[i] == '^') //x^
             {
-                if (term[i + 1] != '(') //x^328
+                if (term[i + 1] != '(') //x^32
                 {
-                    i++; //skip ^
-                    while (isNum(term[i]) || term[i] == 'x')
+                    i++;                   //skip ^
+                    while (isNum(term[i])) //x^{32}
                     {
                         n += term[i];
                         i++;
                     }
+                    while (term[i] == 'x') //x^{x}
+                    {
+                        n += term[i];
+                        i++;
+                    }
+                    if (term[i] == 's' || term[i] == 'c' || term[i] == 't') //x^{sin(2x)}
+                    {
+                        while (term[i] != ')')
+                            n += term[i];
+                        i++;
+                    }
+                    if (term[i] == 'l')     //x^{log10(5x)}
+                    {
+                        if (term[i + 1] == 'n') //ln
+                        {
+                            while (term[i] != ')')
+                            {
+                                n += term[i];
+                                i++;
+                            }
+                        }
+                        else if (term[i + 2] == 'g') //log
+                        {
+                            while (term[i] != ')')
+                            {
+                                n += term[i++];
+                                i++;
+                            }
+                        }
+                    }
                 }
-                else //x^(328)
+                else if (term[i + 1] == '(') //x^(328x)
                 {
                     i += 2; //skip ^(
                     leftPar++;
@@ -42,7 +72,19 @@ struct termComponents
                     }
                 }
             }
-            else if (term[i] == '(') //sin(u)
+            if (term[i] == 'l')
+            {
+                if (term[i + 2] == 'g') //log
+                {
+                    i += 2; //skip og
+                    while (isNum(term[i]))
+                    {
+                        b += term[i];
+                        i++;
+                    }
+                }
+            }
+            if (term[i] == '(') //sin(u)
             {
                 i++; //skip (
                 leftPar++;
@@ -57,27 +99,6 @@ struct termComponents
                     i++;
                 }
             }
-            if (term[i] == 'l')
-            {
-                if (term[i + 1] == 'n') //ln
-                {
-                    i++; //skip n
-                    while (isNum(term[i]))
-                    {
-                        b += term[i];
-                        i++;
-                    }
-                }
-                else if (term[i + 2] == 'g') //log
-                {
-                    i += 2; //skip og
-                    while (isNum(term[i]))
-                    {
-                        b += term[i];
-                        i++;
-                    }
-                }
-            }
         }
         value = {n, b, u};
     }
@@ -85,7 +106,8 @@ struct termComponents
 
 const double PI = 3.14159265358979323846;
 
-double log_func(double b, double u){
+double log_func(double b, double u)
+{
     int log_value = 0;
 
     log_value = log10(u) / log10(b);
@@ -195,7 +217,7 @@ double cal(string term, float x)
                         u_value *= x;
                 }
 
-                n = a_n * log_func(b_value,u_value);
+                n = a_n * log_func(b_value, u_value);
             }
 
             else if (term[i + 1] == 'n') //x^{ln(5x)}
@@ -268,14 +290,14 @@ double cal(string term, float x)
                 u = a_u / sin(u_value * PI / 180);
         }
     }
-    
-    for (unsigned short i = 0; i < term.length; i++)        //3sin(2x)
+
+    for (unsigned short i = 0; i < term.length; i++) //3sin(2x)
     {
         if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) //trigon
         {
-            string tfunc = term.slice(i, i + 3);        // 3sin(2x)
+            string tfunc = term.slice(i, i + 3); // 3sin(2x)
             if (tfunc == "sin")
-                result = a * sin(u);   
+                result = a * sin(u);
             else if (tfunc == "cos")
             {
                 result = a * cos(u);
@@ -297,30 +319,30 @@ double cal(string term, float x)
                 result = a / sin(u);
             }
         }
-        else if (term[i] == 'l')        
+        else if (term[i] == 'l')
         {
             if (term[i + 1] == 'n') //3ln(2x)
-            { 
+            {
                 result = a * log(u);
             }
-            else if (term[i+1] == 'o')      //3log10(2x)
-            { 
+            else if (term[i + 1] == 'o') //3log10(2x)
+            {
                 string base = "";
                 i += 2; //skip og
-                while(term[i] != '(')
+                while (term[i] != '(')
                     base += term[i];
-                
+
                 double base_value = parseNum(base);
 
                 result = a * log_func(base_value, u);
             }
         }
-        else if (term[i] == 'x' && term[i+1] == '^')        // 3x^2x
+        else if (term[i] == 'x' && term[i + 1] == '^') // 3x^2x
         {
-            if(term[i] == 'x')
+            if (term[i] == 'x')
                 a *= x;
-            
-            result = pow(a,n);
+
+            result = pow(a, n);
         }
     }
     return result;
