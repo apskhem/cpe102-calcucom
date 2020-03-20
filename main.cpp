@@ -26,6 +26,12 @@ int main()
     unsigned option;
     bool isFirstPass = false;
 
+    /*
+
+    decorate here
+
+    */
+
     std::cout << "Enter f(x) = ";
     getline(std::cin, expr);
 
