@@ -14,10 +14,8 @@ array<string> readExpr(string);
 /* The method calcalate the derivative value of implicit expression */
 void implFunc(string);
 array<string> operation(string, bool);
-/* The method classify what operation btw each term*/
 
-int main()
-{
+int main() {
     /* parts of user input variables */
     string expr = "", numberOfDiff = "";
 
@@ -29,10 +27,8 @@ int main()
     std::cout << "Enter f(x) = ";
     getline(std::cin, expr);
 
-    while (true)
-    {
-        if (isFirstPass)
-        {
+    while (true) {
+        if (isFirstPass) {
             std::cout << "Press 'enter' to continue...";
 
             getline(std::cin, blank);
@@ -41,8 +37,7 @@ int main()
 
         std::cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
 
-        if (isFirstPass)
-        {
+        if (isFirstPass) {
             std::cout << "\t[4] to try a new expression.\n\t[5] to end the program.\n";
         }
 
@@ -54,28 +49,20 @@ int main()
             break;
         std::cout << "The result is...\n\n";
 
-        switch (option)
-        {
-        case 1:
-            userRequest(expr, numberOfDiff, 1);
-            break;
-        case 2:
-            userRequest(expr, numberOfDiff, 2);
-            break;
-        case 3:
-            userRequest(expr, numberOfDiff, 3);
-            break;
-        case 4:
-        {
-            std::cout << "Enter f(x) = ";
-            getline(std::cin, expr);
-            continue;
-        }
-        break;
+        switch (option) {
+            case 1: userRequest(expr, numberOfDiff, 1); break;
+            case 2: userRequest(expr, numberOfDiff, 2); break;
+            case 3: userRequest(expr, numberOfDiff, 3); break;
+            case 4: {
+                std::cout << "Enter f(x) = ";
+                getline(std::cin, expr);
+                continue;
+            } break;
         }
 
         if (option == 2)
             std::cout << "f^(" << numberOfDiff << ")(x) = ";
+        
         std::cout << expr << "\n\n";
 
         isFirstPass = true;
@@ -84,15 +71,13 @@ int main()
     return 0;
 }
 
-void userRequest(string &expr, string &numberOfDiff, unsigned option)
-{
+void userRequest(string &expr, string &numberOfDiff, unsigned option) {
     array<string> terms = readExpr(expr);
 
     // ++ simplify each term
     string result = "";
 
-    switch (option)
-    {
+    switch (option) {
     case 1: // Eval
     {
         bool neg = false;
@@ -216,8 +201,7 @@ array<string> readExpr(string expr)
     return terms;
 }
 
-array<string> operation(string term, bool &neg)
-{
+array<string> operation(string term, bool &neg) {
     array<string> term_sep;
     int leftPar = 0, rightPar = 0;
 
