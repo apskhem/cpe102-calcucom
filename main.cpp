@@ -133,7 +133,7 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option) {
             if (i > 0 && terms[i][0] != '-')
                 result += "+";
 
-            result += Diff(terms[i], 'x');
+            result += diff(terms[i], 'x');
         }
     }
     break;

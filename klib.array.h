@@ -46,7 +46,7 @@ class Array {
         Array<_type> sort();
         /* The method adds/removes items to/from an array, and returns the removed item(s). */
         /* Note: This method changes the original array. */
-        void splice(const unsigned, const unsigned=0, const std::initializer_list<_type>);
+        // void splice(const unsigned, const unsigned=0, const std::initializer_list<_type>);
         /* The method returns a string with all the array values, separated by commas. */
         char* toString();
         /* method returns the array. */

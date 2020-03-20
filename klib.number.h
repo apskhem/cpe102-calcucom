@@ -25,16 +25,17 @@ double powInt(double base, const int n) {
 }
 
 class Number {
-    friend double parseNum(string);
+    friend double parseNum(string, const unsigned=0, unsigned=-1);
     friend bool isNum(char);
 };
 
-double parseNum(string t) {
+double parseNum(string t, const unsigned start, unsigned end) {
+    if (end == -1) end = t.length;
     unsigned decimalPlace = 0;
     bool passNumber = false;
     short isMinus = 1;
     string parseText = "";
-    for (unsigned i = 0; i < t.length; i++) {
+    for (unsigned i = start; i < end; i++) {
         if (t[i] >= 46 && t[i] <= 57 && t[i] != '.') {
             passNumber = true;
             parseText += t[i];
