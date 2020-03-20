@@ -13,7 +13,7 @@ void userRequest(string &, string &, unsigned);
 array<string> readExpr(string);
 /* The method calcalate the derivative value of implicit expression */
 void implFunc(string);
-array<string> operation(string, bool);
+array<string> operation(string);
 /* The method classify what operation btw each term*/
 
 int main()
@@ -95,8 +95,7 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option)
     {
     case 1: // Eval
     {
-        bool neg = false;
-        array<string> terms_sep = operation(expr, &neg); //-3x^2
+        array<string> terms_sep = operation(expr); //-(3x^2)
 
         double x; //3x^2 + 2x^3 + 3x^5
         std::cout << "Please enter x value to evaluate : ";
@@ -104,10 +103,6 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option)
         unsigned short count = 0;
 
         double answer = cal(terms[0], x);
-
-        if(neg == true){
-            answer *= -1;
-        }
 
         for (unsigned short i = 0; i < terms_sep.length; i++)
         {
@@ -216,7 +211,7 @@ array<string> readExpr(string expr)
     return terms;
 }
 
-array<string> operation(string term, bool &neg)
+array<string> operation(string term)
 {
     array<string> term_sep;
     int leftPar = 0, rightPar = 0;
@@ -231,12 +226,8 @@ array<string> operation(string term, bool &neg)
         {
             if (term[i] == '+')
                 term_sep.push("+");
-            if (term[i] == '-')
-            {
-                if(i == 0)
-
+            if (term[i] == '-' && i != 0)
                 term_sep.push("-");
-            }
             if (term[i] == '*' || term[i] == '(' || term[i] == ')') // 2(2x+3)
             {
                 if (term[i] == '(')
