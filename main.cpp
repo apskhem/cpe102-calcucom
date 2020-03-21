@@ -12,11 +12,11 @@ void userRequest(string &, string &, unsigned);
 /* The method splits input expression into arrays of string */
 array<string> readExpr(string);
 /* The method calcalate the derivative value of implicit expression */
-void implFunc(string);
 array<string> operation(string);
 /* The method classify what operation btw each term*/
 
-int main() {
+int main()
+{
     /* parts of user input variables */
     string expr = "", numberOfDiff = "";
 
@@ -34,8 +34,10 @@ int main() {
     std::cout << "Enter f(x) = ";
     getline(std::cin, expr);
 
-    while (true) {
-        if (isFirstPass) {
+    while (true)
+    {
+        if (isFirstPass)
+        {
             std::cout << "Press 'enter' to continue...";
 
             getline(std::cin, blank);
@@ -44,7 +46,8 @@ int main() {
 
         std::cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
 
-        if (isFirstPass) {
+        if (isFirstPass)
+        {
             std::cout << "\t[4] to try a new expression.\n\t[5] to end the program.\n";
         }
 
@@ -56,20 +59,29 @@ int main() {
             break;
         std::cout << "The result is...\n\n";
 
-        switch (option) {
-            case 1: userRequest(expr, numberOfDiff, 1); break;
-            case 2: userRequest(expr, numberOfDiff, 2); break;
-            case 3: userRequest(expr, numberOfDiff, 3); break;
-            case 4: {
-                std::cout << "Enter f(x) = ";
-                getline(std::cin, expr);
-                continue;
-            } break;
+        switch (option)
+        {
+        case 1:
+            userRequest(expr, numberOfDiff, 1);
+            break;
+        case 2:
+            userRequest(expr, numberOfDiff, 2);
+            break;
+        case 3:
+            userRequest(expr, numberOfDiff, 3);
+            break;
+        case 4:
+        {
+            std::cout << "Enter f(x) = ";
+            getline(std::cin, expr);
+            continue;
+        }
+        break;
         }
 
         if (option == 2)
             std::cout << "f^(" << numberOfDiff << ")(x) = ";
-        
+
         std::cout << expr << "\n\n";
 
         isFirstPass = true;
@@ -78,13 +90,15 @@ int main() {
     return 0;
 }
 
-void userRequest(string &expr, string &numberOfDiff, unsigned option) {
+void userRequest(string &expr, string &numberOfDiff, unsigned option)
+{
     array<string> terms = readExpr(expr);
 
     // ++ simplify each term
     string result = "";
 
-    switch (option) {
+    switch (option)
+    {
     case 1: // Eval
     {
         array<string> terms_sep = operation(expr); //-(3x^2)
@@ -139,22 +153,30 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option) {
     break;
     case 3:
     { // Impl
-        result = "dy/dx = ";
+        unsigned short choice;
+
+        std::cout << "[1] to find dy/dx \t[2] to find dx/dy";
+        std::cin >> choice;
+
+        switch (choice)
+        {
+        case 1: //dy/dx
+        {
+            for (unsigned short i = 0; i < terms.length; i++)
+            {
+                result += implFunc(terms[i], 'x');
+            }
+        }
+        case 2: //dx/dy
+        {
+            for (unsigned short i = 0; i < terms.length; i++)
+            {
+                result += implFunc(terms[i], 'y');
+            }
+        }
+        }
     }
     break;
-    case 4:
-    { //Implicit
-        result = "dx/dy = ";
-    }
-    case 5:
-    { //implicit cal
-        double x, y;
-        double answer;
-
-        std::cout << "Please enter x and y values : ";
-        std::cin >> x >> y;
-        std::cout << "f(x) = ";
-    }
         // ++ re-arrange the result; cleaner result
         expr = result;
     }
@@ -234,28 +256,4 @@ array<string> operation(string term)
         }
     }
     return term_sep;
-}
-
-void implFunc(string t)
-{
-    int choice;
-
-    std::cout << "Press: \t[1] to evaluate dy/dx\n\t[2] to evaluate dx/dy\n";
-    std::cout << "=>\t";
-    std::cin >> choice;
-    std::cin.ignore();
-
-    if (choice == 1)
-    { // dy/dx
-        string result = "";
-        readExpr(t);
-    }
-
-    else if (choice == 2)
-    { //dx/dy
-        string result = "";
-        readExpr(t);
-    }
-    else
-        std::cout << "Please enter 1 or 2";
 }

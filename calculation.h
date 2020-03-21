@@ -506,8 +506,8 @@ double cal(string term, float x) //-3(x+2)
     return result;
 }
 
-float implCal(string t, float x, float y)
-{
+string implFunc(string term, char var)
+{  
     ;
 }
 
