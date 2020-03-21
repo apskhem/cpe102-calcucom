@@ -128,13 +128,7 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option) {
     case 2:
     { // Diff
         numberOfDiff += "'";
-        for (unsigned i = 0; i < terms.length; i++)
-        {
-            if (i > 0 && terms[i][0] != '-')
-                result += "+";
-
-            result += diff(terms[i], 'x');
-        }
+        result = exprDiff(terms, 'x');
     }
     break;
     case 3:
@@ -158,49 +152,6 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option) {
         // ++ re-arrange the result; cleaner result
         expr = result;
     }
-}
-
-array<string> readExpr(string expr)
-{
-    array<string> terms;
-    array<string> operation;
-
-    unsigned leftPar = 0, rightPar = 0;
-
-    // pre-reading process
-    expr = expr.replace(" ", "");
-
-    // reading equation process
-    unsigned splitIndex = 0;
-    for (unsigned i = 0; i < expr.length; i++)
-    {
-        if (expr[i] == '(')
-            leftPar++;
-        else if (expr[i] == ')')
-            rightPar++;
-
-        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar)
-        {
-            terms.push(expr.slice(splitIndex, i));
-            splitIndex = i + (expr[i] == '+' ? 1 : 0);
-
-            if (expr[i] == '+')
-                operation.push("+");
-            if (expr[i] == '-')
-                operation.push("-");
-        }
-
-        if (i >= expr.length - 1)
-        {
-            terms.push(expr.slice(splitIndex, expr.length));
-        }
-    }
-
-    // check for errors
-    if (leftPar != rightPar)
-        throw "Bad arithmetic expression: no complete pair of parentheses ['()'].";
-
-    return terms;
 }
 
 array<string> operation(string term)

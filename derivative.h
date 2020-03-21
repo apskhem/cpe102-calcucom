@@ -1,6 +1,48 @@
 #ifndef DERIVATIVE_H
 #define DERIVATIVE_H
 
+array<string> readExpr(string expr) {
+    array<string> terms;
+
+    unsigned leftPar = 0, rightPar = 0;
+
+    // pre-reading process
+    expr = expr.replace(" ", "");
+
+    // reading equation process
+    unsigned splitIndex = 0;
+    for (unsigned i = 0; i < expr.length; i++) {
+        if (expr[i] == '(') leftPar++;
+        else if (expr[i] == ')') rightPar++;
+
+        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar) {
+            terms.push(expr.slice(splitIndex, i));
+            splitIndex = i + (expr[i] == '+' ? 1 : 0);
+        }
+
+        if (i >= expr.length - 1) {
+            terms.push(expr.slice(splitIndex));
+        }
+    }
+
+    // check for errors
+    if (leftPar != rightPar)
+        throw "Bad arithmetic expression: no complete pair of parentheses ['()'].";
+
+    return terms;
+}
+
+string exprDiff(array<string> terms, char var) {
+    string result = "";
+    for (unsigned i = 0; i < terms.length; i++) {
+        if (i > 0 && terms[i][0] != '-')
+            result += "+";
+
+        result += diff(terms[i], var);
+    }
+    return result;
+}
+
 string diff(string term, char var) {
     array<string> u, trigon, log;
     array<unsigned short> trigonIndex, varIndex, logIndex;
@@ -29,7 +71,7 @@ string diff(string term, char var) {
                     
                     tempU = tfunc + "(";
                 }
-                else if (term[i] == '(') { // find: a*sin(u) or a*sin^1(u)
+                else if (term[i-1] == '(') { // find: a*sin(u) or a*sin^1(u)
                     trigon.push(tfunc);
                 }
 
@@ -127,8 +169,19 @@ string diff(string term, char var) {
         for (unsigned i = 0; i < u.length; i++) {
             for (unsigned j = 0; j < u.length; j++) {
                 result += "(";
-                result += (i == j ? diff(u[j], var) : u[j]);
+                if (i == j) {
+                    array<string> Uterms = readExpr(u[i]);
+                    result += exprDiff(Uterms, var);
+                }
+                else {
+                    result += u[i];
+                }
                 result += ")";
+
+
+                
+                
+                
             }
             
             if (i < u.length-1)
@@ -157,10 +210,8 @@ string diff(string term, char var) {
             bool hasSign = (chainDiff.includes("+") || chainDiff.includes("-"));
             bool hasVarOrU = chainDiff.includes(var);
 
-            if (hasSign)
-                result = toCalStr(a) + trigon[0] + "(" + u[0] + ")*(" + chainDiff + ")";
-            else if (hasVarOrU)
-                result = toCalStr(a) + trigon[0] + "(" + u[0] + ")*" + chainDiff;
+            if (hasSign || hasVarOrU)
+                result = toCalStr(a) + trigon[0] + "(" + u[0] + ")(" + chainDiff + ")";
             else
                 result = toCalStr(a * parseNum(chainDiff)) + trigon[0] + "(" + u[0] + ")";
         }
