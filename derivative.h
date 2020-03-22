@@ -167,25 +167,14 @@ string diff(string term, char var) {
     // main diff function in many cases below...
     if (u.length > 1) {
         for (unsigned i = 0; i < u.length; i++) {
+            if (i > 0)
+                result += "+";
+
             for (unsigned j = 0; j < u.length; j++) {
                 result += "(";
-                if (i == j) {
-                    array<string> Uterms = readExpr(u[i]);
-                    result += exprDiff(Uterms, var);
-                }
-                else {
-                    result += u[i];
-                }
+                result += (i == j ? exprDiff(readExpr(u[i]), var) : u[i]);
                 result += ")";
-
-
-                
-                
-                
             }
-            
-            if (i < u.length-1)
-                result += "+";
         }
     }
     else if (u.length == 1) {
