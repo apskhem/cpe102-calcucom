@@ -6,8 +6,8 @@
 using namespace std;
 
 double x_one(double,double);//ax+b
-double xp(double,double,double); //-b+sqrt
-double xn(double,double,double); //-b-sqrt
+double xp(double,double,double); //-b+sqrt(b^2-4ac)/2a
+double xn(double,double,double); //-b-sqrt(b^2-4ac)/2a
 double SDforx3(double,double,double,double);//ax^3+bx^2+cx+d
 double SDforx4(double,double,double,double,double);//ax^4+bx^3+cx^2+dx+e
 double SDforx5(double,double,double,double,double,double);//ax^5+bx^4+cx^3+dx^2+ex+f
@@ -117,10 +117,7 @@ double SDforx3(double A3,double B3,double C3,double D3){
 		
 		sum3=t37;
 		
-		if(i==999){
-			break;
-		}
-		else if(sum3==0){
+	    if(sum3==0){
 			break;
 		}
 		count1+=1;
@@ -138,23 +135,55 @@ double SDforx3(double A3,double B3,double C3,double D3){
 		
 		sum3=t37;
 	
-		if(i==-999){
-			break;
-		}
-		else if(sum3==0){
+		if(sum3==0){
 			break;
 		}
 		count2-=1;	
 		}
 	
 	if(count1==999){
-		cout<<"x :"<<count2*(-1)<<endl;
+		cout<<"x :"<<count2*(-1)<<",";
+		
 	}
 	else if(count2==-999){
+		if(count1!=999){
+		 cout<<"x :"<<count1*(-1)<<",";
+		 
+		}
 		cout<<"--------------------";
 		cout<<"    CANNOT FIND     ";
 		cout<<"--------------------";
 	}
+	
+	
+	
+	if(count1==998){
+		double num1=A3;
+	    double num2=B3+A3*count2;
+	    double num3=num2*count2+C3;
+	    double xot1=xp(num1,num2,num3);
+	    double xot2=xn(num1,num2,num3);
+	    cout<<"count2 ="<<count2<<endl;
+	    
+	    cout<<num1<<" "<<num2<<" "<<num3<<endl<<endl;
+	    
+	    cout<<xot1<<","<<xot2<<endl;
+	}
+	else {
+		double num1=A3;
+	    double num2=B3+A3*count1;
+	    double num3=num2*count1+C3;
+	    double xot1=xp(num1,num2,num3);
+	    double xot2=xn(num1,num2,num3);
+	    cout<<"count1 ="<<count1<<endl;
+	    
+	    cout<<num1<<" "<<num2<<" "<<num3<<endl<<endl;
+	    
+	    cout<<xot1<<","<<xot2<<endl;
+	}
+	
+	
+	
 	
 }
 
