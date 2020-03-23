@@ -1,6 +1,10 @@
 #ifndef DERIVATIVE_H
 #define DERIVATIVE_H
 
+array<string> readExpr(string);
+string exprDiff(array<string> terms, char var);
+string diff(string term, char var);
+
 array<string> readExpr(string expr) {
     array<string> terms;
 
