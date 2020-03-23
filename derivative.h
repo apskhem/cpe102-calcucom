@@ -224,6 +224,21 @@ string diff(TermComponents tc, char var) {
                 result = toCalStr(a * n) + u[0].slice(0, 3) + "^" + toCalStr(n - 1) + tempBlock + "*" + chainDiff;
             }
         }
+        else if (arc.length){     
+            if (arc[0] == "sin")
+                arc[0] = "cos";
+            else if (arc[0] == "cos")
+                arc[0] = "sin"; //-
+            else if (arc[0] == "tan")
+                arc[0] = "sec^2";
+            else if (arc[0] == "csc")
+                arc[0] = "csc()cot()"; //-
+            else if (arc[0] == "sec")
+                arc[0] = "sec()tan()";
+            else if (arc[0] == "cot")
+                arc[0] = "csc^2"; //-
+            
+        }
         else if (log.length) {
             if (trigonIndex[0] != 0)
             {
