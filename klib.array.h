@@ -33,7 +33,7 @@ class Array {
         /* The method searches the array for the specified item, and returns its position. */
         int indexOf(const _type, const unsigned=0);
         /* The method returns the array as a string. */
-        char* join(const char *="'");
+        // char* join(const char *="'");
         /* The method returns an Array Iterator object with the keys of an array. */
         Array<unsigned> keys();
         /* The method searches the array for the specified item, and returns its position. */
