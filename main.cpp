@@ -13,7 +13,8 @@ void userRequest(string &, string &, unsigned);
 array<string> readExpr(string);
 /* The method calcalate the derivative value of implicit expression */
 array<string> operation(string);
-/* The method classify what operation btw each term*/
+/* The mothod throw error when the errors was occured */
+void error(string);
 
 int main()
 {
@@ -207,4 +208,9 @@ array<string> operation(string term)
         }
     }
     return term_sep;
+}
+
+void error(string msg) {
+    std::cout << "Bad arithmetic expression: " << msg << ".\n\n";
+    throw 0;
 }
