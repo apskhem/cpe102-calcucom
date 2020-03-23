@@ -11,7 +11,7 @@ class TermComponents {
         array<string> u, n, trigon, log;
         array<unsigned short> trigonIndex, varIndex, logIndex;
     
-        void TermComponents() {
+        TermComponents(string) {
             for (unsigned short i = 0; i < term.length; i++) {
                 // find (type): position and #of x
                 if (term[i] == var)
@@ -225,10 +225,38 @@ string diff(TermComponents tc, char var) {
             }
         }
         else if (log.length) {
-            if (trigonIndex[0] != 0) a *= parseNum(tc);
+            if (trigonIndex[0] != 0)
+            {
+                a *= parseNum(tc);
+                string chainDiff = diff(u[0], var);
+                short idx = 0;
+                for(unsigned i = 0; i < tc.log.length; i++){
+                    if(!isNum(tc.log))
+                        break;
+                    else 
+                        idx++;
+                }
+                string b = log.splice(3,3+idx);   
 
-            if (log[0] == "ln")
-            dobule b = parseNum(tc, trigonIndex[0] + 2);
+                bool hasSign = (chainDiff.includes("+") || chainDiff.includes("-"));
+                bool hasVarOrU = chainDiff.includes(var);
+
+                if  (hasSign || hasVarOrU)    // -5log10(5x^2 + sin(x)) => 5x + cos(x)
+                    result = toCalStr(a) + "(" + chainDiff + ")/(" + u[0] + ")(ln(" + b + ")";
+                else    // -5log10(5x+10) => 5      
+                    result = toCalStr(a * parseNum(chainDiff))+ ")/(" + u[0] + ")(ln(" + b + ")";
+            }
+            if (log[0] == "ln"){
+                a *= parseNum(tc);
+                string chainDiff = diff(u[0], var);
+                bool hasSign = (chainDiff.includes("+") || chainDiff.includes("-"));
+                bool hasVarOrU = chainDiff.includes(var);
+
+                if  (hasSign || hasVarOrU)    // -5ln(5x^2 + sin(x)) => 5x + cos(x)
+                    result = toCalStr(a) + "(" + chainDiff + ")/(" + u[0] + ")";
+                else    // -5ln(5x+10) => 5      
+                    result = toCalStr(a * parseNum(chainDiff))+ ")/(" + u[0] + ")";
+            }
         }
     }
     else if (u.length == 0) {
