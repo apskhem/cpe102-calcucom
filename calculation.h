@@ -416,4 +416,6 @@ string implFunc(string term, char var)
 {
     ;
 }
+
+
 #endif

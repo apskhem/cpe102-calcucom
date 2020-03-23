@@ -224,20 +224,54 @@ string diff(TermComponents tc, char var) {
                 result = toCalStr(a * n) + u[0].slice(0, 3) + "^" + toCalStr(n - 1) + tempBlock + "*" + chainDiff;
             }
         }
-        else if (arc.length){     
+        /*
+        else if (arc.length){
+            a *= parseNum(tc);
+
+            string chainDiff = diff(u[0], var);
+            bool hasSign = (chainDiff.includes("+") || chainDiff.includes("-"));
+            bool hasVarOrU = chainDiff.includes(var);
+
             if (arc[0] == "sin")
-                arc[0] = "cos";
-            else if (arc[0] == "cos")
-                arc[0] = "sin"; //-
-            else if (arc[0] == "tan")
-                arc[0] = "sec^2";
-            else if (arc[0] == "csc")
-                arc[0] = "csc()cot()"; //-
-            else if (arc[0] == "sec")
-                arc[0] = "sec()tan()";
-            else if (arc[0] == "cot")
-                arc[0] = "csc^2"; //-
-            
+            {
+                if (hasSign || hasVarOrU) // 5arcsin(3x^2 + 5x) => 5(6x+5)
+                    result = toCalStr(a) + "(" + chainDiff + ") / sqrt(1 - (" + u[0] + ")^2 )";
+                else // 5arcsin(3x) => 5(3)
+                    result = toCalStr(a * parseNum(chainDiff)) + ") / sqrt(1 - (" + u[0] + ")^2 )";
+            }
+            else if (arc[0] == "cos"){
+                a *= -1;
+                if (hasSign || hasVarOrU) // 5arccos(3x^2 + 5x) => 5(6x+5)
+                    result = toCalStr(a) + "(" + chainDiff + ") / sqrt(1 - (" + u[0] + ")^2 )";
+                else // 5arcsin(3x) => 5(3)
+                    result = toCalStr(a * parseNum(chainDiff)) + ") / sqrt(1 - (" + u[0] + ")^2 )";
+            }
+            else if (arc[0] == "tan"){
+                if (hasSign || hasVarOrU) // 5arctan(3x^2 + 5x) => 5(6x+5)
+                    result = toCalStr(a) + "(" + chainDiff + ") / sqrt(1 + (" + u[0] + ")^2 )";
+                else // 5arctan(3x) => 5(3)
+                    result = toCalStr(a * parseNum(chainDiff)) + ") / sqrt(1 + (" + u[0] + ")^2 )";
+            }
+            else if (arc[0] == "cot"){
+                a *= -1;
+                if (hasSign || hasVarOrU) // 5arccot(3x^2 + 5x) => 5(6x+5)
+                    result = toCalStr(a) + "(" + chainDiff + ") / sqrt(1 + (" + u[0] + ")^2 )";
+                else // 5arccot(3x) => 5(3)
+                    result = toCalStr(a * parseNum(chainDiff)) + ") / sqrt(1 + (" + u[0] + ")^2 )";
+            }
+            else if (arc[0] == "sec"){
+                if (hasSign || hasVarOrU) // 5arcsec(3x^2 + 5x) => 5(6x+5)
+                    result = toCalStr(a) + "(" + chainDiff + ") / |" + u[0] + "|(sqrt(" + u[0] + ")^2 -1 )";
+                else // 5arctan(3x) => 5(3)
+                    result = toCalStr(a * parseNum(chainDiff)) + ") / |" + u[0] + "|(sqrt(" + u[0] + ")^2 -1 )";
+            }
+            else if (arc[0] == "csc"){
+                a *= -1;
+                if (hasSign || hasVarOrU) // 5arcsec(3x^2 + 5x) => 5(6x+5)
+                    result = toCalStr(a) + "(" + chainDiff + ") / |" + u[0] + "|(sqrt(" + u[0] + ")^2 -1 )";
+                else // 5arctan(3x) => 5(3)
+                    result = toCalStr(a * parseNum(chainDiff)) + ") / |" + u[0] + "|(sqrt(" + u[0] + ")^2 -1 )";
+            }
         }
         else if (log.length) {
             if (trigonIndex[0] != 0)
@@ -274,6 +308,7 @@ string diff(TermComponents tc, char var) {
             }
         }
     }
+    */
     else if (u.length == 0) {
         switch (tc[varIndex[0] + 1]) {
             case '^': { // CASE: ax^n or ax^(n)
