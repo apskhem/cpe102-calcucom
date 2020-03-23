@@ -5,6 +5,120 @@ array<string> readExpr(string);
 string exprDiff(array<string> terms, char var);
 string diff(string term, char var);
 
+class TermComponents {
+    // 3x^2 + 3sin(2x) + 5log10(3x) + 7ln(5x) + 5x^(2x+3)
+    public:
+        array<string> u, n, trigon, log;
+        array<unsigned short> trigonIndex, varIndex, logIndex;
+    
+        void TermComponents() {
+            for (unsigned short i = 0; i < term.length; i++) {
+                // find (type): position and #of x
+                if (term[i] == var)
+                    varIndex.push(i);
+
+                // find (type): trigonometric function.
+                else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 5 < term.length) {
+                    string tfunc = term.slice(i, i + 3);
+
+                    if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot") {
+                        trigonIndex.push(i);
+                        string tempU = "";
+
+                        i += 4; // skip 'sin^...'
+                        if (term[i-1] == '^') { // find: a*sin^n(u)
+                            if (term[i] == '(') {
+
+                            }
+                            else {
+                                while (isNum(term[i++]));
+                            }
+                            
+                            tempU = tfunc + "(";
+                        }
+                        else if (term[i-1] == '(') { // find: a*sin(u) or a*sin^1(u)
+                            trigon.push(tfunc);
+                        }
+
+                        // loop for collect U
+                        unsigned short leftPar = 1, rightPar = 0;
+                        while (i < term.length) {
+                            if (term[i] == '(') leftPar++;
+                            else if (term[i] == ')') {
+                                if (leftPar == ++rightPar) break;
+                            }
+
+                            tempU += term[i++];
+                        }
+
+                        u.push(tempU);
+                    }
+                }
+
+                // find (type): logarithm function
+                else if (term[i] == 'l' && i + 4 < term.length) {
+                    string l = term.slice(i, i+2); // lo || ln
+
+                    if (l == "lo" || l == "ln") {
+                        logIndex.push(i);
+                        string tempU = "";
+
+                        i+=3; // skip 'log...' or 'ln(...'
+                        if (l == "lo") {
+                            log.push("log");
+
+                            if (!isNum(term[i]))
+                                throw "Bad arithmetic expression: no base value after 'log'.";
+
+                            while(isNum(term[i++]));
+
+                            if (term[i++] == '^') { // also skip '(...'
+                                if (term[i] == '(') {
+
+                                }
+                                else {
+                                    while(isNum(term[i++]));
+                                }
+                            }
+                        }
+                        else if (l == "ln") {
+                            log.push("ln");
+                        }
+
+                        // loop for collect U
+                        unsigned short leftPar = 1, rightPar = 0;
+                        while (i < term.length) {
+                            if (term[i] == '(') leftPar++;
+                            else if (term[i] == ')') {
+                                if (leftPar == ++rightPar) break;
+                            }
+
+                            tempU += term[i++];
+                        }
+
+                        u.push(tempU);
+                    }
+                }
+
+                // find (type): function inside '('
+                else if (term[i] == '(') {
+                    string tempU = "";
+                    unsigned short leftPar = 1, rightPar = 0;
+                    while (i < term.length) {
+                        if (term[i] == '(') leftPar++;
+                        else if (term[i] == ')') {
+                            if (leftPar == ++rightPar) break;
+                        }
+
+                        tempU += term[i++];
+                    }
+
+                    u.push(tempU);
+                }
+            }
+        }
+};
+
 array<string> readExpr(string expr) {
     array<string> terms;
 
@@ -39,137 +153,22 @@ array<string> readExpr(string expr) {
 string exprDiff(array<string> terms, char var) {
     string result = "";
     for (unsigned i = 0; i < terms.length; i++) {
-        if (i > 0 && terms[i][0] != '-')
+        if (i > 0 && diff(terms[i])[0] != '-')
             result += "+";
 
-        result += diff(terms[i], var);
+        result += diff(TermComponents(terms[i]), var);
     }
     return result;
 }
 
-string diff(string term, char var) {
-    array<string> u, trigon, log;
-    array<unsigned short> trigonIndex, varIndex, logIndex;
-
-    for (unsigned short i = 0; i < term.length; i++) {
-        // find (type): position and #of x
-        if (term[i] == var)
-            varIndex.push(i);
-
-        // find (type): trigonometric function.
-        else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 5 < term.length) {
-            string tfunc = term.slice(i, i + 3);
-
-            if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot") {
-                trigonIndex.push(i);
-                string tempU = "";
-
-                i += 4; // skip 'sin^...'
-                if (term[i-1] == '^') { // find: a*sin^n(u)
-                    if (term[i] == '(') {
-
-                    }
-                    else {
-                        while (isNum(term[i++]));
-                    }
-                    
-                    tempU = tfunc + "(";
-                }
-                else if (term[i-1] == '(') { // find: a*sin(u) or a*sin^1(u)
-                    trigon.push(tfunc);
-                }
-
-                // loop for collect U
-                unsigned short leftPar = 1, rightPar = 0;
-                while (i < term.length) {
-                    if (term[i] == '(') leftPar++;
-                    else if (term[i] == ')') {
-                        if (leftPar == ++rightPar) break;
-                    }
-
-                    tempU += term[i++];
-                }
-
-                u.push(tempU);
-            }
-        }
-
-        // find (type): logarithm function
-        else if (term[i] == 'l' && i + 4 < term.length) {
-            string l = term.slice(i, i+2); // lo || ln
-
-            if (l == "lo" || l == "ln") {
-                logIndex.push(i);
-                string tempU = "";
-
-                i+=3; // skip 'log...' or 'ln(...'
-                if (l == "lo") {
-                    log.push("log");
-
-                    if (!isNum(term[i]))
-                        throw "Bad arithmetic expression: no base value after 'log'.";
-
-                    while(isNum(term[i++]));
-
-                    if (term[i++] == '^') { // also skip '(...'
-                        if (term[i] == '(') {
-
-                        }
-                        else {
-                            while(isNum(term[i++]));
-                        }
-                    }
-                }
-                else if (l == "ln") {
-                    log.push("ln");
-                }
-
-                // loop for collect U
-                unsigned short leftPar = 1, rightPar = 0;
-                while (i < term.length) {
-                    if (term[i] == '(') leftPar++;
-                    else if (term[i] == ')') {
-                        if (leftPar == ++rightPar) break;
-                    }
-
-                    tempU += term[i++];
-                }
-
-                u.push(tempU);
-            }
-        }
-
-        // find (type): function inside '('
-        else if (term[i] == '(') {
-            string tempU = "";
-            unsigned short leftPar = 1, rightPar = 0;
-            while (i < term.length) {
-                if (term[i] == '(') leftPar++;
-                else if (term[i] == ')') {
-                    if (leftPar == ++rightPar) break;
-                }
-
-                tempU += term[i++];
-            }
-
-            u.push(tempU);
-        }
-    }
-
-    /* ###################### */
-    /* COMPLETE TERM CHECKING */
-    /* ###################### */
-
-    if (varIndex.length == 0 && u.length == 0)
-        return "";
-    if (term.length == 1 && term[0] == var)
-        return "1";
+string diff(TermComponents tc, char var) {
+    if (varIndex.length == 0 && u.length == 0) return ""; // only c
+    if (tc.length == 1 && tc[0] == var) return "1"; // only single x
 
     string result = "";
     double n = 1, a = 1;
 
-    // main diff function in many cases below...
-    if (u.length > 1) {
+    if (u.length > 1) { // (2x+3)(6x^3-2x)
         for (unsigned i = 0; i < u.length; i++) {
             if (i > 0)
                 result += "+";
@@ -197,7 +196,7 @@ string diff(string term, char var) {
                 trigon[0] = "csc^2"; //-
 
             if (trigon[0] == "sin" || trigon[0] == "csc()*cot()" || trigon[0] == "csc^2") a = -1;
-            if (trigonIndex[0] != 0) a *= parseNum(term);
+            if (trigonIndex[0] != 0) a *= parseNum(tc);
 
             string chainDiff = diff(u[0], var);
             bool hasSign = (chainDiff.includes("+") || chainDiff.includes("-"));
@@ -209,8 +208,8 @@ string diff(string term, char var) {
                 result = toCalStr(a * parseNum(chainDiff)) + trigon[0] + "(" + u[0] + ")";
         }
         else if (trigonIndex.length > 0) { // CASE: a*sin^n(u)
-            if (trigonIndex[0] != 0) a *= parseNum(term);
-            n = parseNum(term, trigonIndex[0] + 4);
+            if (trigonIndex[0] != 0) a *= parseNum(tc);
+            n = parseNum(tc, trigonIndex[0] + 4);
             string chainDiff = diff(u[0], var);
 
             unsigned short fisrtParPos = 0;
@@ -226,24 +225,27 @@ string diff(string term, char var) {
             }
         }
         else if (log.length) {
-        
+            if (trigonIndex[0] != 0) a *= parseNum(tc);
+
+            if (log[0] == "ln")
+            dobule b = parseNum(tc, trigonIndex[0] + 2);
         }
     }
     else if (u.length == 0) {
-        switch (term[varIndex[0] + 1]) {
-            case '^': { // CASE: ax^n
-                unsigned short nIndex = varIndex[0] + (term[varIndex[0] + 2] == '(' ? 3 : 2);
+        switch (tc[varIndex[0] + 1]) {
+            case '^': { // CASE: ax^n or ax^(n)
+                unsigned short nIndex = varIndex[0] + (tc[varIndex[0] + 2] == '(' ? 3 : 2);
 
-                if (term[varIndex[0] + 2] == '(') {
+                if (tc[varIndex[0] + 2] == '(') {
 
                 }
 
-                a = varIndex[0] == 0 ? 1 : parseNum(term, 0, varIndex[0]);
-                n = parseNum(term, nIndex);
+                a = varIndex[0] == 0 ? 1 : parseNum(tc, 0, varIndex[0]);
+                n = parseNum(tc, nIndex);
 
                 string strN = "";
-                for (unsigned short i = nIndex; i < term.length && isNum(term[i]); i++)
-                    strN += term[i];
+                for (unsigned short i = nIndex; i < tc.length && isNum(tc[i]); i++)
+                    strN += tc[i];
 
                 if (n - 1 == 0)
                     result = toCalStr(a * n);
@@ -259,7 +261,7 @@ string diff(string term, char var) {
 
             } break;
             default: { // CASE ax or ax^1
-                result = term.slice(0, varIndex[0]);
+                result = tc.slice(0, varIndex[0]);
             }
         }
     }
