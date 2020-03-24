@@ -163,6 +163,14 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option)
     case 3:
     { // Impl
         unsigned short choice;
+        string impl_expr, pre_expr, post_expr;
+
+        std::cout << "Please enter new expresion : ";       // xy = ysin(x)
+        getline(std::cin, impl_expr);
+        sscanf(impl_expr, "%[^=] %s=%s", pre_expr, post_expr);
+
+        array <string> pre_term = readExpr(pre_expr);   //xy
+        array <string> post_term = readExpr(post_expr);     //ysin(x)
 
         std::cout << "[1] to find dy/dx \t[2] to find dx/dy";
         std::cin >> choice;
@@ -171,13 +179,16 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option)
         {
         case 1: //dy/dx
         {
+            result = "dy/dx = ";
             for (unsigned short i = 0; i < terms.length; i++)
             {
+                
                 result += implFunc(terms[i], 'x');
             }
         }
         case 2: //dx/dy
         {
+            result = "dx/dy = ";
             for (unsigned short i = 0; i < terms.length; i++)
             {
                 result += implFunc(terms[i], 'y');

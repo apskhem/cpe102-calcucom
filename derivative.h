@@ -11,7 +11,7 @@ string diff(string term, char var);
 class TermComponents {
     public:
         string src;
-        array<string> u, n, trig, log, arc;
+        array<string> u, n, trig, log, arc, deno_term;
         array<unsigned short> trigIndex, varIndex, logIndex, nIndex, arcIndex;
         unsigned forcedOp = 0; // 1 = mul
     
@@ -122,8 +122,15 @@ TermComponents::TermComponents(string term) {
         }
 
         // find (type): division
-        else if (term[i] == '/') {
+        else if (term[i] == ')' && term[i+1] == '/') {
             forcedOp = 1;
+            if(term[i+1] != ')' && isNum(term[i+1])){
+                deno_term.push(ElementInsidePar(++i));
+
+                checkForN(i, i+1);
+            }
+            else
+                error("no element inside parentheses '(...)'");
         }
     }
 
@@ -225,15 +232,51 @@ string diff(string term, char var) {
     string result = "";
     double a = isNum(term[0]) ? parseNum(term) : 1;
 
-    if (tc.u.length > 1 || tc.log.length > 1 || tc.trig.length > 1 || tc.arc.length > 1) {
-        for (unsigned i = 0; i < tc.u.length; i++) {
-            if (i > 0) result += "+";
+    if (u.length > 1 || tc.log.length > 1 || tc.trig.length > 1 || tc.arc.length > 1 || (u.length >= 1 && tc.deno_term.length >= 1)) { 
 
-            for (unsigned j = 0; j < tc.u.length; j++) {
-                result += "(";
-                result += i == j ? exprDiff(readExpr(tc.u[i]), var) : tc.u[i];
-                result += ")";
+        if (tc.forcedOp == 0){ //multiple            // (2x+3)(6x^3-2x)
+            for (unsigned i = 0; i < u.length; i++) {
+                if (i > 0)
+                    result += "+";
+
+                for (unsigned j = 0; j < u.length; j++) {
+                    result += "(";
+                    result += (i == j ? exprDiff(readExpr(u[i]), var) : u[i]);
+                    result += ")";
+                }
             }
+        }
+
+        else if(tc.forcedOp == 1){  //divide  (3x+2)(2x^2) / (5x+20)(4x+13)   => u / v
+            // 3/4 ; 3 = numerator, 4 = denominator
+            string numerator = "";
+            string denominator = "";
+
+            for(unsigned i = 0; i < tc.u.length; i++){     //(3x+2)(2x^2)
+                if (i > 0)
+                    numerator += "+";
+
+                for(unsigned j = 0; j < u.length; j++){
+                    numerator += "(";
+                    numerator += (i == j ? exprDiff(readExpr(u[i]), var) : u[i]);
+                    numerator += ")";
+                }
+            }
+            
+            for(unsigned i = 0; i < tc.deno_term.length; i++){     //(5x+20)(4x+13)
+                if (i > 0)
+                    denominator += "+";
+
+                for(unsigned j = 0; j < tc.deno_term.length; j++){
+                    denominator += "(";
+                    denominator += (i == j ? exprDiff(readExpr(tc.deno_term[i]), var) : u[i]);
+                    denominator += ")";
+                }
+            }
+
+            result += "[(" + denominator + ")(" + exprDiff(readExpr(numerator), var) +") ";
+            result += "- (" + numerator + ")(" + exprDiff(readExpr(denominator), var) + ")] ";
+            result += "/ (" + denominator + ")^2";
         }
     }
     else if (tc.u.length == 1 && tc.varIndex > 0) {
