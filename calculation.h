@@ -412,10 +412,64 @@ double cal(string term, float x) //-3(x+2)
     return result;
 }
 
-string implFunc(string term, char var)
+string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
 {
-    ;
-}
+    array<string> each_term = readExpr(term); //y , sin(x)
+    string result = "";
+    double a = parseNum(term);
 
+    result += toCalStr(a);
+
+    if (var == 'x') //dy/dx
+    {
+        for (unsigned i = 0; i < each_term.length; i++)
+        {
+            if (i > 0) // xy
+                result += "+";
+
+      /*      if (each_term.includes("x") && each_term.includes("y")) // (x+y)^2
+            {
+                string mini_result = "";
+                each_term = readExpr(each_term[i]);  // x,y
+                for (unsigned j = 0; j < each_term.length; j++)
+                {
+                    if(each_term.includes("x"))
+                        mini_result += "(" + diff(each_term[i], 'x') + ")";
+                    if(each_term.includes("y"))
+                        mini_result += "(" + diff(each_term[i], 'y') + ")";
+                }
+            }*/
+            else if (each_term.includes("x")) //x
+                result += "(" + diff(each_term[i], 'x') + ")";
+            else if (each_term.includes("y")) //y
+            {
+                result += "(" + diff(each_term[i], 'y') + ")";
+                result += "dy/dx";
+            }
+        }
+    }
+    if (var == 'y')
+    {
+        for (unsigned i = 0; i < each_term.length; i++)
+        {
+            if (i > 0) // xy
+                result += "+";
+
+   /*         if (each_term.includes("x") && each_term.includes("y")) // (x+y)
+            {
+                result += 1;
+            }*/
+            else if (each_term.includes("x")) //x
+            {
+                result += "(" + diff(each_term[i], 'x') + ")";
+                result += "dx/dy";
+            }
+            else if (each_term.includes("y")) //y
+                result += "(" + diff(each_term[i], 'y') + ")";
+        }
+    }
+
+    return result;
+}
 
 #endif
