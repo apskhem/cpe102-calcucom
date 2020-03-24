@@ -417,5 +417,24 @@ string implFunc(string term, char var)
     ;
 }
 
+if (u.length > 1) { // (2x+3)(6x^3-2x)
+        for (unsigned i = 0; i < u.length; i++) {
+            if (i > 0)
+                result += "+";
+
+            for (unsigned j = 0; j < u.length; j++) {
+                result += "(";
+                result += (i == j ? exprDiff(readExpr(u[i]), var) : u[i]);
+                result += ")";
+            }
+        }
+    }
+
+if (u.length > 1){  //(2x+3)/(6x+5)
+    for(unsigned i = 0; i < u.length; i++){
+    
+    }
+}
+
 
 #endif
