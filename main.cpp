@@ -31,23 +31,23 @@ int main()
     decorate here
 
     */
-    std::cout<<"     ___     ___     ___    _________    __           ________    ________      ___      ___    _________     "<<endl;
-    std::cout<<"    [   ]   [    ]  [   ]  [   ______]  [  ]         [   _____]  [ ______ ]    [   ]    [   ]  [   ______]    "<<endl;
-    std::cout<<"    [   ]  [  ][  ] [   ]  [   ______   [  ]         [  ]       [ ]      [ ]   [    ]  [    ]  [   ______     "<<endl;
-    std::cout<<"     [   ][  ] [  ][   ]   [   ______]  [  ]         [  ]      [ ]        [ ]  [     ][  [  ]  [   ______]    "<<endl;
-    std::cout<<"      [     ]   [     ]    [  |______   [  ]______   [  ]_____  [ ]______[ ]   [  ][ ][ ][  ]  [  ]______     "<<endl;
-    std::cout<<"       [___]     [___]     [_________]  [_________]  [________]  [________]    [__] [__] [__]  [_________]    "<<endl;
-    std::cout<<"                                            _____    ____                                                     "<<endl;
-    std::cout<<"                                           [_   _]  [    ]                                                    "<<endl;
-    std::cout<<"                                             | |    [ ][ ]                                                    "<<endl;
-    std::cout<<"                                             |_|    [____]                                                    "<<endl;
-    std::cout<<"                                                                                                              "<<endl;
-    std::cout<<"     ________      __       __           ________    __     __    ________    ________      ___      ___      "<<endl;
-    std::cout<<"    [   _____]    [  ]     [  ]         [   _____]  [  ]   [  ]  [   _____]  [ ______ ]    [   ]    [   ]     "<<endl;
-    std::cout<<"    [  ]         [ ][ ]    [  ]         [  ]        [  ]   [  ]  [  ]       [ ]      [ ]   [    ]  [    ]     "<<endl;
-    std::cout<<"    [  ]        [  __  ]   [  ]         [  ]        [  ]   [  ]  [  ]      [ ]        [ ]  [     ][  [  ]     "<<endl;
-    std::cout<<"    [  ]_____  [  ]  [  ]  [  ]______   [  ]_____   [  ]___[  ]  [  ]_____  [ ]______[ ]   [  ][ ][ ][  ]     "<<endl;
-    std::cout<<"    [________] [__]  [__]  [_________]  [________]  [_________]  [________]  [________]    [__] [__] [__]     "<<endl;
+    std::cout<<"     ___     ___     ___    _________    __           ________    ________      ___      ___    _________     "<<"\n";
+    std::cout<<"    [   ]   [    ]  [   ]  [   ______]  [  ]         [   _____]  [ ______ ]    [   ]    [   ]  [   ______]    "<<"\n";
+    std::cout<<"    [   ]  [  ][  ] [   ]  [   ______   [  ]         [  ]       [ ]      [ ]   [    ]  [    ]  [   ______     "<<"\n";
+    std::cout<<"     [   ][  ] [  ][   ]   [   ______]  [  ]         [  ]      [ ]        [ ]  [     ][  [  ]  [   ______]    "<<"\n";
+    std::cout<<"      [     ]   [     ]    [  |______   [  ]______   [  ]_____  [ ]______[ ]   [  ][ ][ ][  ]  [  ]______     "<<"\n";
+    std::cout<<"       [___]     [___]     [_________]  [_________]  [________]  [________]    [__] [__] [__]  [_________]    "<<"\n";
+    std::cout<<"                                            _____    ____                                                     "<<"\n";
+    std::cout<<"                                           [_   _]  [    ]                                                    "<<"\n";
+    std::cout<<"                                             | |    [ ][ ]                                                    "<<"\n";
+    std::cout<<"                                             |_|    [____]                                                    "<<"\n";
+    std::cout<<"                                                                                                              "<<"\n";
+    std::cout<<"     ________      __       __           ________    __     __    ________    ________      ___      ___      "<<"\n";
+    std::cout<<"    [   _____]    [  ]     [  ]         [   _____]  [  ]   [  ]  [   _____]  [ ______ ]    [   ]    [   ]     "<<"\n";
+    std::cout<<"    [  ]         [ ][ ]    [  ]         [  ]        [  ]   [  ]  [  ]       [ ]      [ ]   [    ]  [    ]     "<<"\n";
+    std::cout<<"    [  ]        [  __  ]   [  ]         [  ]        [  ]   [  ]  [  ]      [ ]        [ ]  [     ][  [  ]     "<<"\n";
+    std::cout<<"    [  ]_____  [  ]  [  ]  [  ]______   [  ]_____   [  ]___[  ]  [  ]_____  [ ]______[ ]   [  ][ ][ ][  ]     "<<"\n";
+    std::cout<<"    [________] [__]  [__]  [_________]  [________]  [_________]  [________]  [________]    [__] [__] [__]     "<<"\n";
     
     system("pause");
 	system("cls");
@@ -169,6 +169,14 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option)
     case 3:
     { // Impl
         unsigned short choice;
+        string impl_expr, pre_expr, post_expr;
+
+        std::cout << "Please enter new expresion : ";       // xy = ysin(x)
+        getline(std::cin, impl_expr);
+        sscanf(impl_expr, "%[^=] %s=%s", pre_expr, post_expr);
+
+        array <string> pre_term = readExpr(pre_expr);   //xy
+        array <string> post_term = readExpr(post_expr);     //ysin(x)
 
         std::cout << "[1] to find dy/dx \t[2] to find dx/dy";
         std::cin >> choice;
@@ -177,13 +185,16 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option)
         {
         case 1: //dy/dx
         {
+            result = "dy/dx = ";
             for (unsigned short i = 0; i < terms.length; i++)
             {
+                
                 result += implFunc(terms[i], 'x');
             }
         }
         case 2: //dx/dy
         {
+            result = "dx/dy = ";
             for (unsigned short i = 0; i < terms.length; i++)
             {
                 result += implFunc(terms[i], 'y');
