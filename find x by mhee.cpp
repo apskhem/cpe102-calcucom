@@ -71,10 +71,17 @@ int main(){
 	cout<<" _______   ___     ___        ____         ___     ___    ___   ___     "<<endl;
 	cout<<"[__   __] [   ]   [   ]      [    ]       [   ]   [   ]  [   ] [   ]    "<<endl;
 	cout<<"   [ ]    [   ]___[   ]     [  []  ]      [    ]  [   ]  [   ][   ]     "<<endl;
-	cout<<"   [ ]    [           ]    [  [__]  ]     [     ] [   ]  [      ]      "<<endl;
-	cout<<"   [ ]    [    ___    ]   [  ______  ]    [   ][ ][   ]  [      ]      "<<endl;
+	cout<<"   [ ]    [           ]    [  [__]  ]     [     ] [   ]  [      ]       "<<endl;
+	cout<<"   [ ]    [    ___    ]   [  ______  ]    [   ][ ][   ]  [      ]       "<<endl;
 	cout<<"   [ ]    [   ]   [   ]  [  ]      [  ]   [   ] [     ]  [   ][   ]     "<<endl;
 	cout<<"   [_]    [___]   [___] [__]        [__]  [___]  [____]  [___] [___]    "<<endl;
+	cout<<"       	          __       __	    _________     __       __               "<<endl;
+	cout<<"                 [  ]     [  ]     [  _____  ]   [  ]     [  ]	     	   "<<endl;
+	cout<<"                  [  ]   [  ]     [  ]     [  ]  [  ]     [  ]		       "<<endl;
+	cout<<"                   [  ] [  ]	  [  ]     [  ]  [  ]     [  ]			   "<<endl;
+	cout<<"                     [  ]  	  [  ]     [  ]  [  ]     [  ]		       "<<endl;
+	cout<<"                     [  ]         [  ]_____[  ]  [  ]_____[  ]              "<<endl;
+	cout<<"                     [__]	   [_________]    [_________]               "<<endl;
 	
 	
 }
@@ -146,44 +153,37 @@ double SDforx3(double A3,double B3,double C3,double D3){
 		
 	}
 	else if(count2==-999){
-		if(count1!=999){
-		 cout<<"x :"<<count1*(-1)<<",";
+		
+		cout<<"x :"<<count1*(-1)<<",";
 		 
-		}
+	}
+	else if(count1==999 && count2==-999){
 		cout<<"--------------------";
 		cout<<"    CANNOT FIND     ";
 		cout<<"--------------------";
 	}
 	
 	
-	
-	if(count1==998){
-		double num1=A3;
-	    double num2=B3+A3*count2;
-	    double num3=num2*count2+C3;
-	    double xot1=xp(num1,num2,num3);
-	    double xot2=xn(num1,num2,num3);
-	    cout<<"count2 ="<<count2<<endl;
-	    
-	    cout<<num1<<" "<<num2<<" "<<num3<<endl<<endl;
-	    
-	    cout<<xot1<<","<<xot2<<endl;
-	}
-	else {
+	if(count1==999){
 		double num1=A3;
 	    double num2=B3+A3*count1;
 	    double num3=num2*count1+C3;
 	    double xot1=xp(num1,num2,num3);
 	    double xot2=xn(num1,num2,num3);
-	    cout<<"count1 ="<<count1<<endl;
 	    
-	    cout<<num1<<" "<<num2<<" "<<num3<<endl<<endl;
+	    cout<<"x :"<<count1<<","<<xot1<<","<<xot2<<endl;
+	}
+	else {
+		double num1=A3;
+	    double num2=B3+A3*count2;
+	    double num3=num2*count2+C3;
 	    
-	    cout<<xot1<<","<<xot2<<endl;
+	    double xot1=xp(num1,num2,num3);
+	    double xot2=xn(num1,num2,num3);
+	    
+	    cout<<"x :"<<count2<<","<<xot1<<","<<xot2<<endl;
 	}
 	
-	
-	
-	
+
 }
 
