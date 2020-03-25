@@ -523,7 +523,7 @@ string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
                 if (i > 0)
                     result += "+";
 
-                result += "(" + toCalStr(a) + ")";
+                result += "(" + toString(a) + ")";
 
                 for (unsigned j = 0; j < each_term.length; i++)
                 {
@@ -546,7 +546,7 @@ string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
                 if (i > 0)
                     result += "+";
 
-                result += "(" + toCalStr(a) + ")";
+                result += "(" + toString(a) + ")";
 
                 for (unsigned j = 0; j < each_term.length; i++)
                 {
@@ -567,7 +567,7 @@ string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
                 if (i > 0)
                     result += "+";
 
-                result += "(" + toCalStr(a) + ")";
+                result += "(" + toString(a) + ")";
 
                 for (unsigned j = 0; j < each_term.length; i++)
                 {
@@ -592,7 +592,7 @@ string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
                 if (i > 0)
                     result += "+";
 
-                result += "(" + toCalStr(a) + ")";
+                result += "(" + toString(a) + ")";
 
                 for (unsigned j = 0; j < each_term.length; i++)
                 {
@@ -615,7 +615,7 @@ string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
                 if (i > 0)
                     result += "+";
 
-                result += "(" + toCalStr(a) + ")";
+                result += "(" + toString(a) + ")";
 
                 for (unsigned j = 0; j < each_term.length; i++)
                 {
@@ -636,7 +636,7 @@ string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
                 if (i > 0)
                     result += "+";
 
-                result += "(" + toCalStr(a) + ")";
+                result += "(" + toString(a) + ")";
 
                 for (unsigned j = 0; j < each_term.length; i++)
                 {
