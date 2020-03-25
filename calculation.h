@@ -7,6 +7,7 @@ double log_func(double b, double u)
 {
     int log_value = 0;
     log_value = log10(u) / log10(b);
+
     return log_value;
 }
 
@@ -412,6 +413,17 @@ double cal(string term, float x) //-3(x+2)
     return result;
 }
 
+array <string> impliRead(string term){
+    array <string> each_term;
+    unsigned i = 0;
+    
+    if(term.includes("^")){
+
+    }
+    
+
+}
+
 string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
 {
     array<string> each_term = readExpr(term); //y , sin(x)
@@ -427,24 +439,29 @@ string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
             if (i > 0) // xy
                 result += "+";
 
-      /*      if (each_term.includes("x") && each_term.includes("y")) // (x+y)^2
+            if (each_term.includes("x") && each_term.includes("y")) // (x+y)^2
             {
-                string mini_result = "";
-                each_term = readExpr(each_term[i]);  // x,y
-                for (unsigned j = 0; j < each_term.length; j++)
+                string mini_result = "(";
+                array<string> mini_each_term = readExpr(each_term[i]); // x,y
+
+                for (unsigned j = 0; j < mini_each_term.length; j++)
                 {
-                    if(each_term.includes("x"))
-                        mini_result += "(" + diff(each_term[i], 'x') + ")";
-                    if(each_term.includes("y"))
-                        mini_result += "(" + diff(each_term[i], 'y') + ")";
+                    if (j > 0)
+                        mini_result += "+";
+                    if (each_term.includes("x"))
+                        mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'x') + ")";
+                    if (each_term.includes("y"))
+                        mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'y') + ")(dy/dx)";
+                    mini_result += ")";
                 }
-            }*/
+                result += diff();
+            }
             else if (each_term.includes("x")) //x
                 result += "(" + diff(each_term[i], 'x') + ")";
             else if (each_term.includes("y")) //y
             {
                 result += "(" + diff(each_term[i], 'y') + ")";
-                result += "dy/dx";
+                result += "(dy/dx)";
             }
         }
     }
@@ -455,14 +472,27 @@ string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
             if (i > 0) // xy
                 result += "+";
 
-   /*         if (each_term.includes("x") && each_term.includes("y")) // (x+y)
+            if (each_term.includes("x") && each_term.includes("y")) // (x+y)
             {
-                result += 1;
-            }*/
+                string mini_result = "(";
+                array<string> mini_each_term = readExpr(each_term[i]); // x,y
+
+                for (unsigned j = 0; j < mini_each_term.length; j++)
+                {
+                    if (j > 0) // xy
+                        result += "+";
+                    if (each_term.includes("x"))
+                        mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'x') + ")(dx/dy)";
+                    if (each_term.includes("y"))
+                        mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'y') + ")";
+                    mini_result += ")";
+                }
+                result += diff(each_term[i], 'y')
+            }
             else if (each_term.includes("x")) //x
             {
                 result += "(" + diff(each_term[i], 'x') + ")";
-                result += "dx/dy";
+                result += "(dx/dy)";
             }
             else if (each_term.includes("y")) //y
                 result += "(" + diff(each_term[i], 'y') + ")";
