@@ -413,15 +413,81 @@ double cal(string term, float x) //-3(x+2)
     return result;
 }
 
-array <string> impliRead(string term){
-    array <string> each_term;
-    unsigned i = 0;
-    
-    if(term.includes("^")){
+array<string> impliRead(string term)
+{
+    array<string> each_term;
+    bool x_y_idx = 0, func_idx = 0;
+
+    for (unsigned i = 0; i < term.length; i++)
+    {
+        if (term[i] == 'x' || term[i] == 'y')
+        {
+            x_y_idx = true;
+            break;
+        }
+        else if (term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l' || term[i] == '^')
+        {
+            func_idx = true;
+            break;
+        }
+    }
+    if(func_idx = true){
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for(unsigned i = 0; i < term.length; i++)
+        {
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 's'|| term[i] == 'c' || term[i] == 't') && leftPar == rightPar)
+            {
+                i += 3; //skip in(
+                leftPar++;
+                while(term[i] != ')')
+                    i++;
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1;
+            }
+            else if (term[i] == '^')
+            {
+                i++; //skip^
+                while(term[i] != 'x' || term[i] != 'y' || term[i] != ')')
+                    i++;
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1;
+            }
+
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i));
+        }
 
     }
-    
 
+    else if (x_y_idx = true)
+    {
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for (unsigned i = 0; i < term.length; i++)
+        {
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 'x' || term[i] == 'y') && term[i + 1] != '^' && leftPar == rightPar)
+            {
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1;
+            }
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i));
+        }
+    }
+    return each_term;
 }
 
 string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
