@@ -1,9 +1,8 @@
 #include <iostream>
-#include <cstring>
 
 #include "array.h"
 #include "string.h"
-
+#include "number.h"
 
 int main() {
     //array<string> temp = {"test#1", "test#2"};
@@ -28,6 +27,12 @@ int main() {
 
     return 0;
 }
+
+TO DO LIST
+- Basic Derivative
+- Evaluation
+- Graph
+- Relative Max/Min
 
 112 : 0
 x : 1

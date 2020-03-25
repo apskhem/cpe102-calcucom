@@ -1,15 +1,17 @@
 class CalMath {
-    friend double powInt(double base, const int n);
+    friend double powInt(double, const int);
     /* The method reduces power of n by -1 of any form. */
-    friend string reduceN(string n);
+    friend string reduceN(string);
     /* The method performs simple calculation of string expression */
-    friend double calStrNum(string t);
+    friend double calStrNum(string);
+    /* The methood reads expression and find '+', '-' and var. */
+    bool hasSignOrVar(const string, char);
 };
 
 double powInt(double base, const int n) {
-    double result = base;
     if (n == 0) return 1;
 
+    double result = base;
     for (unsigned short i = 1; i < n; i++) {
         result *= base;
     }
@@ -75,6 +77,17 @@ double calStrNum(string t) {
     }
 
     return result; 
+}
+
+
+bool hasSignOrVar(const string expr, char var) {
+    for (unsigned short i = (expr[0] == '+' || expr[0] == '-'); i < expr.length; i++) {
+        if (expr[i] == '+' || expr[i] == '-' || expr[i] == var) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /* ################################ */

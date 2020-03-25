@@ -1,7 +1,7 @@
 #ifndef DERIVATIVE_H
 #define DERIVATIVE_H
 
-/* The method splits expression into arrays of term. */
+/* The method splits expression into arrays of string term. */
 array<string> readExpr(string);
 /* The methood turns arrays of term into a new derivative expression. */
 string exprDiff(array<string> terms, char var);
@@ -11,8 +11,8 @@ string diff(string term, char var);
 class TermComponents {
     public:
         string src;
-        array<string> u, deno_term, n, trigon, log, arc;
-        array<unsigned short> trigonIndex, varIndex, logIndex, nIndex, arcIndex, allIndex;
+        array<string> u, n, trig, log, arc, deno_term;
+        array<unsigned short> trigIndex, varIndex, logIndex, nIndex, arcIndex;
         unsigned forcedOp = 0; // 1 = mul
     
         TermComponents(string term);
@@ -37,7 +37,7 @@ TermComponents::TermComponents(string term) {
             string tfunc = term.slice(i, i + 3);
 
             if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot") {
-                trigonIndex.push(i);
+                trigIndex.push(i);
 
                 i += 4; // skip 'sin^...' or 'sin(...'
                 if (checkForN(i, i-1)) { // find: a*sin^n(u)
@@ -45,7 +45,7 @@ TermComponents::TermComponents(string term) {
                     u.push(tfunc + "(" + ElementInsidePar(i) + ")");
                 }
                 else { // find: a*sin(u) or a*sin^1(u)
-                    trigon.push(tfunc);
+                    trig.push(tfunc);
                     u.push(ElementInsidePar(i));
                 }
             }
@@ -59,16 +59,15 @@ TermComponents::TermComponents(string term) {
             string tfunc = term.slice(i+1, i+4);
 
             if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot")  {
-                tfunc = "a" + tfunc;
                 arcIndex.push(i);
 
                 i += 4; // skip 'sin^...' or 'sin(...'
                 if (checkForN(i, i-1)) { // find: a*sin^n(u)
                     while(term[i++] != '(');
-                    u.push(tfunc + "(" + ElementInsidePar(i) + ")");
+                    u.push("a" + tfunc + "(" + ElementInsidePar(i) + ")");
                 }
                 else { // find: a*sin(u) or a*sin^1(u)
-                    arc.push(tfunc);
+                    arc.push("a" + tfunc);
                     u.push(ElementInsidePar(i));
                 }
             }
@@ -220,20 +219,22 @@ string exprDiff(array<string> terms, char var) {
         if (i > 0 && diff(terms[i])[0] != '-')
             result += "+";
 
-        result += diff(TermComponents(terms[i]), var);
+        result += diff(terms[i], var);
     }
     return result;
 }
 
-string diff(TermComponents tc, char var) {
-    if (varIndex.length == 0 && u.length == 0) return ""; // only c
+string diff(string term, char var) {
+    TermComponents tc = TermComponents(term);
+
+    if (tc.varIndex.length == 0 && tc.u.length == 0) return ""; // only c
 
     string result = "";
-    double a = isNum(tc.src[0]) ? parseNum(tc.src) : 1;
+    double a = isNum(term[0]) ? parseNum(term) : 1;
 
-    if (u.length > 1 || (u.length >= 1 && tc.deno_term.length >= 1)) { 
+    if (u.length > 1 || tc.log.length > 1 || tc.trig.length > 1 || tc.arc.length > 1 || (u.length >= 1 && tc.deno_term.length >= 1)) { 
 
-        if(tc.forcedOp == 0){ //multiple            // (2x+3)(6x^3-2x)
+        if (tc.forcedOp == 0){ //multiple            // (2x+3)(6x^3-2x)
             for (unsigned i = 0; i < u.length; i++) {
                 if (i > 0)
                     result += "+";
@@ -278,144 +279,84 @@ string diff(TermComponents tc, char var) {
             result += "/ (" + denominator + ")^2";
         }
     }
-    else if (u.length == 1) {
-        if (trigon.length) { // CASE: a*sin(u) or a*sin^1(u)
+    else if (tc.u.length == 1 && tc.varIndex > 0) {
+
+    }
+    else if (tc.u.length == 1) {
+        if (tc.trig.length) { // CASE: a*sin(u) or a*sin^1(u)
             string diffTrigon1, diffTrigon2;
 
-            string chainDiff = diff(u[0], var);
-            bool hasSign = (chainDiff.includes("+") || chainDiff.includes("-"));
-            bool hasVarOrU = chainDiff.includes(var);
+            string chainDiff = diff(tc.u[0], var);
+            bool isChainHasOnlyNum = hasSignOrVar(chainDiff, var);
 
-            if (trigon[0] == "cos" || trigon[0] == "cot" || trigon[0] == "csc") a = -1;
+            if (tc.trig[0] == "cos" || tc.trig[0] == "cot" || tc.trig[0] == "csc") a = -1;
 
-            if (trigon[0] == "sin" || trigon[0] == "cos" || trigon[0] == "tan" || trigon[0] == "cot") {
+            if (tc.trig[0] == "sin" || tc.trig[0] == "cos" || tc.trig[0] == "tan" || tc.trig[0] == "cot") {
 
-                if (trigon[0] == "sin") diffTrigon1 = "cos";
-                else if (trigon[0] == "cos") diffTrigon1 = "sin"; //-
-                else if (trigon[0] == "tan") diffTrigon1 = "sec^2";
-                else if (trigon[0] == "cot") diffTrigon1 = "csc^2"; //-
+                if (tc.trig[0] == "sin") diffTrigon1 = "cos";
+                else if (tc.trig[0] == "cos") diffTrigon1 = "sin"; //-
+                else if (tc.trig[0] == "tan") diffTrigon1 = "sec^2";
+                else if (tc.trig[0] == "cot") diffTrigon1 = "csc^2"; //-
 
-                if (hasSign || hasVarOrU)
-                    result = toCalStr(a) + diffTrigon1 + "(" + u[0] + ")(" + chainDiff + ")";
-                else
-                    result = toCalStr(a * parseNum(chainDiff)) + diffTrigon1 + "(" + u[0] + ")";
+                result = isChainHasOnlyNum
+                    ? toCalStr(a * parseNum(chainDiff)) + diffTrigon1 + "(" + tc.u[0] + ")"
+                    : toCalStr(a) + diffTrigon1 + "(" + tc.u[0] + ")(" + chainDiff + ")";
             }
             else {
-                if (trigon[0] == "csc") {
+                if (tc.trig[0] == "csc") {
                     diffTrigon1 = "csc";
                     diffTrigon2 = "cot";
                 }
-                if (trigon[0] == "sec") {
+                if (tc.trig[0] == "sec") {
                     diffTrigon1 = "sec";
                     diffTrigon2 = "tan";
                 }
 
-                if (hasSign || hasVarOrU)
-                    result = toCalStr(a) + diffTrigon1 + "(" + u[0] + ")" + diffTrigon2 + "(" + u[0] + ")(" + chainDiff + ")";
-                else
-                    result = toCalStr(a * parseNum(chainDiff)) + diffTrigon1 + "(" + u[0] + ")" + diffTrigon2 + "(" + u[0] + ")(" + chainDiff + ")";
+                result = isChainHasOnlyNum
+                    ? toCalStr(a * parseNum(chainDiff)) + diffTrigon1 + "(" + tc.u[0] + ")" + diffTrigon2 + "(" + tc.u[0] + ")"
+                    : toCalStr(a) + diffTrigon1 + "(" + tc.u[0] + ")" + diffTrigon2 + "(" + tc.u[0] + ")(" + chainDiff + ")";
             }
         }
-        else if (trigonIndex.length > 0) { // CASE: a*sin^n(u)
-            n = parseNum(tc, trigonIndex[0] + 4);
-            string chainDiff = diff(u[0], var);
+        else if (tc.trigIndex.length) { // CASE: a*sin^n(u)
+            string redN = reduceN(tc.n[0]);
+            string chainDiff = diff(tc.u[0], var);
 
-            for (unsigned short i = 0; i < u[0].length && u[0][i] != '('; i++) { // find fisrt '(' pos
-                fisrtParPos++;
-            }
+            string blockInsideTrigon = tc.u[0].slice(tc.u[0].search("("));
 
-            if (n - 1 == 1)
-                result = toCalStr(a * n) + u[0] + "*" + chainDiff;
-            else {
-                string tempBlock = u[0].slice(fisrtParPos, u[0].length);
-                result = toCalStr(a * n) + u[0].slice(0, 3) + "^" + toCalStr(n - 1) + tempBlock + "*" + chainDiff;
-            }
+            result = redN == "1"
+                ? toCalStr(a * calStrNum(redN)) + tc.u[0] + "*" + chainDiff
+                : toCalStr(a * calStrNum(redN)) + tc.u[0].slice(0, 3) + "^" + toCalStr(n - 1) + blockInsideTrigon + "*" + chainDiff;
         }
-        /*
-        else if (arc.length){
-            a *= parseNum(tc);
+        else if (tc.arc.length) {
+            string chainDiff = diff(tc.u[0], var);
+            bool isChainHasOnlyNum = hasSignOrVar(chainDiff, var);
 
-            string chainDiff = diff(u[0], var);
-            bool hasSign = (chainDiff.includes("+") || chainDiff.includes("-"));
-            bool hasVarOrU = chainDiff.includes(var);
+            if (tc.arc[0] == "acos" || tc.arc[0] == "acot" || tc.arc[0] == "acsc") a *= -1;
 
-            if (arc[0] == "sin")
-            {
-                if (hasSign || hasVarOrU) // 5arcsin(3x^2 + 5x) => 5(6x+5)
-                    result = toCalStr(a) + "(" + chainDiff + ") / sqrt(1 - (" + u[0] + ")^2 )";
-                else // 5arcsin(3x) => 5(3)
-                    result = toCalStr(a * parseNum(chainDiff)) + ") / sqrt(1 - (" + u[0] + ")^2 )";
-            }
-            else if (arc[0] == "cos"){
-                a *= -1;
-                if (hasSign || hasVarOrU) // 5arccos(3x^2 + 5x) => 5(6x+5)
-                    result = toCalStr(a) + "(" + chainDiff + ") / sqrt(1 - (" + u[0] + ")^2 )";
-                else // 5arcsin(3x) => 5(3)
-                    result = toCalStr(a * parseNum(chainDiff)) + ") / sqrt(1 - (" + u[0] + ")^2 )";
-            }
-            else if (arc[0] == "tan"){
-                if (hasSign || hasVarOrU) // 5arctan(3x^2 + 5x) => 5(6x+5)
-                    result = toCalStr(a) + "(" + chainDiff + ") / sqrt(1 + (" + u[0] + ")^2 )";
-                else // 5arctan(3x) => 5(3)
-                    result = toCalStr(a * parseNum(chainDiff)) + ") / sqrt(1 + (" + u[0] + ")^2 )";
-            }
-            else if (arc[0] == "cot"){
-                a *= -1;
-                if (hasSign || hasVarOrU) // 5arccot(3x^2 + 5x) => 5(6x+5)
-                    result = toCalStr(a) + "(" + chainDiff + ") / sqrt(1 + (" + u[0] + ")^2 )";
-                else // 5arccot(3x) => 5(3)
-                    result = toCalStr(a * parseNum(chainDiff)) + ") / sqrt(1 + (" + u[0] + ")^2 )";
-            }
-            else if (arc[0] == "sec"){
-                if (hasSign || hasVarOrU) // 5arcsec(3x^2 + 5x) => 5(6x+5)
-                    result = toCalStr(a) + "(" + chainDiff + ") / |" + u[0] + "|(sqrt(" + u[0] + ")^2 -1 )";
-                else // 5arctan(3x) => 5(3)
-                    result = toCalStr(a * parseNum(chainDiff)) + ") / |" + u[0] + "|(sqrt(" + u[0] + ")^2 -1 )";
-            }
-            else if (arc[0] == "csc"){
-                a *= -1;
-                if (hasSign || hasVarOrU) // 5arcsec(3x^2 + 5x) => 5(6x+5)
-                    result = toCalStr(a) + "(" + chainDiff + ") / |" + u[0] + "|(sqrt(" + u[0] + ")^2 -1 )";
-                else // 5arctan(3x) => 5(3)
-                    result = toCalStr(a * parseNum(chainDiff)) + ") / |" + u[0] + "|(sqrt(" + u[0] + ")^2 -1 )";
-            }
+            result = isChainHasOnlyNum
+                ? toCalStr(a * parseNum(chainDiff)) + ")/";
+                : toCalStr(a) + "(" + chainDiff + ")/";
+
+            if (tc.arc[0] == "asin" || tc.arc[0] == "acos") result += "((1-(" + tc.u[0] + ")^2)^(1/2))";
+            else if (tc.arc[0] == "atan" || tc.arc[0] == "acot") result += "(1-(" + tc.u[0] + ")^2)";
+            else if (tc.arc[0] == "asec" || tc.arc[0] == "acsc") result += "(|" + tc.u[0] + "|((" + tc.u[0] + ")^2-1)^(1/2))";
         }
-        else if (log.length) {
-            if (trigonIndex[0] != 0)
-            {
-                a *= parseNum(tc);
-                string chainDiff = diff(u[0], var);
-                short idx = 0;
-                for(unsigned i = 0; i < tc.log.length; i++){
-                    if(!isNum(tc.log))
-                        break;
-                    else 
-                        idx++;
-                }
-                string b = log.splice(3,3+idx);   
+        else if (tc.log.length) {
+            string chainDiff = diff(tc.u[0], var);
+            bool isChainHasOnlyNum = hasSignOrVar(chainDiff, var);
 
-                bool hasSign = (chainDiff.includes("+") || chainDiff.includes("-"));
-                bool hasVarOrU = chainDiff.includes(var);
-
-                if  (hasSign || hasVarOrU)    // -5log10(5x^2 + sin(x)) => 5x + cos(x)
-                    result = toCalStr(a) + "(" + chainDiff + ")/(" + u[0] + ")(ln(" + b + ")";
-                else    // -5log10(5x+10) => 5      
-                    result = toCalStr(a * parseNum(chainDiff))+ ")/(" + u[0] + ")(ln(" + b + ")";
+            if (tc.log[0].length > 2) { // log...
+                result = isChainHasOnlyNum
+                    ? toCalStr(a * parseNum(chainDiff)) + "/((" + tc.u[0] + ")ln" + tc.log[0].slice(3) + ")"
+                    : toCalStr(a) + "(" + chainDiff + ")/((" + tc.u[0] + ")ln" + tc.log[0].slice(3) + ")";
             }
-            if (log[0] == "ln"){
-                a *= parseNum(tc);
-                string chainDiff = diff(u[0], var);
-                bool hasSign = (chainDiff.includes("+") || chainDiff.includes("-"));
-                bool hasVarOrU = chainDiff.includes(var);
-
-                if  (hasSign || hasVarOrU)    // -5ln(5x^2 + sin(x)) => 5x + cos(x)
-                    result = toCalStr(a) + "(" + chainDiff + ")/(" + u[0] + ")";
-                else    // -5ln(5x+10) => 5      
-                    result = toCalStr(a * parseNum(chainDiff))+ ")/(" + u[0] + ")";
+            else { // ln
+                result = isChainHasOnlyNum
+                    ? toCalStr(a * parseNum(chainDiff)) + "/(" + tc.u[0] + ")"
+                    : toCalStr(a) + "(" + chainDiff + ")/(" + tc.u[0] + ")";
             }
         }
     }
-    */
     else if (u.length == 0) {
         switch (tc.src[varIndex[0] + 1]) {
             case '^': { // CASE: ax^n or ax^(n)
