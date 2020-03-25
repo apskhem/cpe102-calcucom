@@ -151,9 +151,9 @@ String::~String() {
 }
 
 /* call operators */
-String::operator char*() {return _proto_;}
-String::operator const char*() {return _proto_;}
-char& String::operator[] (const int index) {return _proto_[index];}
+String::operator char*() { return _proto_; }
+String::operator const char*() { return _proto_; }
+char& String::operator[] (const int index) { return _proto_[index]; }
 
 /* processing operators: FRIEND */
 std::ostream& operator<< (std::ostream &out, const String &str) {
@@ -186,10 +186,8 @@ String operator+ (const char *lstr, String &rstr) {
     char result[llength+rstr.length+1];
     result[llength+rstr.length] = '\0';
 
-    for (unsigned i = 0; i < llength; i++)
-        result[i] = lstr[i];
-    for (unsigned i = 0; i < rstr.length; i++)
-        result[rstr.length+i] = rstr._proto_[i];
+    for (unsigned i = 0; i < llength; i++) result[i] = lstr[i];
+    for (unsigned i = 0; i < rstr.length; i++) result[rstr.length+i] = rstr._proto_[i];
 
     rstr._proto_ = result;
     rstr.length += llength;
@@ -204,10 +202,8 @@ String String::operator+ (const char *str) {
     _proto_ = new char[length+inlength+1];
     _proto_[length+inlength] = '\0';
 
-    for (unsigned i = 0; i < length; i++)
-        _proto_[i] = old[i];
-    for (unsigned i = 0; i < inlength; i++)
-        _proto_[length+i] = str[i];
+    for (unsigned i = 0; i < length; i++) _proto_[i] = old[i];
+    for (unsigned i = 0; i < inlength; i++) _proto_[length+i] = str[i];
 
     delete[] old;
     length += inlength;
@@ -220,10 +216,8 @@ String String::operator+ (const String &str) {
     _proto_ = new char[length+str.length+1];
     _proto_[length+str.length] = '\0';
 
-    for (unsigned i = 0; i < length; i++)
-        _proto_[i] = old[i];
-    for (unsigned i = 0; i < str.length; i++)
-        _proto_[length+i] = str._proto_[i];
+    for (unsigned i = 0; i < length; i++) _proto_[i] = old[i];
+    for (unsigned i = 0; i < str.length; i++) _proto_[length+i] = str._proto_[i];
 
     delete[] old;
     length += str.length;
@@ -240,10 +234,8 @@ String String::operator+= (const char *str) {
     _proto_ = new char[length+inlength+1];
     _proto_[length+inlength] = '\0';
 
-    for (unsigned i = 0; i < length; i++)
-        _proto_[i] = old[i];
-    for (unsigned i = 0; i < inlength; i++)
-        _proto_[length+i] = str[i];
+    for (unsigned i = 0; i < length; i++) _proto_[i] = old[i];
+    for (unsigned i = 0; i < inlength; i++) _proto_[length+i] = str[i];
 
     delete[] old;
     length += inlength;
@@ -257,8 +249,7 @@ String String::operator+= (const char chr) {
     _proto_[length-1] = chr;
     _proto_[length] = '\0';
     
-    for (unsigned i = 0; i < length-1; i++)
-        _proto_[i] = old[i];
+    for (unsigned i = 0; i < length-1; i++) _proto_[i] = old[i];
     
     delete[] old;
 
@@ -270,10 +261,8 @@ String String::operator+= (const String &str) {
     _proto_ = new char[length+str.length+1];
     _proto_[length+str.length] = '\0';
 
-    for (unsigned i = 0; i < length; i++)
-        _proto_[i] = old[i];
-    for (unsigned i = 0; i < str.length; i++)
-        _proto_[length+i] = str._proto_[i];
+    for (unsigned i = 0; i < length; i++) _proto_[i] = old[i];
+    for (unsigned i = 0; i < str.length; i++) _proto_[length+i] = str._proto_[i];
 
     delete[] old;
     length += str.length;
@@ -349,9 +338,7 @@ void String::assign(const char *str) {
 
     _proto_ = new char[length+1];
         
-    for (unsigned i = 0; i < length+1; i++) {
-        _proto_[i] = str[i];
-    }
+    for (unsigned i = 0; i < length+1; i++) _proto_[i] = str[i];
 
     _proto_[length] = '\0';
 }

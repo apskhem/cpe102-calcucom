@@ -135,7 +135,8 @@ TermComponents::TermComponents(string term) {
     }
 
     // completion
-    if (varIndex > 1) {
+    if (varIndex > 0 && (u.length > 0 || log.length > 0 || trig.length > 0 || arc.length > 0)) {
+        u.unshift(src.slice(0, src.search("(")));
         //++ marge var like (2x)(4x^4) to 8x^5
     }
 }
@@ -277,9 +278,6 @@ string diff(string term, char var) {
         result += "[(" + denominator + ")(" + exprDiff(readExpr(numerator), var) +") ";
         result += "- (" + numerator + ")(" + exprDiff(readExpr(denominator), var) + ")] ";
         result += "/ (" + denominator + ")^2";
-    }
-    else if (tc.u.length == 1 && tc.varIndex) {
-
     }
     else if (tc.u.length == 1) {
         if (tc.trig.length) { // CASE: a*sin(u) or a*sin^1(u)
