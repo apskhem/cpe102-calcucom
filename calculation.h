@@ -431,42 +431,7 @@ array<string> impliRead(string term)
             break;
         }
     }
-    if(func_idx = true){
-        unsigned start = 0;
-        unsigned leftPar = 0, rightPar = 0;
-
-        for(unsigned i = 0; i < term.length; i++)
-        {
-            if (term[i] == '(')
-                leftPar++;
-            else if (term[i] == ')')
-                rightPar++;
-
-            if ((term[i] == 's'|| term[i] == 'c' || term[i] == 't') && leftPar == rightPar)
-            {
-                i += 3; //skip in(
-                leftPar++;
-                while(term[i] != ')')
-                    i++;
-                each_term.push(term.slice(start, i + 1));
-                start = i + 1;
-            }
-            else if (term[i] == '^')
-            {
-                i++; //skip^
-                while(term[i] != 'x' || term[i] != 'y' || term[i] != ')')
-                    i++;
-                each_term.push(term.slice(start, i + 1));
-                start = i + 1;
-            }
-
-            if (i == term.length - 1)
-                each_term.push(term.slice(start, i));
-        }
-
-    }
-
-    else if (x_y_idx = true)
+    if (func_idx = true)
     {
         unsigned start = 0;
         unsigned leftPar = 0, rightPar = 0;
@@ -478,94 +443,134 @@ array<string> impliRead(string term)
             else if (term[i] == ')')
                 rightPar++;
 
-            if ((term[i] == 'x' || term[i] == 'y') && term[i + 1] != '^' && leftPar == rightPar)
+            if ((term[i] == 's' || term[i] == 'c' || term[i] == 't' || a[i] == 'l') && leftPar == rightPar)
             {
+                i += 3; //skip in(
+                leftPar++;
+                while (term[i] != ')')
+                    i++;
                 each_term.push(term.slice(start, i + 1));
                 start = i + 1;
             }
+
+            else if (term[i] == '^')
+            {
+                unsigned stop = i;
+
+                if (term[i] != 'x' || term[i] != 'y' || term[i] != ')')
+                {
+                    while (isNum(term[++i]))
+                        stop++;
+                }
+                each_term.push(term.slice(start, stop + 1));
+                start = stop + 1;
+            }
+
             if (i == term.length - 1)
-                each_term.push(term.slice(start, i));
+                    each_term.push(term.slice(start, i));
         }
+
+        else if (x_y_idx = true)
+        {
+            unsigned start = 0;
+            unsigned leftPar = 0, rightPar = 0;
+
+            for (unsigned i = 0; i < term.length; i++)
+            {
+                if (term[i] == '(')
+                    leftPar++;
+                else if (term[i] == ')')
+                    rightPar++;
+
+                if ((term[i] == 'x' || term[i] == 'y') && term[i + 1] != '^' && leftPar == rightPar)
+                {
+                    each_term.push(term.slice(start, i + 1));
+                    start = i + 1;
+                }
+                if (i == term.length - 1)
+                    each_term.push(term.slice(start, i));
+            }
+        }
+        return each_term;
     }
-    return each_term;
 }
 
-string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
-{
-    array<string> each_term = readExpr(term); //y , sin(x)
-    string result = "";
-    double a = parseNum(term);
-
-    result += toCalStr(a);
-
-    if (var == 'x') //dy/dx
+    string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
     {
-        for (unsigned i = 0; i < each_term.length; i++)
+        array<string> each_term = readExpr(term); //y , sin(x)
+        string result = "";
+        double a = parseNum(term);
+
+        result += toCalStr(a);
+
+        if (var == 'x') //dy/dx
         {
-            if (i > 0) // xy
-                result += "+";
-
-            if (each_term.includes("x") && each_term.includes("y")) // (x+y)^2
+            for (unsigned i = 0; i < each_term.length; i++)
             {
-                string mini_result = "(";
-                array<string> mini_each_term = readExpr(each_term[i]); // x,y
+                if (i > 0) // xy
+                    result += "+";
 
-                for (unsigned j = 0; j < mini_each_term.length; j++)
+                if (each_term.includes("x") && each_term.includes("y")) // (x+y)^2
                 {
-                    if (j > 0)
-                        mini_result += "+";
-                    if (each_term.includes("x"))
-                        mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'x') + ")";
-                    if (each_term.includes("y"))
-                        mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'y') + ")(dy/dx)";
-                    mini_result += ")";
+                    string mini_result = "(";
+                    array<string> mini_each_term = readExpr(each_term[i]); // x,y
+
+                    for (unsigned j = 0; j < mini_each_term.length; j++)
+                    {
+                        if (j > 0)
+                            mini_result += "+";
+                        if (each_term.includes("x"))
+                            mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'x') + ")";
+                        if (each_term.includes("y"))
+                            mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'y') + ")(dy/dx)";
+                        mini_result += ")";
+                    }
+                    result += diff();
                 }
-                result += diff();
-            }
-            else if (each_term.includes("x")) //x
-                result += "(" + diff(each_term[i], 'x') + ")";
-            else if (each_term.includes("y")) //y
-            {
-                result += "(" + diff(each_term[i], 'y') + ")";
-                result += "(dy/dx)";
+                else if (each_term.includes("x")) //x
+                    result += "(" + diff(each_term[i], 'x') + ")";
+                else if (each_term.includes("y")) //y
+                {
+                    result += "(" + diff(each_term[i], 'y') + ")";
+                    result += "(dy/dx)";
+                }
             }
         }
-    }
-    if (var == 'y')
-    {
-        for (unsigned i = 0; i < each_term.length; i++)
+        if (var == 'y')
         {
-            if (i > 0) // xy
-                result += "+";
-
-            if (each_term.includes("x") && each_term.includes("y")) // (x+y)
+            for (unsigned i = 0; i < each_term.length; i++)
             {
-                string mini_result = "(";
-                array<string> mini_each_term = readExpr(each_term[i]); // x,y
+                if (i > 0) // xy
+                    result += "+";
 
-                for (unsigned j = 0; j < mini_each_term.length; j++)
+                if (each_term.includes("x") && each_term.includes("y")) // (x+y)
                 {
-                    if (j > 0) // xy
-                        result += "+";
-                    if (each_term.includes("x"))
-                        mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'x') + ")(dx/dy)";
-                    if (each_term.includes("y"))
-                        mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'y') + ")";
-                    mini_result += ")";
-                }
-                result += diff(each_term[i], 'y')
-            }
-            else if (each_term.includes("x")) //x
-            {
-                result += "(" + diff(each_term[i], 'x') + ")";
-                result += "(dx/dy)";
-            }
-            else if (each_term.includes("y")) //y
-                result += "(" + diff(each_term[i], 'y') + ")";
-        }
-    }
+                    string mini_result = "(";
+                    array<string> mini_each_term = readExpr(each_term[i]); // x,y
 
-    return result;
-}
+                    for (unsigned j = 0; j < mini_each_term.length; j++)
+                    {
+                        if (j > 0) // xy
+                            result += "+";
+                        if (each_term.includes("x"))
+                            mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'x') + ")(dx/dy)";
+                        if (each_term.includes("y"))
+                            mini_result += "(" + toCalStr(parseNum(mini_each_term[i])) + diff(mini_each_term[i], 'y') + ")";
+                        mini_result += ")";
+                    }
+                    result += diff(each_term[i], 'y')
+                }
+                else if (each_term.includes("x")) //x
+                {
+                    result += "(" + diff(each_term[i], 'x') + ")";
+                    result += "(dx/dy)";
+                }
+                else if (each_term.includes("y")) //y
+                    result += "(" + diff(each_term[i], 'y') + ")";
+            }
+        }
+
+        return result;
+    }
 
 #endif
