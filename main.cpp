@@ -42,9 +42,9 @@ int main()
     std::cout << "    [  ]        [  __  ]   [  ]         [  ]        [  ]   [  ]  [  ]      [ ]        [ ]  [     ][  [  ]     \n";
     std::cout << "    [  ]_____  [  ]  [  ]  [  ]______   [  ]_____   [  ]___[  ]  [  ]_____  [ ]______[ ]   [  ][ ][ ][  ]     \n";
     std::cout << "    [________] [__]  [__]  [_________]  [________]  [_________]  [________]  [________]    [__] [__] [__]     \n";
-    
+
     system("pause");
-	system("cls");
+    system("cls");
 
     std::cout << "\nEnter f(x) = ";
     getline(std::cin, expr);
@@ -165,12 +165,12 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option)
         unsigned short choice;
         string impl_expr, pre_expr, post_expr;
 
-        std::cout << "Please enter new expresion : ";       // xy = ysin(x)
+        std::cout << "Please enter new expresion : "; // xy = ysin(x)
         getline(std::cin, impl_expr);
         sscanf(impl_expr, "%[^=] %s=%s", pre_expr, post_expr);
 
-        array <string> pre_term = readExpr(pre_expr);   //xy
-        array <string> post_term = readExpr(post_expr);     //ysin(x)
+        array<string> pre_term = readExpr(pre_expr);   //xy
+        array<string> post_term = readExpr(post_expr); //ysin(x)
 
         std::cout << "[1] to find dy/dx \t[2] to find dx/dy";
         std::cin >> choice;
@@ -180,10 +180,13 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option)
         case 1: //dy/dx
         {
             result = "dy/dx = ";
-            for (unsigned short i = 0; i < terms.length; i++)
+            for (unsigned short i = 0; i < pre_term.length; i++)
             {
-                
-                result += implFunc(terms[i], 'x');
+                result += implFunc(pre_term[i], 'x');
+            }
+            for (unsigned i = 0; i < post_term.length; i++)
+            {
+                result += implFunc(post_term[i], 'x');
             }
         }
         case 2: //dx/dy
@@ -235,7 +238,8 @@ array<string> operation(string term)
     return term_sep;
 }
 
-void error(string msg) {
+void error(string msg)
+{
     std::cout << "Bad arithmetic expression: " << msg << ".\n\n";
     throw 0;
 }
