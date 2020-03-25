@@ -7,6 +7,7 @@ double log_func(double b, double u)
 {
     int log_value = 0;
     log_value = log10(u) / log10(b);
+
     return log_value;
 }
 
@@ -412,64 +413,241 @@ double cal(string term, float x) //-3(x+2)
     return result;
 }
 
+array<string> impliRead(string term)
+{
+    array<string> each_term;
+    bool x_y_idx = 0, func_idx = 0;
+
+    for (unsigned i = 0; i < term.length; i++)
+    {
+        if (term[i] == 'x' || term[i] == 'y')
+        {
+            x_y_idx = true;
+            break;
+        }
+        else if (term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l' || term[i] == '^')
+        {
+            func_idx = true;
+            break;
+        }
+    }
+    if (func_idx = true)
+    {
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for (unsigned i = 0; i < term.length; i++)
+        {
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 's' || term[i] == 'c' || term[i] == 't' || a[i] == 'l') && leftPar == rightPar)
+            {
+                i += 3; //skip in(
+                leftPar++;
+                while (term[i] != ')')
+                    i++;
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1;
+            }
+
+            else if (term[i] == '^')
+            {
+                unsigned stop = i;
+
+                if (term[i] != 'x' || term[i] != 'y' || term[i] != ')')
+                {
+                    while (isNum(term[++i]))
+                        stop++;
+                }
+                each_term.push(term.slice(start, stop + 1));
+                start = stop + 1;
+            }
+
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i));
+        }
+    }
+    else if (x_y_idx = true)
+    {
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for (unsigned i = 0; i < term.length; i++)
+        {
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 'x' || term[i] == 'y') && term[i + 1] != '^' && leftPar == rightPar)
+            {
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1;
+            }
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i));
+        }
+    }
+    return each_term;
+}
+
 string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
 {
-    array<string> each_term = readExpr(term); //y , sin(x)
+    array<string> each_term;
     string result = "";
-    double a = parseNum(term);
+    bool x_y = false, x_only = false, y_only = false;
 
-    result += toString(a);
-
-    if (var == 'x') //dy/dx
+    for (unsigned i = 0; i < term.length; i++)
     {
-        for (unsigned i = 0; i < each_term.length; i++)
-        {
-            if (i > 0) // xy
-                result += "+";
+        if (term.includes("x") && term.includes("y"))
+            x_y = true;
+        else if (term.includes("x"))
+            x_only = true;
+        else if (term.includes("y"))
+            y_only = true;
+    }
 
-      /*      if (each_term.includes("x") && each_term.includes("y")) // (x+y)^2
+    if (var == 'x') //dy/dx******
+    {
+        if (x_y) //xy
+        {
+            each_term = impliRead(term); //x,y
+
+            for (unsigned i = 0; i < each_term.length; i++)
             {
-                string mini_result = "";
-                each_term = readExpr(each_term[i]);  // x,y
-                for (unsigned j = 0; j < each_term.length; j++)
+                double a = parseNum(each_term[i]);
+
+                if (i > 0)
+                    result += "+";
+
+                result += "(" + toCalStr(a) + ")";
+
+                for (unsigned j = 0; j < each_term.length; i++)
                 {
-                    if(each_term.includes("x"))
-                        mini_result += "(" + diff(each_term[i], 'x') + ")";
-                    if(each_term.includes("y"))
-                        mini_result += "(" + diff(each_term[i], 'y') + ")";
+                    result += "(";
+                    if (each_term[i].includes("x"))
+                        result += (i == j ? diff(each_term[i], 'x') : each_term[i]) + ")";
+                    else if (each_term[i].includes("y"))
+                        result += (i == j ? diff(each_term[i], 'y') : each_term[i]) + ")(dy/dx)";
                 }
-            }*/
-            else if (each_term.includes("x")) //x
-                result += "(" + diff(each_term[i], 'x') + ")";
-            else if (each_term.includes("y")) //y
-            {
-                result += "(" + diff(each_term[i], 'y') + ")";
-                result += "dy/dx";
             }
         }
-    }
-    if (var == 'y')
-    {
-        for (unsigned i = 0; i < each_term.length; i++)
+        else if (x_only)
         {
-            if (i > 0) // xy
-                result += "+";
+            each_term = readExpr(term); //3sin(x)
 
-   /*         if (each_term.includes("x") && each_term.includes("y")) // (x+y)
+            for (unsigned i = 0; i < each_term.length; i++)
             {
-                result += 1;
-            }*/
-            else if (each_term.includes("x")) //x
-            {
-                result += "(" + diff(each_term[i], 'x') + ")";
-                result += "dx/dy";
+                double a = parseNum(each_term[i]);
+
+                if (i > 0)
+                    result += "+";
+
+                result += "(" + toCalStr(a) + ")";
+
+                for (unsigned j = 0; j < each_term.length; i++)
+                {
+                    result += "(";
+                    result += (i == j ? diff(each_term[i], 'x') : each_term[i]);
+                    result += ")";
+                }
             }
-            else if (each_term.includes("y")) //y
-                result += "(" + diff(each_term[i], 'y') + ")";
+        }
+        else if (y_only)
+        {
+            each_term = readExpr(term); //3sin(y)
+
+            for (unsigned i = 0; i < each_term.length; i++)
+            {
+                double a = parseNum(each_term[i]);
+
+                if (i > 0)
+                    result += "+";
+
+                result += "(" + toCalStr(a) + ")";
+
+                for (unsigned j = 0; j < each_term.length; i++)
+                {
+                    result += "(";
+                    result += (i == j ? diff(each_term[i], 'y') : each_term[i]);
+                    result += ")(dy/dx)";
+                }
+            }
         }
     }
 
-    return result;
-}
+    else if (var == 'y')
+    {
+        if (x_y) //xy
+        {
+            each_term = impliRead(term); //x,y
+
+            for (unsigned i = 0; i < each_term.length; i++)
+            {
+                double a = parseNum(each_term[i]);
+
+                if (i > 0)
+                    result += "+";
+
+                result += "(" + toCalStr(a) + ")";
+
+                for (unsigned j = 0; j < each_term.length; i++)
+                {
+                    result += "(";
+                    if (each_term[i].includes("x"))
+                        result += (i == j ? diff(each_term[i], 'x') : each_term[i]) + ")(dx/dy)";
+                    else if (each_term[i].includes("y"))
+                        result += (i == j ? diff(each_term[i], 'y') : each_term[i]) + ")";
+                }
+            }
+        }
+        else if (x_only)
+        {
+            each_term = readExpr(term); //3sin(x)
+
+            for (unsigned i = 0; i < each_term.length; i++)
+            {
+                double a = parseNum(each_term[i]);
+
+                if (i > 0)
+                    result += "+";
+
+                result += "(" + toCalStr(a) + ")";
+
+                for (unsigned j = 0; j < each_term.length; i++)
+                {
+                    result += "(";
+                    result += (i == j ? diff(each_term[i], 'x') : each_term[i]);
+                    result += ")(dx/dy)";
+                }
+            }
+        }
+        else if (y_only)
+        {
+            each_term = readExpr(term); //3sin(y)
+
+            for (unsigned i = 0; i < each_term.length; i++)
+            {
+                double a = parseNum(each_term[i]);
+
+                if (i > 0)
+                    result += "+";
+
+                result += "(" + toCalStr(a) + ")";
+
+                for (unsigned j = 0; j < each_term.length; i++)
+                {
+                    result += "(";
+                    result += (i == j ? diff(each_term[i], 'y') : each_term[i]);
+                    result += ")";
+                }
+            }
+        }
+
+        return result;
+    }
 
 #endif
