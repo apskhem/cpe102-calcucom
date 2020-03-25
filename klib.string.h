@@ -9,9 +9,9 @@ typedef class String {
     friend std::ostream& operator<< (std::ostream &, const String &);
     friend std::istream& operator>> (std::istream &, String &);
     friend std::istream& getline(std::istream &, String &);
-    /* The method converts numbers to arithmetic string. */
+    /* The method converts numbers to arithmetic string. max decimal places is 2. */
     template <class number>
-    friend String toCalStr(number);
+    friend String toString(number);
     /* The method converts Unicode values into characters. */
     friend char fromCharCode(const unsigned);
     private:
@@ -358,11 +358,31 @@ void String::assign(const char *str) {
 
 /* class methods: FRIEND */
 template <class number>
-String toCalStr(number n) {
+String toString(number n) {
     if (n == 1) return "";
     if (n == -1) return "-";
 
-    return std::to_string(int(n)).c_str();
+    string t = std::to_string(n).c_str();
+    unsigned short dotPos = -1, lastZeroPos = -1;
+
+    for (unsigned short i = 0; i < t.length; i++) {
+        if (t[i] == '.') {
+            dotPos = i;
+            break;
+        }
+    }
+
+    if (dotPos == -1) return t;
+
+    for (unsigned short i = t.length-1; i >= dotPos; i++) {
+        if (t[i] != '0' || i == dotPos) lastZeroPos = i+1;
+    }
+
+    switch (lastZeroPos - dotPos) {
+        case 1: return t.slice(0, dotPos); // .0
+        case 2: return t.slice(0, dotPos+2); // .x0
+        default: return t.slice(0, dotPos+3); // .xx0
+    }
 }
 
 /* class methods: BUILT-IN */

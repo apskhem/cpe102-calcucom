@@ -91,7 +91,6 @@ bool hasSignOrVar(const string expr, char var) {
 }
 
 /* ################################ */
-/* ################################ */
 
 class Number {
     friend double parseNum(string, const unsigned=0, unsigned=-1);

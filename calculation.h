@@ -418,7 +418,7 @@ string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
     string result = "";
     double a = parseNum(term);
 
-    result += toCalStr(a);
+    result += toString(a);
 
     if (var == 'x') //dy/dx
     {
