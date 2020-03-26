@@ -121,7 +121,7 @@ String::String(const char *str) {
     _proto_ = new char[length = strlen(str)+1];
     _proto_[length] = '\0';
         
-    for (unsigned i = 0; i < length+1; i++) _proto_[i] = str[i];
+    for (unsigned i = 0; i < length; i++) _proto_[i] = str[i];
 }
 
 String::String(const char c) {
@@ -137,7 +137,7 @@ String::String(const String &str) {
     _proto_ = new char[length = str.length+1];
     _proto_[length] = '\0';
 
-    for (unsigned i = 0; i < length+1; i++) _proto_[i] = str._proto_[i];
+    for (unsigned i = 0; i < length; i++) _proto_[i] = str._proto_[i];
 }
 
 String::~String() {
@@ -162,7 +162,7 @@ std::istream& operator>> (std::istream &in, String &str) {
     str._proto_ = new char[str.length = t.size()+1];
     str._proto_[str.length] = '\0';
         
-    for (unsigned i = 0; i < str.length+1; i++) str._proto_[i] = t[i];
+    for (unsigned i = 0; i < str.length; i++) str._proto_[i] = t[i];
     
     return in;
 }
@@ -174,7 +174,7 @@ std::istream& getline(std::istream &in, String &str) {
     str._proto_ = new char[str.length = t.size()+1];
     str._proto_[str.length] = '\0';
         
-    for (unsigned i = 0; i < str.length+1; i++) str._proto_[i] = t[i];
+    for (unsigned i = 0; i < str.length; i++) str._proto_[i] = t[i];
     
     return in;
 }
@@ -266,7 +266,7 @@ String String::operator= (const char *str) {
     _proto_ = new char[length = strlen(str)+1];
     _proto_[length] = '\0';
 
-    for (unsigned i = 0; i < length+1; i++) _proto_[i] = str[i];
+    for (unsigned i = 0; i < length; i++) _proto_[i] = str[i];
 
     return *this;
 }
@@ -276,7 +276,7 @@ String String::operator= (const String &str) {
     _proto_ = new char[length = str.length+1];
     _proto_[length] = '\0';
 
-    for (unsigned i = 0; i < length+1; i++) _proto_[i] = str._proto_[i];
+    for (unsigned i = 0; i < length; i++) _proto_[i] = str._proto_[i];
 
     return *this;
 }
