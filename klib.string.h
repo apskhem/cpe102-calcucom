@@ -18,7 +18,6 @@ typedef class String {
     friend char fromCharCode(const unsigned);
     private:
         char *_proto_; // c-string data
-        void assign(const char *);
     public:
         /* The length property returns the length of a string (number of characters). */
         unsigned length;
@@ -53,7 +52,7 @@ typedef class String {
         /* The method returns a non-negative integer that is the Unicode code point value. */
         unsigned codePointAt(const unsigned);
         /* The method is used to join two or more strings. */
-        String concat(String);
+        String concat(const String &);
         /* The method retunrs the value of c-string. */
         char* cstring();
         /* The method determines whether a string ends with the characters of a specified string. */
@@ -119,7 +118,10 @@ String::String() {
 }
 
 String::String(const char *str) {
-    this->assign(str);
+    _proto_ = new char[length = strlen(str)+1];
+    _proto_[length] = '\0';
+        
+    for (unsigned i = 0; i < length+1; i++) _proto_[i] = str[i];
 }
 
 String::String(const char c) {
@@ -132,7 +134,10 @@ String::String(const char c) {
 }
 
 String::String(const String &str) {
-    this->assign(str._proto_);
+    _proto_ = new char[length = str.length+1];
+    _proto_[length] = '\0';
+
+    for (unsigned i = 0; i < length+1; i++) _proto_[i] = str._proto_[i];
 }
 
 String::~String() {
@@ -153,8 +158,11 @@ std::ostream& operator<< (std::ostream &out, const String &str) {
 std::istream& operator>> (std::istream &in, String &str) {
     std::string t;
     in >> t;
-    
-    str.assign(t.c_str());
+
+    str._proto_ = new char[str.length = t.size()+1];
+    str._proto_[str.length] = '\0';
+        
+    for (unsigned i = 0; i < str.length+1; i++) str._proto_[i] = t[i];
     
     return in;
 }
@@ -162,8 +170,11 @@ std::istream& operator>> (std::istream &in, String &str) {
 std::istream& getline(std::istream &in, String &str) {
     std::string t;
     std::getline(std::cin, t);
-    
-    str.assign(t.c_str());
+
+    str._proto_ = new char[str.length = t.size()+1];
+    str._proto_[str.length] = '\0';
+        
+    for (unsigned i = 0; i < str.length+1; i++) str._proto_[i] = t[i];
     
     return in;
 }
@@ -177,71 +188,61 @@ String operator+ (const char *lstr, String &rstr) {
 
     for (unsigned i = 0; i < len; i++) result[i] = lstr[i];
     for (unsigned i = 0; i < rstr.length; i++) result[len+i] = rstr._proto_[i];
-    
-    rstr.length += len;
 
     return result;
 }
 
 String String::operator+ (const char *str) {
-    unsigned inlength = strlen(str);
+    unsigned len = strlen(str);
 
-    char *old = _proto_;
-    _proto_ = new char[length+inlength+1];
-    _proto_[length+inlength] = '\0';
+    char result[length+len+1];
+    result[length+len] = '\0';
 
-    for (unsigned i = 0; i < length; i++) _proto_[i] = old[i];
-    for (unsigned i = 0; i < inlength; i++) _proto_[length+i] = str[i];
-
-    delete[] old;
-    length += inlength;
+    for (unsigned i = 0; i < length; i++) result[i] = _proto_[i];
+    for (unsigned i = 0; i < len; i++) result[length+i] = str[i];
     
-    return _proto_;
+    return result;
 }
 
 String String::operator+ (const String &str) {
-    char *old = _proto_;
-    _proto_ = new char[length+str.length+1];
-    _proto_[length+str.length] = '\0';
+    char result[length+str.length+1];
+    result[length+str.length] = '\0';
 
-    for (unsigned i = 0; i < length; i++) _proto_[i] = old[i];
-    for (unsigned i = 0; i < str.length; i++) _proto_[length+i] = str._proto_[i];
-
-    delete[] old;
-    length += str.length;
+    for (unsigned i = 0; i < length; i++) result[i] = _proto_[i];
+    for (unsigned i = 0; i < str.length; i++) result[length+i] = str._proto_[i];
     
-    return _proto_;
+    return result;
 }
 
 /* ### */
 
 String String::operator+= (const char *str) {
-    unsigned inlength = strlen(str);
+    unsigned len = strlen(str);
 
     char *old = _proto_;
-    _proto_ = new char[length+inlength+1];
-    _proto_[length+inlength] = '\0';
+    _proto_ = new char[length+len+1];
+    _proto_[length+len] = '\0';
 
     for (unsigned i = 0; i < length; i++) _proto_[i] = old[i];
-    for (unsigned i = 0; i < inlength; i++) _proto_[length+i] = str[i];
+    for (unsigned i = 0; i < len; i++) _proto_[length+i] = str[i];
 
     delete[] old;
-    length += inlength;
+    length += len;
     
-    return _proto_;
+    return *this;
 }
 
 String String::operator+= (const char chr) {
     char *old = _proto_;
-    _proto_ = new char[(++length)+1];
-    _proto_[length-1] = chr;
+    _proto_ = new char[length+2];
+    _proto_[++length] = chr;
     _proto_[length] = '\0';
     
     for (unsigned i = 0; i < length-1; i++) _proto_[i] = old[i];
     
     delete[] old;
 
-    return _proto_;
+    return *this;
 }
 
 String String::operator+= (const String &str) {
@@ -255,18 +256,28 @@ String String::operator+= (const String &str) {
     delete[] old;
     length += str.length;
     
-    return _proto_;
+    return *this;
 }
 
 /* ### */
 
 String String::operator= (const char *str) {
-    this->assign(str);
+    delete[] _proto_;
+    _proto_ = new char[length = strlen(str)+1];
+    _proto_[length] = '\0';
+
+    for (unsigned i = 0; i < length+1; i++) _proto_[i] = str[i];
+
     return *this;
 }
 
 String String::operator= (const String &str) {
-    this->assign(str._proto_);
+    delete[] _proto_;
+    _proto_ = new char[length = str.length+1];
+    _proto_[length] = '\0';
+
+    for (unsigned i = 0; i < length+1; i++) _proto_[i] = str._proto_[i];
+
     return *this;
 }
 
@@ -318,19 +329,6 @@ String String::operator* (const unsigned mul) {
     
 }
 
-/* class methods: PRIVATE */
-void String::assign(const char *str) {
-    //delete[] _proto_;
-
-    length = strlen(str);
-
-    _proto_ = new char[length+1];
-        
-    for (unsigned i = 0; i < length+1; i++) _proto_[i] = str[i];
-
-    _proto_[length] = '\0';
-}
-
 /* class methods: FRIEND */
 template <class number>
 String toString(number n) {
@@ -369,7 +367,7 @@ int String::charCodeAt(const unsigned index) {
     return _proto_[index];
 }
 
-String String::concat(String str) {
+String String::concat(const String &str) {
     char result[length+str.length+1];
     result[length+str.length] = '\0';
     
