@@ -6,6 +6,8 @@
 
 typedef class String {
     friend String operator+ (const char *, String &);
+    friend bool operator== (const char *, String &);
+    friend bool operator!= (const char *, String &);
     friend std::ostream& operator<< (std::ostream &, const String &);
     friend std::istream& operator>> (std::istream &, String &);
     friend std::istream& getline(std::istream &, String &);

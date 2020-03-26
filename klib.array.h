@@ -59,8 +59,9 @@ class Array {
         Array<any> sort();
         /* The method adds/removes items to/from an array, and returns the removed item(s). */
         /* Note: This method changes the original array. */
-        void splice(const unsigned, const std::initializer_list<any>);
-        void splice(const unsigned, const unsigned, const std::initializer_list<any>);
+        Array<any> splice(const unsigned, const std::initializer_list<any> = {});
+        Array<any> splice(const unsigned, const unsigned, const std::initializer_list<any> = {});
+        Array<any> splice(const unsigned, const unsigned, Array<any> & = {});
         /* The method returns a string with all the array values, separated by commas. */
         char* toString();
         /* method returns the array. */
@@ -164,6 +165,21 @@ Array<any> Array<any>::concat(const Array<any> &items) {
     for (unsigned i = 0; i < items.length; i++) result[length+i] = items[i];
 
     return {};
+}
+
+template<class any>
+Array<any> Array<any>::splice(const unsigned index, const unsigned howmany, Array<any> &items) {
+    any *old = _proto_;
+    _proto_ = new any[length + items.length - (howmany > (length - index) ? length - index : howmany)];
+
+    for (unsigned i = 0; i < index; i++)  _proto_[i] = old[i];
+    for (unsigned i = 0; i < items.length; i++) _proto_[index+i] = items[i];
+    for (unsigned i = index+howmany; i < length; i++) _proto_[items.length+i] = old[i];
+
+    length += items.length - (howmany > (length - index) ? length - index : howmany);
+    delete[] old;
+
+    return *this;
 }
 
 template<class any>
