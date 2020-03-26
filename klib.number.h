@@ -7,8 +7,6 @@ class CalNumber {
     friend bool isNum(char);
     /* The method reduces power of n by -1 of any form. */
     friend string reduceN(string);
-    /* The method performs simple calculation of string expression */
-    friend double calStrNum(string);
     /* The methood reads expression and find '+', '-' and var. */
     bool hasSignOrVar(string, char);
 };
@@ -57,66 +55,32 @@ bool isNum(char t) {
     return (t >= 46 && t <= 57);
 }
 
-string reduceN(string n, char var) {
-    string result = "";
-    bool isNHasVar = false;
-    char hasOp = 0;
+string reduceN(string n, char var, double &numOutput) {
+    unsigned short divIndex = 0;
 
     for (unsigned short i = 0; i < n.length; i++) {
-        if (n[i] == var) isNHasVar = true;
-
-        // perform simple calculation for n
-        hasOp = (n[i] == '+' || n[i] == '-' || n[i] == '*' || n[i] == '/');
+        if (n[i] == var) {
+            numOutput = 1;
+            return "";
+        }
+        else if (n[i] == '/') {
+            divIndex = i;
+            break;
+        }
     }
 
-    if (!isNHasVar && hasOp) {
+    if (divIndex) {
         string newCal = "";
+        double upper = parseNum(n.slice(0, divIndex))
+        double lower = parseNum(n.slice(divIndex+1));
 
-        result = newCal;
+        numOutput = upper / lower;
+        return toString(upper-lower) + "/" + toString(lower);
     }
-
-    return result;
+    else {
+        return toString(parseNum(n)-1);
+    }
 }
-
-double calStrNum(string t) {
-    array<char> ops;
-    array<string> parts;
-    unsigned short splitIndex = 0;
-    
-    for (unsigned short i = (t[0] == '+' || t[0] == '-'); i < t.length; i++) {
-        if (t[i] == '+' || t[i] == '-' || t[i] == '*' || t[i] == '/') {
-            ops.push(t[i]);
-            parts.push(t.slice(splitIndex, i));
-            
-            splitIndex = i+1;
-            if (t[i+1] == '+' || t[i+1] == '-') i++;
-        }
-    }
-
-    parts.push(t.slice(splitIndex));
-
-    if (ops.length == 0)
-        return parseNum(parts[0]);
-
-    double result = 0;
-    for (unsigned short i = 0; i < ops.length; i++) {
-        if (ops[i] == '+') {
-            result += parseNum(parts[i]) + parseNum(parts[i+1]);
-        }
-        else if (ops[i] == '-') {
-            result += parseNum(parts[i]) - parseNum(parts[i+1]);
-        }
-        else if (ops[i] == '*') {
-            result += parseNum(parts[i]) * parseNum(parts[i+1]);
-        }
-        else if (ops[i] == '/') {
-            result += parseNum(parts[i]) / parseNum(parts[i+1]);
-        }
-    }
-
-    return result; 
-}
-
 
 bool hasSignOrVar(string expr, char var) {
     for (unsigned short i = (expr[0] == '+' || expr[0] == '-'); i < expr.length; i++) {

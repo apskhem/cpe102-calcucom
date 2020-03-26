@@ -25,7 +25,7 @@ class TermComponents {
         TermComponents(string term, char var);
     private:
         /* the start position of 'i' should be the position of '(' + 1 */
-        string ElementInsidePar(unsigned short &i);
+        string itemInsidePar(unsigned short &i);
         /* checkingPos should be the index position of '^' */
         bool checkForN(unsigned short &i, int checkingPos);
 };
@@ -49,11 +49,11 @@ TermComponents::TermComponents(string term, char var) {
                 i += 4; // skip 'sin^...' or 'sin(...'
                 if (checkForN(i, i-1)) { // find: a*sin^n(u)
                     while(term[i++] != '(');
-                    u.push(tfunc + "(" + ElementInsidePar(i) + ")");
+                    u.push(tfunc + "(" + itemInsidePar(i) + ")");
                 }
                 else { // find: a*sin(u) or a*sin^1(u)
                     trig.push(tfunc);
-                    u.push(ElementInsidePar(i));
+                    u.push(itemInsidePar(i));
                 }
             }
             else {
@@ -71,11 +71,11 @@ TermComponents::TermComponents(string term, char var) {
                 i += 4; // skip 'sin^...' or 'sin(...'
                 if (checkForN(i, i-1)) { // find: a*sin^n(u)
                     while(term[i++] != '(');
-                    u.push("a" + tfunc + "(" + ElementInsidePar(i) + ")");
+                    u.push("a" + tfunc + "(" + itemInsidePar(i) + ")");
                 }
                 else { // find: a*sin(u) or a*sin^1(u)
                     arc.push("a" + tfunc);
-                    u.push(ElementInsidePar(i));
+                    u.push(itemInsidePar(i));
                 }
             }
             else {
@@ -99,19 +99,19 @@ TermComponents::TermComponents(string term, char var) {
                     
                     if (checkForN(i, i)) { // logb^n
                         while(term[i++] != '(');
-                        u.push(ElementInsidePar(i));
+                        u.push(itemInsidePar(i));
                     }
                     else { // logb
                         string tempRes = "log";
                         log.push(tempRes + term.slice(logIndex[logIndex.length-1], i));
-                        u.push(ElementInsidePar(i));
+                        u.push(itemInsidePar(i));
                     }
                 }
                 else if (l == "ln") {
                     log.push("ln");
                 }
 
-                u.push(ElementInsidePar(i));
+                u.push(itemInsidePar(i));
             }
             else {
                 error("none standard arithmatic expression presented");
@@ -121,7 +121,7 @@ TermComponents::TermComponents(string term, char var) {
         // find (type): function inside '(...)'
         else if (term[i] == '(') {
             if (term[i+1] != ')' && isNum(term[i+1])) {
-                u.push(ElementInsidePar(++i));
+                u.push(itemInsidePar(++i));
 
                 checkForN(i, i+1);
             }
@@ -133,7 +133,7 @@ TermComponents::TermComponents(string term, char var) {
         else if (term[i] == ')' && term[i+1] == '/') {
             forcedOp = 1;
             if(term[i+1] != ')' && isNum(term[i+1])){
-                deno_term.push(ElementInsidePar(++i));
+                deno_term.push(itemInsidePar(++i));
 
                 checkForN(i, i+1);
             }
@@ -142,19 +142,27 @@ TermComponents::TermComponents(string term, char var) {
         }
     }
 
-    // completing
-    if (varIndex.length && (u.length || log.length || trig.length || arc.length)) {
+    // finalizer
+    if (varIndex.length && (u.length || log.length || trig.length || arc.length)) { // convert whole term to u: has u and functions
         unsigned short leftPar = 0, rightPar = 0, pairIndex = 0;
+        unsigned short i = 0;
+
         for (unsigned short i = 0; i < src.length; i++) {
             if (src[i] == '(') {
+
+
                 
+                if (i != 0)
                 // skip block
+            }
+            else if (src[i] == ')' && leftPar == ++rightPar) {
+                
             }
         }
 
         varIndex = {};
     }
-    else if (u.length > 1 && (log.length || trig.length || arc.length)) {
+    else if (u.length > 1 && (log.length || trig.length || arc.length)) { // convert whole term to u: multiple functions
         unsigned short leftPar = 0, rightPar = 0;
         for (unsigned short i = 0; i < log.length; i++) {
             string tempU = "";
@@ -179,28 +187,36 @@ TermComponents::TermComponents(string term, char var) {
         trig = {};
         arc = {};
     }
+    else if (u.length == 1 || (u.length == 1 && nIndex.length == 1 && nIndex[0] == "1")) { // (u) or (u)^1
+        src = u[0];
+
+        u = {};
+        nIndex = {};
+    }
+    else if (!u.length && (varIndex == 1 && nIndex.length == 1 && nIndex[0] == "1")) { // ax^1
+        src = src.slice(0, src.search("^"));
+        nIndex = {};
+    }
 }
 
-string TermComponents::ElementInsidePar(unsigned short &i) {
-    string result = "";
-    unsigned short leftPar = 1, rightPar = 0;
+string TermComponents::itemInsidePar(unsigned short &i) {
+    unsigned short leftPar = 1, rightPar = 0, start = i;
     while (i < src.length) {
         if (src[i] == '(') leftPar++;
-        else if (src[i] == ')') {
-            if (leftPar == ++rightPar) break;
-        }
-
-        result += src[i++];
+        else if (src[i] == ')' && leftPar == ++rightPar)
+            return src.slice(start, i);
     }
 
-    return result;
+    return "";
 }
 
 bool TermComponents::checkForN(unsigned short &i, int checkingPos) {
-    if (src[checkingPos] == '^') {
-        if (isNum(src[++checkingPos])) {
+    if (src[checkingPos++] == '^') {
+        if (isNum(src[checkingPos])) {
+            if (src[i = checkingPos] == '0')
+                error("using power of 0");
+
             n.push(parseNum(src));
-            i = checkingPos;
 
             while (isNum(src[i+1])) i++;
 
@@ -208,7 +224,7 @@ bool TermComponents::checkForN(unsigned short &i, int checkingPos) {
         }
         else if (src[checkingPos] == '(') {
             nIndex.push(i = ++checkingPos);
-            n.push(ElementInsidePar(i));
+            n.push(itemInsidePar(i));
 
             return true;
         }
@@ -279,8 +295,7 @@ string diff(string term, char var) {
 
     if (tc.u.length > 1 || tc.log.length > 1 || tc.trig.length > 1 || tc.arc.length > 1) { 
         for (unsigned i = 0; i < tc.u.length; i++) {
-            if (i > 0)
-                result += "+";
+            if (i > 0) result += "+";
 
             for (unsigned j = 0; j < tc.u.length; j++) {
                 result += "(";
@@ -291,23 +306,20 @@ string diff(string term, char var) {
     }
     else if (tc.u.length && tc.deno_term.length && tc.forcedOp == 1) { //divide  (3x+2)(2x^2) / (5x+20)(4x+13) => u / v
         // 3/4 ; 3 = numerator, 4 = denominator
-        string numerator = "";
-        string denominator = "";
+        string numerator = "", denominator = "";
 
         for(unsigned i = 0; i < tc.u.length; i++) {     //(3x+2)(2x^2)
-            if (i > 0)
-                numerator += "+";
+            if (i > 0) numerator += "+";
 
             for(unsigned j = 0; j < tc.u.length; j++) {
                 numerator += "(";
-                numerator += (i == j ? exprDiff(readExpr(tc.u[i]), var) : tc.u[i]);
+                numerator += i == j ? exprDiff(readExpr(tc.u[i]), var) : tc.u[i];
                 numerator += ")";
             }
         }
         
         for(unsigned i = 0; i < tc.deno_term.length; i++) {     //(5x+20)(4x+13)
-            if (i > 0)
-                denominator += "+";
+            if (i > 0) denominator += "+";
 
             for(unsigned j = 0; j < tc.deno_term.length; j++) {
                 denominator += "(";
@@ -355,12 +367,13 @@ string diff(string term, char var) {
             }
         }
         else if (tc.trigIndex.length) { // CASE: a*sin^n(u)
-            string redN = reduceN(tc.n[0], var);
+            double numRedN;
+            string redN = reduceN(tc.n[0], var, numRedN);
             string blockInsideTrig = tc.u[0].slice(tc.u[0].search("("));
 
             result = redN == "1"
-                ? toString(a * calStrNum(redN)) + tc.u[0] + "*" + chainDiff
-                : toString(a * calStrNum(redN)) + tc.u[0].slice(0, 3) + "^" + redN + blockInsideTrig + "*" + chainDiff;
+                ? toString(a * numRedN) + tc.u[0] + "*" + chainDiff
+                : toString(a * numRedN) + tc.u[0].slice(0, 3) + "^" + redN + blockInsideTrig + "*" + chainDiff;
         }
         else if (tc.arc.length) { // CASE: a*asin(u)
             if (tc.arc[0] == "acos" || tc.arc[0] == "acot" || tc.arc[0] == "acsc") a *= -1;
@@ -390,46 +403,38 @@ string diff(string term, char var) {
             }
         }
         else if (tc.logIndex.length) { // CASE: logb^n(u)
-            string redN = reduceN(tc.n[0], var);
+            double numRedN;
+            string redN = reduceN(tc.n[0], var, numRedN);
             string blockInsideTrig = tc.u[0].slice(tc.u[0].search("("));
 
             if (redN == "1")
                 result = toString(a * 2) + tc.u[0] + "*" + chainDiff;
             else if (tc.u[0].slice(0, 2) == "ln") // ln
-                result = toString(a * calStrNum(redN)) + tc.u[0].slice(0, 2) + "^" + redN + blockInsideTrig + "*" + chainDiff;
+                result = toString(a * numRedN) + tc.u[0].slice(0, 2) + "^" + redN + blockInsideTrig + "*" + chainDiff;
             else // log
-                result = toString(a * calStrNum(redN)) + tc.u[0].slice(0, tc.u[0].search("^")) + "^" + redN + blockInsideTrig + "*" + chainDiff;
+                result = toString(a * numRedN) + tc.u[0].slice(0, tc.u[0].search("^")) + "^" + redN + blockInsideTrig + "*" + chainDiff;
         }
         else if (tc.nIndex.length) { // CASE: (u)^n
-            string redN = reduceN(tc.n[0], var);
+            double numRedN;
+            string redN = reduceN(tc.n[0], var, numRedN);
             string blockInsideTrig = tc.u[0].slice(tc.u[0].search("("));
 
-            if (redN == "0")
-                result = toString(a) + chainDiff;
-            if (redN == "1")
-                result = toString(a * 2) + "(" + tc.u[0] + ")*" + chainDiff;
-            else
-                result = toString(a * calStrNum(redN)) + "(" + tc.u[0] + ")^" + redN + "*" + chainDiff;
+            result = redN == "1"
+                ? toString(a * 2) + "(" + tc.u[0] + ")*" + chainDiff
+                : toString(a * numRedN) + "(" + tc.u[0] + ")^" + redN + "*" + chainDiff;
         }
     }
-    else if (tc.u.length == 0) {
-        switch (tc.src[tc.varIndex[0] + 1]) {
-            case '^': { // CASE: ax^n or ax^(n)
-                string redN = reduceN(tc.n[0], var);
+    else if (!tc.u.length && tc.varIndex.length) {
+        if (tc.nIndex) { // CASE: ax^n or ax^(n)
+            double numRedN;
+            string redN = reduceN(tc.n[0], var, numRedN);
 
-                if (redN == "0")
-                    result = toString(a);
-                else if (redN == "1")
-                    result = toString(a * 2) + "x";
-                else
-                    result = toString(a * calStrNum(redN)) + "x^" + redN;
-            } break;
-            case '*': { // CASE: ax*(n) or ax*(u)
-
-            } break;
-            default: { // CASE ax or ax^1
-                result = toString(parseNum(tc.src));
-            }
+            result = redN == "1"
+                ? toString(a * 2) + "x"
+                : toString(a * numRedN) + "x^" + redN;
+        }
+        else { // CASE ax or ax^1
+            result = tc.src.slice(0, tc.src.search(var));
         }
     }
 
