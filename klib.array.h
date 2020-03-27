@@ -10,18 +10,18 @@ class Array {
         unsigned length;
     
         Array();
-        Array(const std::initializer_list<any>);
+        Array(const std::initializer_list<any> &);
         Array(const Array<any> &);
         Array(const any *);
         ~Array();
         
-        any& operator[] (const int);
+        any& operator[] (const unsigned &);
         
-        Array<any> operator= (const std::initializer_list<any>);
+        Array<any> operator= (const std::initializer_list<any> &);
         Array<any> operator= (const Array<any> &);
         
         /* The method is used to join two or more arrays. */
-        Array<any> concat(const std::initializer_list<any>);
+        Array<any> concat(const std::initializer_list<any> &);
         /* The method is used to join two or more arrays. */
         Array<any> concat(const Array<any> &);
         /* The method copies array elements to another position in the array, overwriting the existing values. */
@@ -66,7 +66,6 @@ class Array {
         char* toString();
         /* method returns the array. */
         Array<any> values();
-        
 
         /* The method adds new items to the end of an array, and returns the new length. */
         unsigned push(const std::initializer_list<any>);
@@ -90,17 +89,15 @@ Array<any>::Array() {
 }
 
 template<class any>
-Array<any>::Array(const std::initializer_list<any> list) {
-    length = list.size(); // list.end()-list.begin()
-    _proto_ = new any[length];
+Array<any>::Array(const std::initializer_list<any> &list) {
+    _proto_ = new any[length = list.size()]; // list.end()-list.begin()
     
     for (unsigned i = 0; i < length; i++) _proto_[i] = *(list.begin()+i);
 }
 
 template<class any>
 Array<any>::Array(const Array<any> &list) {
-    length = list.length;
-    _proto_ = new any[length];
+    _proto_ = new any[length = list.length];
     
     for (unsigned i = 0; i < length; i++) _proto_[i] = list._proto_[i];
 }
@@ -112,17 +109,16 @@ Array<any>::~Array() {
 
 /* call operators */
 template<class any>
-any& Array<any>::operator[] (const int index) { return _proto_[index]; }
+any& Array<any>::operator[] (const unsigned &index) { return _proto_[index]; }
 
 /* processing operators: FRIEND */
 
 /* processing operators: OVERLOAD */
 template<class any>
-Array<any> Array<any>::operator= (const std::initializer_list<any> list) {
+Array<any> Array<any>::operator= (const std::initializer_list<any> &list) {
     delete[] _proto_;
 
-    length = list.size();
-    _proto_ = new any[length];
+    _proto_ = new any[length = list.size()];
 
     for (unsigned i = 0; i < length; i++) _proto_[i] = *(list.begin()+i);
 
@@ -133,8 +129,7 @@ template<class any>
 Array<any> Array<any>::operator= (const Array<any> &list) {
     delete[] _proto_;
 
-    length = list.length;
-    _proto_ = new any[length];
+    _proto_ = new any[length = list.length];
     
     for (unsigned i = 0; i < length; i++) _proto_[i] = list._proto_[i];
 
@@ -147,7 +142,7 @@ Array<any> Array<any>::operator= (const Array<any> &list) {
 
 /* class methods: BUILT-IN */
 template<class any>
-Array<any> Array<any>::concat(const std::initializer_list<any> items) {
+Array<any> Array<any>::concat(const std::initializer_list<any> &items) {
     unsigned itemSize = items.size();
     any result[length+itemSize];
 

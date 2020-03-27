@@ -23,19 +23,19 @@ typedef class String {
         unsigned length;
         
         String();
-        String(const char *str);
-        String(const char);
-        String(const String &str);
+        String(const char *);
+        String(const char &);
+        String(const String &);
         ~String();
         
-        operator char*();
-        operator const char*();
+        operator char *();
+        operator const char *();
 
-        char& operator[] (const int);
+        char& operator[] (const unsigned &);
         String operator+ (const char *);
         String operator+ (const String &);
         String operator+= (const char *);
-        String operator+= (const char);
+        String operator+= (const char &);
         String operator+= (const String &);
         String operator= (const char *);
         String operator= (const String &);
@@ -46,47 +46,47 @@ typedef class String {
         String operator* (const unsigned);
         
         /* The method returns the character at the specified index in a string. */
-        char charAt(const unsigned);
+        char charAt(const unsigned &);
         /* The method returns the Unicode of the character at the specified index in a string. */
-        int charCodeAt(const unsigned);
+        int charCodeAt(const unsigned &);
         /* The method returns a non-negative integer that is the Unicode code point value. */
-        unsigned codePointAt(const unsigned);
+        unsigned codePointAt(const unsigned &);
         /* The method is used to join two or more strings. */
         String concat(const String &);
         /* The method retunrs the value of c-string. */
         char* cstring();
         /* The method determines whether a string ends with the characters of a specified string. */
-        bool endsWith(String, unsigned=-1);
+        bool endsWith(const String &, unsigned=-1);
         /* The method determines whether a string contains the characters of a specified string. */
-        bool includes(String, const unsigned=0);
+        bool includes(const String &, const unsigned=0);
         /* The method returns the position of the first occurrence of a specified value in a string. */
-        int indexOf(String, const unsigned=0);
+        int indexOf(const String &, const unsigned=0);
         /* The method returns the position of the last occurrence of a specified value in a string. */
-        int lastIndexOf(String, unsigned=-1);
+        int lastIndexOf(const String &, unsigned=-1);
         /* The method compares two strings in the current locale. */
-        int localeCompare(String);
+        int localeCompare(const String &);
         /* The method searches a string for a match against a regular expression, and returns the matches, as an Array object. */
         String match();
         /* method pads the current string with a given string (repeated, if needed) so that the resulting string reaches a given length. */
         String matchAll();
         /* The method returns the Unicode Normalization Form of the string. */
-        String normalize(String);
+        String normalize(const String &);
         /* The method pads the current string with another string (multiple times, if needed) until the resulting string reaches the given length */
-        String padEnd(const unsigned, String);
+        String padEnd(const unsigned &, const String &);
         /* The method pads the current string with another string (multiple times, if needed) until the resulting string reaches the given length */
-        String padStart(const unsigned, String);
+        String padStart(const unsigned &, const String &);
         /* The method returns a new string with a specified number of copies of the string it was called on. */
-        String repeat(const unsigned);
+        String repeat(const unsigned &);
         /* The method searches a string for a specified value, or a regular expression, and returns a new string where the specified values are replaced. */
-        String replace(String, String);
+        String replace(const String &, const String &);
         /* The  method searches a string for a specified value, and returns the position of the match. */
-        int search(String);
+        int search(const String &);
         /* The method extracts parts of a string and returns the extracted parts in a new string. */
         String slice(const unsigned, unsigned=-1);
         /* The method is used to split a string into an array of substrings, and returns the new array. */
-        Array<String> split(String);
+        Array<String> split(const String &);
         /* The method determines whether a string begins with the characters of a specified string. */
-        bool startsWith(String, const unsigned=0);
+        bool startsWith(const String &, const unsigned=0);
         /* The method extracts parts of a string, beginning at the character at the specified position, and returns the specified number of characters. */
         String substr(const unsigned, unsigned=-1);
         /* The method extracts the characters from a string, between two specified indices, and returns the new sub string. */
@@ -124,7 +124,7 @@ String::String(const char *str) {
     for (unsigned i = 0; i < length; i++) _proto_[i] = str[i];
 }
 
-String::String(const char c) {
+String::String(const char &c) {
     length = 1;
 
     _proto_ = new char[2];
@@ -147,7 +147,7 @@ String::~String() {
 /* call operators */
 String::operator char*() { return _proto_; }
 String::operator const char*() { return _proto_; }
-char& String::operator[] (const int index) { return _proto_[index]; }
+char& String::operator[] (const unsigned &index) { return _proto_[index]; }
 
 /* processing operators: FRIEND */
 std::ostream& operator<< (std::ostream &out, const String &str) {
@@ -232,10 +232,10 @@ String String::operator+= (const char *str) {
     return *this;
 }
 
-String String::operator+= (const char chr) {
+String String::operator+= (const char &chr) {
     char *old = _proto_;
     _proto_ = new char[length+2];
-    _proto_[++length] = chr;
+    _proto_[length++] = chr;
     _proto_[length] = '\0';
     
     for (unsigned i = 0; i < length-1; i++) _proto_[i] = old[i];
@@ -325,8 +325,16 @@ bool String::operator!= (const char *str) {
 
 /* ### */
 
-String String::operator* (const unsigned mul) {
-    
+String String::operator* (const unsigned count) {
+    if (count < 1) return "";
+
+    unsigned len = length*count;
+    char result[len+1];
+    result[len] = '\0';
+
+    for (unsigned i = 0; i < len; i++) result[i] = _proto_[i%length];
+
+    return result;
 }
 
 /* class methods: FRIEND */
@@ -359,11 +367,11 @@ String toString(number n) {
 }
 
 /* class methods: BUILT-IN */
-char String::charAt(const unsigned index) {
+char String::charAt(const unsigned &index) {
     return _proto_[index];
 }
 
-int String::charCodeAt(const unsigned index) {
+int String::charCodeAt(const unsigned &index) {
     return _proto_[index];
 }
 
@@ -377,35 +385,38 @@ String String::concat(const String &str) {
     return result;
 }
 
-bool String::endsWith(String searchvalue, unsigned atlength) {
+bool String::endsWith(const String &searchvalue, unsigned atlength) {
     if (atlength == -1 || atlength > length) atlength = length;
 
     unsigned j = 0;
-    for (unsigned i = atlength-searchvalue.length-1; i < atlength; i++) {
-        if (searchvalue[j] == _proto_[i] && ++j == searchvalue.length) return true;
-        return false;
+    for (unsigned i = atlength-searchvalue.length; i < atlength; i++) {
+        if (searchvalue._proto_[j] == _proto_[i]) {
+            if (++j == searchvalue.length) return true;
+        }
+        else return false;
     }
 
     return false;
 }
 
-bool String::includes(String searchvalue, const unsigned start) {
+bool String::includes(const String &searchvalue, const unsigned start) {
     unsigned j = 0;
     for (unsigned i = start; i < length; i++) {
-        if (_proto_[i] == searchvalue[j] && ++j == searchvalue.length) return true;
+        if (_proto_[i] == searchvalue._proto_[j]) {
+            if (++j == searchvalue.length) return true;
+        }
         else j = 0;
     }
 
     return false;
 }
 
-int String::indexOf(String searchvalue, const unsigned start) {
+int String::indexOf(const String &searchvalue, const unsigned start) {
     unsigned j = 0, fisrtFindIndex = 0;
-    for (unsigned i = start; i < length; i++) {
-        if (_proto_[i] == searchvalue[j]) {
-            if (j == 0) fisrtFindIndex = i;
-            if (++j == searchvalue.length)
-                return true;
+    for (unsigned i = 0; i < length; i++) {
+        if (_proto_[i] == searchvalue._proto_[j]) {
+            if (!j) fisrtFindIndex = i;
+            if (++j == searchvalue.length) return fisrtFindIndex;
         }
         else {
             j = 0;
@@ -415,41 +426,63 @@ int String::indexOf(String searchvalue, const unsigned start) {
     return -1;
 }
 
-int String::lastIndexOf(String searchvalue, unsigned start) {
+int String::lastIndexOf(const String &searchvalue, unsigned start) {
     if (start == -1) start = length;
 
-    unsigned j = length-1;
-    for (unsigned i = j; i >= 0; i--) {
-        if (searchvalue[j] == _proto_[i] && ++j == searchvalue.length) return i;
-        else j = 0;
+    unsigned j = searchvalue.length-1;
+    for (unsigned i = length-1; i >= 0; i--) {
+        if (searchvalue._proto_[j--] == _proto_[i]) {
+            if (!j) return i-1;
+        }
+        else j = searchvalue.length-1;
     }
 
     return -1;
 }
 
-String String::replace(String searchvalue, String newvalue) {
-    if (searchvalue == "") return *this;
+String String::repeat(const unsigned &count) {
+    if (count < 1) return "";
+
+    unsigned len = length*count;
+    char result[len+1];
+    result[len] = '\0';
+
+    for (unsigned i = 0; i < len; i++) result[i] = _proto_[i%length];
+
+    return result;
+}
+
+String String::replace(const String &searchvalue, const String &newvalue) {
+    if (!searchvalue.length) return *this;
 
     string result = "";
+    unsigned j = 0, firstFindIndex = 0;
     for (unsigned i = 0; i < length; i++) {
-        if (_proto_[i] == searchvalue[0]) {
-            if (newvalue == "") continue;
-            result += newvalue;
+        if (_proto_[i] == searchvalue._proto_[j]) {
+            if (!j) firstFindIndex = i;
+            if (++j == searchvalue.length) {
+                firstFindIndex = j = 0;
+                if (!newvalue.length) continue;
+                result += newvalue;
+            }
         }
         else {
-            result += _proto_[i];
+            if (firstFindIndex) result += this->slice(firstFindIndex, i+1);
+            else result += _proto_[i];
+            
+            firstFindIndex = j = 0;
         }
     }
 
     return result;
 }
 
-int String::search(String searchvalue) {
+int String::search(const String &searchvalue) {
     unsigned j = 0, fisrtFindIndex = 0;
     for (unsigned i = 0; i < length; i++) {
-        if (_proto_[i] == searchvalue[j]) {
-            if (i == 0) fisrtFindIndex = i;
-            if (i == searchvalue.length) return fisrtFindIndex;
+        if (_proto_[i] == searchvalue._proto_[j]) {
+            if (!j) fisrtFindIndex = i;
+            if (++j == searchvalue.length) return fisrtFindIndex;
         }
         else {
             j = 0;
@@ -472,27 +505,35 @@ String String::slice(const unsigned start, unsigned end) {
     return result;
 }
 
-Array<String> String::split(String separator) {
-    Array<String> splited;
+Array<String> String::split(const String &separator) {
+    Array<String> results;
 
-    unsigned splitIndex = 0;
+    unsigned splitat = 0, j = 0;
     for (unsigned i = 0; i < length; i++) {
-        if (_proto_[i] == separator[0]) {
-            splited.push(this->slice(splitIndex,i));
-            splitIndex = i+separator.length;
+        if (_proto_[i] == separator._proto_[j]) {
+            if (++j == separator.length) {
+                results.push(this->slice(splitat,i-separator.length+1));
+                splitat = i+1;
+                j = 0;
+            }
+        }
+        else {
+            j = 0;
         }
     }
 
-    splited.push(this->slice(splitIndex));
+    results.push(this->slice(splitat));
 
-    return splited;
+    return results;
 }
 
-bool String::startsWith(String searchvalue, const unsigned start) {
+bool String::startsWith(const String &searchvalue, const unsigned start) {
     unsigned i = start;
     while (i < length) {
-        if (_proto_[i] == searchvalue[i] && ++i == searchvalue.length) return true;
-        return false;
+        if (_proto_[i] == searchvalue._proto_[i]) {
+            if (++i == searchvalue.length) return true;
+        }
+        else return false;
     }
 
     return false;
