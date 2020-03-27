@@ -152,7 +152,7 @@ TermComponents::TermComponents(string term, char var) {
 
 
                 
-                if (i != 0)
+                if (i != 0);
                 // skip block
             }
             else if (src[i] == ')' && leftPar == ++rightPar) {
