@@ -202,36 +202,3 @@ void userRequest(string &expr, string &numberOfDiff, unsigned option)
         expr = result;
     }
 }
-
-array<string> operation(string term)
-{
-    array<string> term_sep;
-    int leftPar = 0, rightPar = 0;
-
-    for (int i = 0; i < term.length; i++) //(2x^2)*3
-    {
-        if (term[i] == ')')
-            rightPar++;
-        if (term[i] == '(') //-2x+3
-            leftPar++;
-        if (leftPar == rightPar)
-        {
-            if (term[i] == '+')
-                term_sep.push("+");
-            if (term[i] == '-' && i != 0)
-                term_sep.push("-");
-            if (term[i] == '*' || term[i] == '(' || term[i] == ')') // 2(2x+3)
-            {
-                if (term[i] == '(')
-                    leftPar++;
-                if (term[i] == ')')
-                    rightPar++;
-
-                term_sep.push("*");
-            }
-            if (term[i] == '/')
-                term_sep.push("/");
-        }
-    }
-    return term_sep;
-}
