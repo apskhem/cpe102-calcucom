@@ -51,13 +51,15 @@ array<string> operation(string term)
     return term_sep;
 }
 
-double cal(string term, float x) //-3(x+2)
+double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
 {
     TermComponents var(term, 'x');
+    double n_value;
+    double u_value;
 
     if (var.n.length)
     {
-        double n_value; // 3x^{2sin(3x)+2x^3+5ln(3x)}
+        // 3x^{2sin(3x)+2x^3+5ln(3x)}
         array<string> n_operation;
         array<string> n_term;
         array<double> each_n_value;
@@ -272,7 +274,7 @@ double cal(string term, float x) //-3(x+2)
 
         n_value = each_n_value[0];
 
-        for (unsigned i = 0; i < n_operation.length; i++)
+        for (unsigned i = 0; i < n_operation.length; i++) //get n value
         {
             if (n_operation[i] == '+')
                 n_value += each_n_value[i + 1];
@@ -283,26 +285,12 @@ double cal(string term, float x) //-3(x+2)
             else if (n_operation[i] == '/')
                 n_value /= each_n_value[i + 1];
         }
-
-        for (unsigned list = 0; list < n_operation.length; list++) //get n value
-        {
-            n_value = parseNum(each_n_value[0]);
-
-            if (n_operation[list] == '+')
-                n_value += each_n_value[list++];
-            else if (n_operation[list] == '+')
-                n_value += each_n_value[list++];
-            else if (n_operation[list] == '+')
-                n_value += each_n_value[list++];
-            else if (n_operation[list] == '+')
-                n_value += each_n_value[list++];
-        }
     }
 
     //**********************************************
     if (var.u.length)
     {
-        double u_value; // 2sin(3x^(2x+5)+20sin(5x)+5log(20x)+2x)
+        // 2sin(3x^(2x+5)+20sin(5x)+5log(20x)+2x)
         array<string> u_operation;
         array<string> u_term;
         array<double> each_u_value;
@@ -326,8 +314,11 @@ double cal(string term, float x) //-3(x+2)
                 {
                     double u_n_value = parseNum(n_equation[i]);
 
-                    if (n_equation[list][i] == 'x')
-                        u_n_value *= x;
+                    for (unsigned j = 0; j < n_equation[i].length; j++)
+                    {
+                        if (n_equation[i][j] == 'x')
+                            u_n_value *= x;
+                    }
 
                     each_n_value.push(u_n_value);
                 }
@@ -358,286 +349,254 @@ double cal(string term, float x) //-3(x+2)
                 TermComponents u_equation(u_term[list], 'x');           //20sin(5x+20)
                 array<string> each_u_term = readExpr(u_equation.u[0]);  //5x, 20
                 array<string> u_operation = operation(u_equation.u[0]); //+
-                array<double> each_u_value;
+                array<double> each_trig_value;
 
                 for (unsigned i = 0; i < each_u_term.length; i++) //5x, 20
                 {
-                    double trig_value = parseNum(each_u_term[i]);
+                    double trig_u_value = parseNum(each_u_term[i]);
 
-                    for (unsigned j = 0; j < each_u_term[j].length; j++)
+                    for (unsigned j = 0; j < each_u_term[i].length; j++)
                     {
-                        if (u_equation[i] == 'x')
-                            n_u_value *= x;
+                        if (each_u_term[i][j] == 'x')
+                            trig_u_value *= x;
                     }
 
-                    each_u_value.push(n_u_value);
+                    each_trig_value.push(trig_u_value);
                 }
 
-                u_value = each_u_value[0];
+                double trig_value = each_trig_value[0]; //5x+20
 
                 for (unsigned i = 0; i < u_operation.length; i++)
                 {
                     if (u_operation[i] == '+')
-                        u_value += each_u_value[i + 1];
+                        trig_value += each_trig_value[i + 1];
                     else if (u_operation[i] == '-')
-                        u_value -= each_u_value[i + 1];
+                        trig_value -= each_trig_value[i + 1];
                     else if (u_operation[i] == '*')
-                        u_value *= each_u_value[i + 1];
+                        trig_value *= each_trig_value[i + 1];
                     else if (u_operation[i] == '/')
-                        u_value /= each_u_value[i + 1];
+                        trig_value /= each_trig_value[i + 1];
                 }
 
-                double n_n_value = parseNum(n_term[list]);
+                double u_u_value = parseNum(u_term[list]); //20
 
-                for (unsigned i = 0; i < n_equation.trig.length; i++)
+                for (unsigned i = 0; i < u_term[list].length; i++)
                 {
-                    if (n_equation.trig.includes("sin"))
-                        n_n_value *= sin(u_value);
-                    else if (n_equation.trig.includes("cos"))
-                        n_n_value *= cos(u_value);
-                    else if (n_equation.trig.includes("tan"))
-                        n_n_value *= tan(u_value);
-                    else if (n_equation.trig.includes("cot"))
-                        n_n_value /= tan(u_value);
-                    else if (n_equation.trig.includes("sec"))
-                        n_n_value /= cos(u_value);
-                    else if (n_equation.trig.includes("csc"))
-                        n_n_value /= sin(u_value);
+                    if (u_term[list].includes("sin"))
+                        u_u_value *= sin(trig_value);
+                    else if (u_term[list].includes("cos"))
+                        u_u_value *= cos(trig_value);
+                    else if (u_term[list].includes("tan"))
+                        u_u_value *= tan(trig_value);
+                        u_u_value /= tan(trig_value);
+                    else if (u_term[list].includes("sec"))
+                        u_u_value /= cos(trig_value);
+                    else if (u_term[list].includes("csc"))
+                        u_u_value /= sin(trig_value);
                 }
 
-                each_n_value.push(n_n_value);
+                each_u_value.push(u_u_value);
             }
 
-            for (unsigned short i = 0; i < u_term[list].length; i++) // 2sin(5x)
+            else if (u_term[list].includes("ln")) //5ln(20x+5)
             {
-                if (u_term[list][i] == '^') //5x^2
+                TermComponents u_equation(u_term[list], 'x');
+                array<string> each_u_term = readExpr(u_equation.u[0]); //20x, 5
+                array<string> u_operation = operation(u_equation.u[0]);
+                array<double> each_log_value;
+
+                for (unsigned i = 0; i < each_u_term.length; i++) //20x, 5
                 {
-                    if (u_term[list][i] || u_term[list][i + 1] != '(') //5x^2
+                    double log_u_value = parseNum(each_u_term[i]);
+
+                    for (unsigned j = 0; j < each_u_term[i].length; j++)
                     {
-                        string n_u = "";
-                        i++; //skip ^
-                        while (isNum(u_term[list][i]) || u_term[list][i] == 'x')
-                        {
-                            n_u += u_term[list][i];
-                            i++;
-                        }
-
-                        double n_u_value = x;
-                        double u_value = 0;
-
-                        u_value = a_u * pow(x, x);
-
-                        each_u_value.push(u_value);
+                        if (each_u_term[i][j] == 'x')
+                            log_u_value *= x;
                     }
-                    else //5x^(2x)
-                    {
-                        string n_u = "";
-                        i++; //skip ^
-                        while (isNum(u_term[list][i]) || u_term[list][i] == 'x')
-                        {
-                            n_u += u_term[list][i];
-                            i++;
-                        }
 
-                        double n_u_value = parseNum(n_u); //2
-
-                        for (unsigned short i = 0; i < n_u.length; i++)
-                        {
-                            if (n_u[i] == 'x') //2x
-                                n_u_value *= x;
-                        }
-                        double u_value = 0;
-
-                        u_value = a_u * pow(x, n_u_value);
-
-                        each_u_value.push(u_value);
-                    }
+                    each_log_value.push(log_u_value);
                 }
-                if (u_term[list][i] == 's' || u_term[list][i] == 'c' || u_term[list][i] == 't')
+
+                double log_value = each_log_value[0];
+
+                for (unsigned i = 0; i < u_operation.length; i++)
                 {
-                    string tfunc = u_term[list].slice(i, i + 3); //sin
-                    string u_u = "";                             //(5x)
-                    double u_value = 0;
-                    int leftPar = 0, rightPar = 0;
-
-                    i + 4; //skip sin(
-                    leftPar++;
-
-                    while (leftPar != rightPar)
-                    {
-                        if (var.u == '(')
-                            leftPar++;
-                        if (var.u == ')')
-                            rightPar++;
-
-                        u_u += var.u[i]; // 5x)
-                        i++;
-                    }
-
-                    double u_u_value = parseNum(u_u); //5
-
-                    for (unsigned short i = 0; i < u_u.length; i++)
-                    {
-                        if (u_u[i] == 'x')
-                            u_u_value *= x;
-                    }
-
-                    if (tfunc == "sin")
-                        u_value = a_u * sin(u_u_value); // PI unit
-                    else if (tfunc == "cos")
-                        u_value = a_u * cos(u_u_value);
-                    else if (tfunc == "tan")
-                        u_value = a_u * tan(u_u_value);
-                    else if (tfunc == "cot")
-                        u_value = a_u / tan(u_u_value);
-                    else if (tfunc == "sec")
-                        u_value = a_u / cos(u_u_value);
-                    else if (tfunc == "csc")
-                        u_value = a_u / sin(u_u_value);
-
-                    each_u_value.push(u_value); //value of each u
+                    if (u_operation[i] == '+')
+                        log_value += each_log_value[i + 1];
+                    else if (u_operation[i] == '-')
+                        log_value -= each_log_value[i + 1];
+                    else if (u_operation[i] == '*')
+                        log_value *= each_log_value[i + 1];
+                    else if (u_operation[i] == '/')
+                        log_value /= each_log_value[i + 1];
                 }
-                else if (u_term[list][i] == 'x') //3x
+
+                double u_u_value = parseNum(u_term[list]); //5
+
+                u_u_value *= log(log_value);
+
+                each_u_value.push(u_u_value);
+            }
+
+            else if (u_term[list].includes("log")) //7log10(5x+2)
+            {
+                TermComponents u_equation(u_term[list], 'x');
+                array<string> each_u_term = readExpr(u_equation.u[0]);
+                array<string> u_operation = operation(u_equation.u[0]);
+                array<double> each_log_value;
+                double b_value;
+
+                for (unsigned i = 0; i < u_equation.log[0].length; i++)
                 {
-                    double u_value = 0;
-                    u_value = a_u * x;
-
-                    each_u_value.push(u_value);
+                    i += 3; //skip log
+                    b_value = parseNum(u_equation.log[0].slice(i, u_equation.log[0].length - 1));
                 }
-                else if (u_term[list][i] == 'l') //7ln(3x)
+
+                for (unsigned i = 0; i < each_u_term.length; i++) //5x , 2
                 {
-                    string u_u = "";
-                    int leftPar = 0, rightPar = 0;
+                    double log_u_value = parseNum(each_u_term[i]);
 
-                    if (u_term[list][i + 1] == 'n') //ln
+                    for (unsigned j = 0; j < each_u_term[i].length; j++)
                     {
-                        i + 2; //skip n(
-                        leftPar++;
-                        double u_value = 0;
-
-                        while (leftPar != rightPar)
-                        {
-                            if (u_term[list][i] == '(')
-                                leftPar++;
-                            if (u_term[list][i] == ')')
-                                rightPar++;
-
-                            u_u += u_term[list][i]; // 3x)
-                            i++;
-                        }
-
-                        double u_u_value = parseNum(u_u);
-
-                        for (unsigned short i = 0; i < u_u.length; i++)
-                        {
-                            if (u_u[i] == 'x')
-                                u_u_value *= x;
-                        }
-                        u_value = a_u * log(u_u_value);
-
-                        each_u_value.push(u_value);
+                        if (each_u_term[i][j] == 'x')
+                            log_u_value *= x;
                     }
 
-                    else if (u_term[list][i + 1] == 'o') //log10(3x)
-                    {
-                        i + 2; //skip og
-                        string b_u = "", u_u = "";
-                        double u_value = 0;
-
-                        while (isNum(u_term[list][i]))
-                        {
-                            b_u += u_term[list][i];
-                            i++;
-                        }
-                        double b_u_value = parseNum(b_u);
-
-                        i++; //skip(
-                        leftPar++;
-
-                        while (leftPar != rightPar)
-                        {
-                            if (u_term[list][i] == '(')
-                                leftPar++;
-                            if (u_term[list][i] == ')')
-                                rightPar++;
-
-                            u_u += u_term[list][i]; // 3x)
-                            i++;
-                        }
-                        double u_u_value = parseNum(u_u); //3
-
-                        for (unsigned short i = 0; i < u_u.length; i++)
-                        {
-                            if (u_u[i] == 'x')
-                                u_u_value *= x;
-                        }
-
-                        u_value = a_u * log_func(b_u_value, u_u_value);
-
-                        each_u_value.push(u_value);
-                    }
+                    each_log_value.push(log_u_value);
                 }
+
+                double log_value = each_log_value[0];
+
+                for (unsigned i = 0; i < u_operation.length; i++)
+                {
+                    if (u_operation[i] == '+')
+                        log_value += each_log_value[i + 1];
+                    else if (u_operation[i] == '-')
+                        log_value -= each_log_value[i + 1];
+                    else if (u_operation[i] == '*')
+                        log_value *= each_log_value[i + 1];
+                    else if (u_operation[i] == '/')
+                        log_value /= each_log_value[i + 1];
+                }
+
+                double u_u_value = parseNum(u_term[list]);
+                u_u_value *= log_func(b_value, log_value);
+
+                each_u_value.push(u_u_value);
+            }
+            else //3x
+            {
+                double u_u_value = parseNum(u_term[list]);
+
+                for (unsigned i = 0; i < u_term[list].length; i++)
+                {
+                    if (u_term[list][i] == 'x')
+                        u_u_value *= x;
+                }
+
+                each_u_value.push(u_u_value);
             }
         }
 
-        for (unsigned list = 0; list < u_operation.length; list++) //get u value
+        u_value = each_u_value[0];
+
+        for (unsigned i = 0; i < u_operation.length; i++) //get u value
         {
-
-            u_value = parseNum(each_u_value[0]);
-
-            if (u_operation[list] == '+')
-                u_value += each_u_value[list++];
-            else if (u_operation[list] == '+')
-                u_value += each_u_value[list++];
-            else if (u_operation[list] == '+')
-                u_value += each_u_value[list++];
-            else if (u_operation[list] == '+')
-                u_value += each_u_value[list++];
+            if (u_operation[i] == '+')
+                u_value += each_u_value[i + 1];
+            else if (u_operation[i] == '-')
+                u_value -= each_u_value[i + 1];
+            else if (u_operation[i] == '*')
+                u_value *= each_u_value[i + 1];
+            else if (u_operation[i] == '/')
+                u_value /= each_u_value[i + 1];
         }
     }
+
+    //*******************************************
+
     double result = parseNum(term);
 
-    for (unsigned short i = 0; i < term.length; i++) //3x^(5x+2) + 5sin(2x+5)
+    for (unsigned i = 0; i < term.length; i++)
     {
-        if (term[i] == 'x') //5x
+        if (term[i] == 'x' && term[i + 1] == '^')
         {
-            result *= x;
+            result *= pow(x, n_value);
         }
-        else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) //trigon
+        
+        else if (term[i] == ')' && term[i + 1] == '^') //(x+2)^2
+        {
+            double a_value;
+            array<string> each_a_term = readExpr(var.u[0]);
+            array<string> a_operation = operation(var.u[0]);
+            array<double> each_a_value;
+
+            for (unsigned list = 0; list < each_a_term.length; list++) //x,2
+            {
+                double a_n = parseNum(each_a_term[list]);
+                for (unsigned j = 0; j < each_a_term[list].length; j++)
+                {
+                    if (each_a_term[list][j] == 'x')
+                        a_n *= x;
+                }
+                each_a_term.push(a_n);
+            }
+
+            a_value = each_a_value[0];
+
+            for (unsigned i = 0; i < a_operation.length; i++)
+            {
+                if (a_operation[i] == '+')
+                    a_value += each_a_value[i + 1];
+                else if (a_operation[i] == '-')
+                    a_value -= each_a_value[i + 1];
+                else if (a_operation[i] == '*')
+                    a_value *= each_a_value[i + 1];
+                else if (a_operation[i] == '/')
+                    a_value /= each_a_value[i + 1];
+            }
+            result *= (a_value, n_value);
+        }
+
+        else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 4 < term.length) //5sin(x)
         {
             string tfunc = term.slice(i, i + 3);
-
             if (tfunc == "sin")
                 result *= sin(u_value);
-            else if (tfunc == "cos")
+            if (tfunc == "cos")
                 result *= cos(u_value);
-            else if (tfunc == "tan")
+            if (tfunc == "tan")
                 result *= tan(u_value);
-            else if (tfunc == "cot")
+            if (tfunc == "cot")
                 result /= tan(u_value);
-            else if (tfunc == "sec")
+            if (tfunc == "sec")
                 result /= cos(u_value);
-            else if (tfunc == "csc")
+            if (tfunc == "csc")
                 result /= sin(u_value);
         }
-        else if (term[i] == 'l') //5ln(3x+2)
-        {
-            if (term[i + 1] == 'n')
-                result *= log(u_value);
-            else if (term[i + 1] == 'o') //3log10(2x)
-            {
-                string b = "";
-                i += 2; //skip og
-                while (term[i] != '(')
-                    b += term[i];
 
-                double b_value = parseNum(b);
+        else if (term[i] == 'l')
+        {
+            if (term[i + 1] == 'o') //5log10(5x)
+            {
+                double b_value;
+
+                for (unsigned i = 0; i < var.log.length; i++)
+                {
+                    i += 3; //skip log
+                    b_value = parseNum(var.log[0].slice(i, var.log[0].length - 1));
+                }
 
                 result *= log_func(b_value, u_value);
             }
+            else if (term[i + 1] == 'n') //5ln(5x)
+            {
+                result *= log(u_value);
+            }
         }
-        else if (term[i] == 'x' && term[i + 1] == '^') // 3x^2x
-            result *= pow(result, n_value);
+        else // 3x
+            result *= x;
     }
     return result;
 }
