@@ -1,7 +1,6 @@
 #ifndef KLIB_STRING_H
 #define KLIB_STRING_H
 
-#include <cstring>
 #include <string> // for iostream
 
 typedef class String {
@@ -13,11 +12,14 @@ typedef class String {
     friend std::istream& getline(std::istream &, String &);
     /* The method converts numbers to arithmetic string. max decimal places is 2. */
     template <class number>
-    friend String toString(number);
+    friend String toString(const number &);
     /* The method converts Unicode values into characters. */
-    friend char fromCharCode(const unsigned);
+    friend char fromCharCode(const unsigned &);
+    /* The method retruns length of c-string. */
+    friend unsigned strlen(const char *);
     private:
-        char *_proto_; // c-string data
+        /* The encrypted data of string class (stored in c-string form). */
+        char *_proto_;
     public:
         /* The length property returns the length of a string (number of characters). */
         unsigned length;
@@ -339,7 +341,7 @@ String String::operator* (const unsigned count) {
 
 /* class methods: FRIEND */
 template <class number>
-String toString(number n) {
+String toString(const number &n) {
     if (n == 1) return "";
     if (n == -1) return "-";
 
@@ -364,6 +366,12 @@ String toString(number n) {
         case 2: return t.slice(0, dotPos+2); // .x0
         default: return t.slice(0, dotPos+3); // .xx0
     }
+}
+
+unsigned strlen(const char *str) {
+    unsigned i = 0;
+    while (str[i]) i++;
+    return i;
 }
 
 /* class methods: BUILT-IN */
