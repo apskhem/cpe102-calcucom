@@ -388,6 +388,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
                         u_u_value *= cos(trig_value);
                     else if (u_term[list].includes("tan"))
                         u_u_value *= tan(trig_value);
+                    else if (u_term[list].includes("cot"))
                         u_u_value /= tan(trig_value);
                     else if (u_term[list].includes("sec"))
                         u_u_value /= cos(trig_value);
