@@ -271,7 +271,17 @@ Array<any> Array<any>::sort() {
 
 template<class any>
 Array<any> Array<any>::splice(const unsigned &index, const Array<any> &items) {
+    any *old = _proto_;
+    _proto_ = new any[length+items.length];
 
+    for (unsigned i = 0; i < index; i++)  _proto_[i] = old[i];
+    for (unsigned i = 0; i < items.length; i++) _proto_[index+i] = items[i];
+    for (unsigned i = index; i < length; i++) _proto_[items.length+i] = old[i];
+
+    length += items.length;
+    delete[] old;
+
+    return *this;
 }
 
 template<class any>

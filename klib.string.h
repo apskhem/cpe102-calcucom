@@ -50,13 +50,11 @@ typedef class String {
         /* The method returns the character at the specified index in a string. */
         char charAt(const unsigned &);
         /* The method returns the Unicode of the character at the specified index in a string. */
-        int charCodeAt(const unsigned &);
-        /* The method returns a non-negative integer that is the Unicode code point value. */
-        unsigned codePointAt(const unsigned &);
+        unsigned charCodeAt(const unsigned &);
         /* The method is used to join two or more strings. */
         String concat(const String &);
         /* The method retunrs the value of c-string. */
-        char* cstring();
+        char* cstr();
         /* The method determines whether a string ends with the characters of a specified string. */
         bool endsWith(const String &, unsigned=-1);
         /* The method determines whether a string contains the characters of a specified string. */
@@ -68,11 +66,11 @@ typedef class String {
         /* The method compares two strings in the current locale. */
         int localeCompare(const String &);
         /* The method searches a string for a match against a regular expression, and returns the matches, as an Array object. */
-        String match();
+        String match(const String &);
         /* method pads the current string with a given string (repeated, if needed) so that the resulting string reaches a given length. */
-        String matchAll();
+        String matchAll(const String &);
         /* The method returns the Unicode Normalization Form of the string. */
-        String normalize(const String &);
+        String normalize(const String & = "NFC");
         /* The method pads the current string with another string (multiple times, if needed) until the resulting string reaches the given length */
         String padEnd(const unsigned &, const String &);
         /* The method pads the current string with another string (multiple times, if needed) until the resulting string reaches the given length */
@@ -379,8 +377,12 @@ char String::charAt(const unsigned &index) {
     return _proto_[index];
 }
 
-int String::charCodeAt(const unsigned &index) {
+unsigned String::charCodeAt(const unsigned &index) {
     return _proto_[index];
+}
+
+char* String::cstr() {
+    return _proto_;
 }
 
 String String::concat(const String &str) {
@@ -446,6 +448,44 @@ int String::lastIndexOf(const String &searchvalue, unsigned start) {
     }
 
     return -1;
+}
+
+int String::localeCompare(const String &compareString) {
+
+}
+
+String String::match(const String &regex) {
+
+}
+
+String String::matchAll(const String &regex) {
+
+}
+
+String String::normalize(const String &form) {
+    if (form._proto_ == "NFC") {
+
+    }
+    else if (form._proto_ == "NFD") {
+
+    }
+    else if (form._proto_ == "NFKC") {
+
+    }
+    else if (form._proto_ == "NFKD") {
+
+    }
+    else {
+        throw "RangeError";
+    }
+}
+
+String String::padEnd(const unsigned &, const String &) {
+
+}
+
+String String::padStart(const unsigned &, const String &) {
+
 }
 
 String String::repeat(const unsigned &count) {
@@ -621,6 +661,22 @@ String String::trim() {
     }
 
     return this->slice(indexLeft, indexRight);
+}
+
+String String::trimStart() {
+
+}
+
+String String::trimLeft() {
+
+}
+
+String String::trimEnd() {
+
+}
+
+String String::trimRight() {
+
 }
 
 String String::valueOf() {

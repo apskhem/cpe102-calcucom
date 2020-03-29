@@ -1,21 +1,23 @@
 #include <iostream>
-#include <cmath>
+
+void error(const char * msg) {
+    std::cout << "Bad arithmetic expression: " << msg << ".\n\n";
+    throw 0;
+}
 
 #include "klib.array.h"
 #include "klib.string.h"
 #include "klib.number.h"
-#include "derivative.h"
-#include "calculation.h"
+#include "engine.base.h"
+#include "engine.eval.h"
+// #include "engine.lim.h"
+// #include "engine.mhee.h"
 
-/* The method recieves user input from fisrt place */
-void userRequest(string &, string &, unsigned);
-/* The method calcalate the derivative value of implicit expression */
-array<string> operation(string);
-
-int main()
-{
+int main() {
     /* parts of user input variables */
-    string expr = "", numberOfDiff = "";
+    string expr = "";
+    char var = 'x';
+    unsigned numberOfDiff = 0;
 
     /* parts of program variables */
     string blank;
@@ -44,56 +46,96 @@ int main()
     system("pause");
     system("cls");
 
+
     std::cout << "\nEnter f(x) = ";
     getline(std::cin, expr);
 
-    while (true)
-    {
-        if (isFirstPass)
-        {
+    while (true) {
+        if (isFirstPass) {
             std::cout << "Press 'enter' to continue...";
 
             getline(std::cin, blank);
             std::cout << "------------------------------------------\n";
         }
 
-        std::cout << "Press: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
+        std::cout << "Mode: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
 
-        if (isFirstPass)
-        {
-            std::cout << "\t[4] to try a new expression.\n\t[5] to end the program.\n";
-        }
+        if (isFirstPass) std::cout << "\t[4] to try a new expression.\n\t[5] to end the program.\n";
 
         std::cout << "=>\t";
         std::cin >> option;
         std::cin.ignore();
 
-        if (option == 5)
-            break;
+        if (option == 5) break;
         std::cout << "The result is...\n\n";
 
-        switch (option)
-        {
-        case 1:
-            userRequest(expr, numberOfDiff, 1);
-            break;
-        case 2:
-            userRequest(expr, numberOfDiff, 2);
-            break;
-        case 3:
-            userRequest(expr, numberOfDiff, 3);
-            break;
-        case 4:
-        {
-            std::cout << "Enter f(x) = ";
-            getline(std::cin, expr);
-            continue;
-        }
-        break;
-        }
+        switch (option) {
+            case 1: { // Evaluation
+                array<string> termOps = readExprOps(expr); //-(3x^2)
 
-        if (option == 2)
-            std::cout << "f^(" << numberOfDiff << ")(x) = ";
+                double x; //3x^2 + 2x^3 + 3x^5
+                std::cout << "Please enter x value to evaluate : ";
+                std::cin >> x;
+                unsigned short count = 0;
+
+                double answer = cal(terms[0], x);
+
+                for (unsigned short i = 0; i < termOps.length; i++) {
+                    if (termOps[i] == '+') answer += cal(terms[i + 1], x);
+                    else if (termOps[i] == '-') answer -= cal(terms[i + 1], x);
+                    else if (termOps[i] == '*') answer *= cal(terms[i + 1], x);
+                    else if (termOps[i] == '/') answer /= cal(terms[i + 1], x);
+                    else continue;
+
+                    count++;
+                }
+                if (count == 0)
+                    answer = cal(terms[0], x);
+
+                std::cout << "f(x) = " << answer;
+            } break;
+            case 2: { // Derivative
+                numberOfDiff++;
+                expr = simplifyExpr(diffExpr(readExpr(expr), var));
+
+                if (numberOfDiff < 4)
+                    std::cout << "f" << string("'").repeat(numberOfDiff) << "(x) = ";
+                else
+                    std::cout << "f(" << numberOfDiff << ")(x) = ";
+            } break;
+            case 3: { // Implicit Derivative
+                unsigned short choice;
+                string impl_expr, pre_expr, post_expr;
+
+                std::cout << "Please enter new expresion : "; // xy = ysin(x)
+                getline(std::cin, impl_expr);
+                sscanf(impl_expr, "%[^=] %s=%s", pre_expr, post_expr);
+
+                array<string> pre_term = readExpr(pre_expr);   //xy
+                array<string> post_term = readExpr(post_expr); //ysin(x)
+
+                std::cout << "[1] to find dy/dx \t[2] to find dx/dy";
+                std::cin >> choice;
+
+                switch (choice) {
+                    case 1: { //dy/dx
+                        result = "dy/dx = ";
+                        for (unsigned short i = 0; i < pre_term.length; i++) result += implFunc(pre_term[i], 'x');
+                        for (unsigned i = 0; i < post_term.length; i++) result += implFunc(post_term[i], 'x');
+                    }
+                    case 2: { //dx/dy
+                        result = "dx/dy = ";
+                        for (unsigned short i = 0; i < terms.length; i++) result += implFunc(terms[i], 'y');
+                    }
+                }
+            } break;
+            case 4: {
+                std::cout << "Enter f(x) = ";
+                getline(std::cin, expr);
+                continue;
+            } break;
+            default: error();
+        }
 
         std::cout << expr << "\n\n";
 
@@ -101,104 +143,4 @@ int main()
     }
 
     return 0;
-}
-
-void userRequest(string &expr, string &numberOfDiff, unsigned option)
-{
-    array<string> terms = readExpr(expr);
-
-    // ++ simplify each term
-    string result = "";
-
-    switch (option)
-    {
-    case 1: // Eval
-    {
-        array<string> terms_sep = operation(expr); //-(3x^2)
-
-        double x; //3x^2 + 2x^3 + 3x^5
-        std::cout << "Please enter x value to evaluate : ";
-        std::cin >> x;
-        unsigned short count = 0;
-
-        double answer = cal(terms[0], x);
-
-        for (unsigned short i = 0; i < terms_sep.length; i++)
-        {
-            if (terms_sep[i] == '+')
-            {
-                answer += cal(terms[i + 1], x);
-                count++;
-            }
-            else if (terms_sep[i] == '-')
-            {
-                answer -= cal(terms[i + 1], x);
-                count++;
-            }
-            else if (terms_sep[i] == '*')
-            {
-                answer *= cal(terms[i + 1], x);
-                count++;
-            }
-            else if (terms_sep[i] == '/')
-            {
-                answer /= cal(terms[i + 1], x);
-                count++;
-            }
-        }
-        if (count == 0)
-            answer = cal(terms[0], x);
-
-        std::cout << "f(x) = " << answer;
-    }
-    break;
-    case 2:
-    { // Diff
-        numberOfDiff += "'";
-        result = exprDiff(terms, 'x');
-    }
-    break;
-    case 3:
-    { // Impl
-        unsigned short choice;
-        string impl_expr, pre_expr, post_expr;
-
-        std::cout << "Please enter new expresion : "; // xy = ysin(x)
-        getline(std::cin, impl_expr);
-        sscanf(impl_expr, "%[^=] %s=%s", pre_expr, post_expr);
-
-        array<string> pre_term = readExpr(pre_expr);   //xy
-        array<string> post_term = readExpr(post_expr); //ysin(x)
-
-        std::cout << "[1] to find dy/dx \t[2] to find dx/dy";
-        std::cin >> choice;
-
-        switch (choice)
-        {
-        case 1: //dy/dx
-        {
-            result = "dy/dx = ";
-            for (unsigned short i = 0; i < pre_term.length; i++)
-            {
-                result += implFunc(pre_term[i], 'x');
-            }
-            for (unsigned i = 0; i < post_term.length; i++)
-            {
-                result += implFunc(post_term[i], 'x');
-            }
-        }
-        case 2: //dx/dy
-        {
-            result = "dx/dy = ";
-            for (unsigned short i = 0; i < terms.length; i++)
-            {
-                result += implFunc(terms[i], 'y');
-            }
-        }
-        }
-    }
-    break;
-        // ++ re-arrange the result; cleaner result
-        expr = result;
-    }
 }

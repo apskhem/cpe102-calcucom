@@ -5,8 +5,6 @@ class CalNumber {
     friend double parseNum(string, const unsigned=0, unsigned=-1);
     /* The method checks if input char is number or not. */
     friend bool isNum(char);
-    /* The method reduces power of n by -1 of any form. */
-    friend string reduceN(string);
     /* The methood reads expression and find '+', '-' and var. */
     bool hasSignOrVar(string, char);
 };
@@ -53,33 +51,6 @@ double parseNum(string t, const unsigned start, unsigned end) {
 
 bool isNum(char t) {
     return (t >= 46 && t <= 57);
-}
-
-string reduceN(string n, char var, double &numOutput) {
-    unsigned short divIndex = 0;
-
-    for (unsigned short i = 0; i < n.length; i++) {
-        if (n[i] == var) {
-            numOutput = 1;
-            return "";
-        }
-        else if (n[i] == '/') {
-            divIndex = i;
-            break;
-        }
-    }
-
-    if (divIndex) {
-        string newCal = "";
-        double upper = parseNum(n.slice(0, divIndex))
-        double lower = parseNum(n.slice(divIndex+1));
-
-        numOutput = upper / lower;
-        return toString(upper-lower) + "/" + toString(lower);
-    }
-    else {
-        return toString(parseNum(n)-1);
-    }
 }
 
 bool hasSignOrVar(string expr, char var) {

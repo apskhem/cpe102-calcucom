@@ -1,54 +1,47 @@
 #ifndef CALCULATION_H
 #define CALCULATION_H
 
-double log_func(double, double);
-array<string> operation(string);
+#include <cmath>
+
+double calLog(const double &, const double &);
+array<string> readExprOps(string);
 double cal(string, float);
-array<string> impliRead(string);
-string implFunc(string, char);
+array<string> readImplExpr(string);
+string implDiff(string, const char &);
 
 const double PI = 3.14159265358979323846;
 
-double log_func(double b, double u)
-{
-    int log_value = 0;
-    log_value = log10(u) / log10(b);
-
-    return log_value;
+double calLog(const double &b, const double &u) {
+    return log(u)/log(b);
 }
 
-array<string> operation(string term)
+array<string> readExprOps(string term)
 {
-    array<string> term_sep;
+    array<string> res;
     unsigned leftPar = 0, rightPar = 0;
 
     for (unsigned i = 0; i < term.length; i++) //(2x^2)*3
     {
-        if (term[i] == ')')
-            rightPar++;
-        else if (term[i] == '(')
-            leftPar++;
+        if (term[i] == ')') rightPar++;
+        else if (term[i] == '(') leftPar++;
 
-        if (leftPar == rightPar)
-        {
+        if (leftPar == rightPar) {
             if (term[i] == '+')
-                term_sep.push("+");
+                res.push("+");
             else if (term[i] == '-' && i != 0)
-                term_sep.push("-");
+                res.push("-");
             else if (term[i] == '*' || term[i] == '(' || term[i] == ')') // 2(2x+3)
             {
-                if (term[i] == '(')
-                    leftPar++;
-                if (term[i] == ')')
-                    rightPar++;
+                if (term[i] == '(') leftPar++;
+                if (term[i] == ')') rightPar++;
 
-                term_sep.push("*");
+                res.push("*");
             }
             else if (term[i] == '/')
-                term_sep.push("/");
+                res.push("/");
         }
     }
-    return term_sep;
+    return res;
 }
 
 double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
@@ -66,7 +59,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
 
         for (unsigned i = 0; i < var.n.length; i++)
         {
-            n_operation.push(operation(var.n[i])); // + , +
+            n_operation.push(readExprOps(var.n[i])); // + , +
             n_term.push(readExpr(var.n[i]));       //2sin(3x), 2x^3, 5ln(3x), 2x
         }
 
@@ -76,7 +69,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
             {
                 TermComponents n_equation(n_term[list], 'x');
                 array<string> u_equation = readExpr(n_equation.n[0]); //3x, 2
-                array<string> u_operation = operation(n_equation.n[0]);
+                array<string> u_operation = readExprOps(n_equation.n[0]);
                 double u_value; //3x+2
                 array<double> each_u_value;
 
@@ -117,7 +110,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
             {
                 TermComponents n_equation(n_term[list], 'x');           //2sin(3x+2)
                 array<string> u_equation = readExpr(n_equation.u[0]);   //3x, 2
-                array<string> u_operation = operation(n_equation.u[0]); //+
+                array<string> u_operation = readExprOps(n_equation.u[0]); //+
                 array<double> each_u_value;
                 double u_value;
 
@@ -173,7 +166,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
             {
                 TermComponents n_equation(n_term[list], 'x');
                 array<string> u_equation = readExpr(n_equation.u[0]);
-                array<string> u_operation = operation(n_equation.u[0]);
+                array<string> u_operation = readExprOps(n_equation.u[0]);
                 array<double> each_u_value;
                 double u_value;
 
@@ -215,7 +208,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
             {
                 TermComponents n_equation(n_term[list], 'x');
                 array<string> u_equation = readExpr(n_equation.u[0]);
-                array<string> u_operation = operation(n_equation.u[0]);
+                array<string> u_operation = readExprOps(n_equation.u[0]);
                 array<double> each_u_value;
                 double b_value;
                 double u_value;
@@ -254,7 +247,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
                 }
 
                 double n_n_value = parseNum(n_term[list]);
-                n_n_value *= log_func(b_value, u_value);
+                n_n_value *= calLog(b_value, u_value);
 
                 each_n_value.push(n_n_value);
             }
@@ -297,7 +290,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
 
         for (unsigned i = 0; i < var.u.length; i++)
         {
-            u_operation.push(operation(var.u[i])); //3x^(2x+5), 20sin(5x), 5log(20x), 2x
+            u_operation.push(readExprOps(var.u[i])); //3x^(2x+5), 20sin(5x), 5log(20x), 2x
             u_term.push(readExpr(var.u[i]));       // + , + , +
         }
 
@@ -307,7 +300,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
             {
                 TermComponents u_equation(u_term[list], 'x');
                 array<string> n_equation = readExpr(u_equation.n[0]);   //2x, 5
-                array<string> n_operation = operation(u_equation.n[0]); // +
+                array<string> n_operation = readExprOps(u_equation.n[0]); // +
                 array<double> each_n_value;
 
                 for (unsigned i = 0; i < n_equation.length; i++) //2x,5
@@ -348,7 +341,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
             {
                 TermComponents u_equation(u_term[list], 'x');           //20sin(5x+20)
                 array<string> each_u_term = readExpr(u_equation.u[0]);  //5x, 20
-                array<string> u_operation = operation(u_equation.u[0]); //+
+                array<string> u_operation = readExprOps(u_equation.u[0]); //+
                 array<double> each_trig_value;
 
                 for (unsigned i = 0; i < each_u_term.length; i++) //5x, 20
@@ -403,7 +396,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
             {
                 TermComponents u_equation(u_term[list], 'x');
                 array<string> each_u_term = readExpr(u_equation.u[0]); //20x, 5
-                array<string> u_operation = operation(u_equation.u[0]);
+                array<string> u_operation = readExprOps(u_equation.u[0]);
                 array<double> each_log_value;
 
                 for (unsigned i = 0; i < each_u_term.length; i++) //20x, 5
@@ -444,7 +437,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
             {
                 TermComponents u_equation(u_term[list], 'x');
                 array<string> each_u_term = readExpr(u_equation.u[0]);
-                array<string> u_operation = operation(u_equation.u[0]);
+                array<string> u_operation = readExprOps(u_equation.u[0]);
                 array<double> each_log_value;
                 double b_value;
 
@@ -482,7 +475,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
                 }
 
                 double u_u_value = parseNum(u_term[list]);
-                u_u_value *= log_func(b_value, log_value);
+                u_u_value *= calLog(b_value, log_value);
 
                 each_u_value.push(u_u_value);
             }
@@ -530,7 +523,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
         {
             double a_value;
             array<string> each_a_term = readExpr(var.u[0]);
-            array<string> a_operation = operation(var.u[0]);
+            array<string> a_operation = readExprOps(var.u[0]);
             array<double> each_a_value;
 
             for (unsigned list = 0; list < each_a_term.length; list++) //x,2
@@ -589,7 +582,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
                     b_value = parseNum(var.log[0].slice(i, var.log[0].length - 1));
                 }
 
-                result *= log_func(b_value, u_value);
+                result *= calLog(b_value, u_value);
             }
             else if (term[i + 1] == 'n') //5ln(5x)
             {
@@ -602,7 +595,7 @@ double cal(string term, float x) //3x^{2sin(3x)+2x^3+5ln(3x)}
     return result;
 }
 
-array<string> impliRead(string term)
+array<string> readImplExpr(string term)
 {
     array<string> each_term;
     bool x_y_idx = 0, func_idx = 0;
@@ -683,7 +676,7 @@ array<string> impliRead(string term)
     return each_term;
 }
 
-string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
+string implDiff(string term, char var) // xy , ysin(x) , (x+y)^2
 {
     array<string> each_term;
     string result = "";
@@ -703,7 +696,7 @@ string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
     {
         if (x_y) //xy
         {
-            each_term = impliRead(term); //x,y
+            each_term = readImplExpr(term); //x,y
 
             for (unsigned i = 0; i < each_term.length; i++)
             {
@@ -772,7 +765,7 @@ string implFunc(string term, char var) // xy , ysin(x) , (x+y)^2
     {
         if (x_y) //xy
         {
-            each_term = impliRead(term); //x,y
+            each_term = readImplExpr(term); //x,y
 
             for (unsigned i = 0; i < each_term.length; i++)
             {
