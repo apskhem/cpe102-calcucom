@@ -26,6 +26,12 @@ double parseNum(string t, const unsigned start, unsigned end) {
     bool passNumber = false;
     short isMinus = 1;
     string parseText = "";
+
+    // check for number in the front
+    if (!(t[0] >= 46 && t[0] <= 57) && t[0] != '-') return 0;
+    if (t[0] == '-' && !(t[1] >= 46 && t[1] <= 57)) return -1;
+
+    // parsing string
     for (unsigned i = start; i < end; i++) {
         if (t[i] >= 46 && t[i] <= 57 && t[i] != '.') {
             passNumber = true;

@@ -4,7 +4,7 @@
 #include <string> // for iostream
 
 typedef class String {
-    friend String operator+ (const char *, String &);
+    friend String operator+ (const char *, const String &);
     friend bool operator== (const char *, String &);
     friend bool operator!= (const char *, String &);
     friend std::ostream& operator<< (std::ostream &, const String &);
@@ -13,6 +13,8 @@ typedef class String {
     /* The method converts numbers to arithmetic string. max decimal places is 2. */
     template <class number>
     friend String toString(const number &);
+    template <class number>
+    friend String toCalStr(const number &);
     /* The method converts Unicode values into characters. */
     friend char fromCharCode(const unsigned &);
     /* The method retruns length of c-string. */
@@ -180,7 +182,7 @@ std::istream& getline(std::istream &in, String &str) {
 }
 
 /* processing operators: OVERLOAD */
-String operator+ (const char *lstr, String &rstr) {
+String operator+ (const char *lstr, const String &rstr) {
     unsigned len = strlen(lstr);
 
     char result[len+rstr.length+1];
@@ -340,6 +342,31 @@ String String::operator* (const unsigned count) {
 /* class methods: FRIEND */
 template <class number>
 String toString(const number &n) {
+    string t = std::to_string(n).c_str();
+    unsigned short dotPos = -1, lastZeroPos = -1;
+
+    for (unsigned short i = 0; i < t.length; i++) {
+        if (t[i] == '.') {
+            dotPos = i;
+            break;
+        }
+    }
+
+    if (dotPos == -1) return t;
+
+    for (unsigned short i = t.length-1; i >= dotPos; i--) {
+        if (t[i] != '0' || i == dotPos) lastZeroPos = i+1;
+    }
+
+    switch (lastZeroPos - dotPos) {
+        case 1: return t.slice(0, dotPos); // .0
+        case 2: return t.slice(0, dotPos+2); // .x0
+        default: return t.slice(0, dotPos+3); // .xx0
+    }
+}
+
+template <class number>
+String toCalStr(const number &n) {
     if (n == 1) return "";
     if (n == -1) return "-";
 
@@ -355,7 +382,7 @@ String toString(const number &n) {
 
     if (dotPos == -1) return t;
 
-    for (unsigned short i = t.length-1; i >= dotPos; i++) {
+    for (unsigned short i = t.length-1; i >= dotPos; i--) {
         if (t[i] != '0' || i == dotPos) lastZeroPos = i+1;
     }
 
