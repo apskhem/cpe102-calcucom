@@ -309,6 +309,7 @@ string implDiff(string term, char var) // xy , ysin(x) , (x+y)^2
                 }
             }
         }
+        return result;
     }
 
     else if (var == 'y')
