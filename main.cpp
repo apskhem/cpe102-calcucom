@@ -76,23 +76,8 @@ int main() {
                 double x; //3x^2 + 2x^3 + 3x^5
                 std::cout << "Please enter x value to evaluate : ";
                 std::cin >> x;
-                unsigned short count = 0;
 
-                double answer = cal(terms[0], x);
-
-                for (unsigned short i = 0; i < termOps.length; i++) {
-                    if (termOps[i] == '+') answer += cal(terms[i + 1], x);
-                    else if (termOps[i] == '-') answer -= cal(terms[i + 1], x);
-                    else if (termOps[i] == '*') answer *= cal(terms[i + 1], x);
-                    else if (termOps[i] == '/') answer /= cal(terms[i + 1], x);
-                    else continue;
-
-                    count++;
-                }
-                if (count == 0)
-                    answer = cal(terms[0], x);
-
-                std::cout << "f(x) = " << answer;
+                std::cout << "f(" << x << ") = " << evalExpr(readExpr(expr), x, var);
             } break;
             case 2: { // Derivative
                 numberOfDiff++;

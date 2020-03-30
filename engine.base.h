@@ -12,7 +12,7 @@ string diff(const string &term, const char &var);
 /* The method reforms the expression to be an clearier expression. */
 string simplifyExpr(string expr);
 /* The method finds tangent of expression */
-string tangent(string expr, double pos);
+string tangent(string expr, double posX, const char &var);
 
 struct factor {
     unsigned type = 0; // 0 = u, 1 = trig, 2 = log, 3 = arc, 4 = var
@@ -66,7 +66,7 @@ class TermComponents {
         string src;
         array<factor> factors;
         double a = 1;
-        unsigned divAt = 0;
+        array<unsigned> divIndex;
     
         TermComponents(string term, char var);
     private:
@@ -190,7 +190,7 @@ TermComponents::TermComponents(string term, char var) {
 
         // find (type): division
         else if (term[i] == ')' && term[i+1] == '/') {
-            divAt = factors.length;
+            divIndex.push(factors.length);
         }
     }
 }
@@ -289,7 +289,7 @@ string diff(const string &term, const char &var) {
     string result = tc.a;
 
     if (tc.factors.length > 1) { 
-        if (tc.divAt) {
+        if (tc.divIndex.length) {
             string dividend = tc.factors[0].compress(), divisor = tc.factors[1].compress();
 
             result += "((" + divisor + ")(" + diffExpr(readExpr(dividend), var) + ")-(" + dividend + ")(" + diffExpr(readExpr(divisor), var) + "))/(" + divisor + ")^2";
@@ -390,6 +390,18 @@ string diff(const string &term, const char &var) {
     }
 
     return result;
+}
+
+
+string tangent(string expr, double posX, const char &var) {
+    // string slopeFunc = diffExpr(readExpr(expr), var);
+    // dobule slope = evalExpr(readExpr(slopeFunc), posX);
+
+    //tangent = m(x1)(x-x1) + y1;
+    // string x1 = posX < 0 ? "-" : "";
+    // x1 += toString(posX);
+
+    // return slope + "(" + string(var) + x1 + ")" + evalExpr(readExpr(expr), posX);
 }
 
 #endif
