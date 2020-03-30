@@ -61,10 +61,10 @@ int main()
             std::cout << "------------------------------------------\n";
         }
 
-        std::cout << "Mode: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n\t[4] to find Max-Min value of function\n\t[5] to find limit of function";
+        std::cout << "Mode: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n\t[4] to find Max-Min value of function\n\t[5] to find limit of function\n";
 
         if (isFirstPass)
-            std::cout << "\t[6] to try a new expression.\n\t[7] to show a graph \t[8] to end the program.\n";
+            std::cout << "\t[6] to try a new expression.\n\t[7] to show a graph\n\t[8] to end the program.\n";
 
         std::cout << "=>\t";
         std::cin >> option;
@@ -110,7 +110,8 @@ int main()
 
             string pre_equation, post_equation;
 
-            std::cout << "[1] to find dy/dx \t[2] to find dx/dy";
+            std::cout << "[1] to find dy/dx\n\t[2] to find dx/dy\n";
+            std::cout << "=>\t";
             std::cin >> choice;
 
             switch (choice)
