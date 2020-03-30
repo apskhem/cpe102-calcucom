@@ -11,7 +11,7 @@ void error(const char * msg) {
 #include "engine.base.h"
 #include "engine.eval.h"
 // #include "engine.lim.h"
-// #include "engine.mhee.h"
+#include "engine.max_min.h"
 
 int main() {
     /* parts of user input variables */
