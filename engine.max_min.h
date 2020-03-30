@@ -139,19 +139,7 @@ array<double> SDforx3(double A3, double B3, double C3, double D3)
 		count2 -= 1;
 	}
 
-	if (count1 == 999)
-		count2 *= -1;
 	
-
-	else if (count2 == -999)
-		count1 *= -1;
-	
-	else if (count1 == 999 && count2 == -999)
-	{
-		//cout << "    CANNOT FIND     ";
-
-	}
-
 	if (count1 == 999)
 	{
 		double num1 = A3;
@@ -160,7 +148,7 @@ array<double> SDforx3(double A3, double B3, double C3, double D3)
 		double xot1 = xp(num1, num2, num3);
 		double xot2 = xn(num1, num2, num3);
 
-		ans.push(count1);
+		ans.push(count1*(-1));
 		ans.push(xot1);
 		ans.push(xot2);
 	}
@@ -174,9 +162,16 @@ array<double> SDforx3(double A3, double B3, double C3, double D3)
 		double xot1 = xp(num1, num2, num3);
 		double xot2 = xn(num1, num2, num3);
 
-		ans.push(count2);
+		ans.push(count2*(-1));
 		ans.push(xot1);
 		ans.push(xot2);
+	}
+	
+	
+		if (count1 == 999 && count2 == -999)
+	{
+		cout << "    CANNOT FIND     ";
+
 	}
 
 	return ans;
