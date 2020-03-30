@@ -24,23 +24,18 @@ double eval(string term, const double &value, const char &var) {
     if (!tc.factors.length && tc.a) return tc.a;
     else if (!tc.factors.length && !tc.a) return 0;
 
-    double result = 1;
+    double result = tc.a;
     unsigned divPlace = 0;
 
     for (unsigned short i = 0; i < tc.factors.length; i++) {
+        double preResult;
+
         switch (tc.factors[i].type) {
             case 0: {
                 double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
-                string valPlaceholder;
-                double n = tc.factors[i].subtractN(valPlaceholder, var);
+                double n = evalExpr(readExpr(tc.factors[i].n), value, var);
 
-                if (tc.divIndex[divPlace] == i) {
-                    result /= pow(chainEval, n);
-                    divPlace++;
-                }
-                else {
-                    result *= pow(chainEval, n);
-                }
+                preResult = pow(chainEval, n);
             } break;
             case 1: {
                 double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
@@ -58,65 +53,49 @@ double eval(string term, const double &value, const char &var) {
                     preResult = 1/cos(chainEval * 180 / PI);
                 else if (tc.factors[i].func == "cot")
                     preResult = 1/tan(chainEval * 180 / PI);
-
-                if (tc.divIndex[divPlace] == i) {
-                    preResult = 1/preResult;
-                    divPlace++;
-                }
             } break;
             case 2: {
                 double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
                 double logbase = parseNum(tc.factors[i].func.slice(3));
                 if (!logbase) logbase = 10;
 
-                if (tc.divIndex[divPlace] == i) {
-                    result /= tc.factors[i].func.length > 2 ? log(chainEval)/log(logbase) : log(chainEval);
-                    divPlace++;
-                }
-                else {
-                    result *= tc.factors[i].func.length > 2 ? log(chainEval)/log(logbase) : log(chainEval);
-                }
+                preResult = tc.factors[i].func.length > 2 ? log(chainEval)/log(logbase) : log(chainEval);
             } break;
             case 3: {
                 double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
-                double preResult;
 
                 if (tc.factors[i].func == "sin")
-                    preResult = asin(chainEval * 180 / PI);
+                    preResult = asin(chainEval);
                 else if (tc.factors[i].func == "cos")
-                    preResult = acos(chainEval * 180 / PI);
+                    preResult = acos(chainEval);
                 else if (tc.factors[i].func == "tan")
-                    preResult = atan(chainEval * 180 / PI);
+                    preResult = atan(chainEval);
                 else if (tc.factors[i].func == "csc")
-                    preResult = 1/asin(chainEval * 180 / PI);
+                    preResult = 1/asin(chainEval);
                 else if (tc.factors[i].func == "sec")
-                    preResult = 1/acos(chainEval * 180 / PI);
+                    preResult = 1/acos(chainEval);
                 else if (tc.factors[i].func == "cot")
-                    preResult = 1/atan(chainEval * 180 / PI);
-
-                if (tc.divIndex[divPlace] == i) {
-                    preResult = 1/preResult;
-                    divPlace++;
-                }
-
-                result *= preResult;
+                    preResult = 1/atan(chainEval);
             } break;
             case 4: {
-                string valPlaceholder;
-                double n = tc.factors[i].subtractN(valPlaceholder, var);
+                double n = evalExpr(readExpr(tc.factors[i].n), value, var);
 
-                if (tc.divIndex[divPlace] == i) {
-                    result /= pow(value, n);
-                    divPlace++;
-                }
-                else {
-                    result *= pow(value, n);
-                }
+                preResult = pow(value, n);
             } break;
+            default: error();
+        }
+
+        // sum the result
+        if (tc.divIndex[divPlace] == i) {
+            result /= preResult;
+            divPlace++;
+        }
+        else {
+            result *= preResult;
         }
     }
 
-    return result * tc.a;
+    return result;
 }
 
 array<string> readImplExpr(string term)
@@ -206,15 +185,9 @@ string implDiff(string term, char var) // xy , ysin(x) , (x+y)^2
     string result = "";
     bool x_y = false, x_only = false, y_only = false;
 
-    for (unsigned i = 0; i < term.length; i++)
-    {
-        if (term.includes("x") && term.includes("y"))
-            x_y = true;
-        else if (term.includes("x"))
-            x_only = true;
-        else if (term.includes("y"))
-            y_only = true;
-    }
+    if (term.includes("x") && term.includes("y")) x_y = true;
+    else if (term.includes("x")) x_only = true;
+    else if (term.includes("y")) y_only = true;
 
     if (var == 'x') //dy/dx******
     {
@@ -231,8 +204,7 @@ string implDiff(string term, char var) // xy , ysin(x) , (x+y)^2
 
                 result += "(" + toString(a) + ")";
 
-                for (unsigned j = 0; j < each_term.length; i++)
-                {
+                for (unsigned j = 0; j < each_term.length; i++) {
                     result += "(";
                     if (each_term[i].includes("x"))
                         result += (i == j ? diff(each_term[i], 'x') : each_term[i]) + ")";
@@ -241,26 +213,8 @@ string implDiff(string term, char var) // xy , ysin(x) , (x+y)^2
                 }
             }
         }
-        else if (x_only)
-        {
-            each_term = readExpr(term); //3sin(x)
-
-            for (unsigned i = 0; i < each_term.length; i++)
-            {
-                double a = parseNum(each_term[i]);
-
-                if (i > 0)
-                    result += "+";
-
-                result += "(" + toString(a) + ")";
-
-                for (unsigned j = 0; j < each_term.length; i++)
-                {
-                    result += "(";
-                    result += (i == j ? diff(each_term[i], 'x') : each_term[i]);
-                    result += ")";
-                }
-            }
+        else if (x_only) { //3sin(x)
+            result = diffExpr(readExpr(term), var);
         }
         else if (y_only)
         {
@@ -333,24 +287,7 @@ string implDiff(string term, char var) // xy , ysin(x) , (x+y)^2
         }
         else if (y_only)
         {
-            each_term = readExpr(term); //3sin(y)
-
-            for (unsigned i = 0; i < each_term.length; i++)
-            {
-                double a = parseNum(each_term[i]);
-
-                if (i > 0)
-                    result += "+";
-
-                result += "(" + toString(a) + ")";
-
-                for (unsigned j = 0; j < each_term.length; i++)
-                {
-                    result += "(";
-                    result += (i == j ? diff(each_term[i], 'y') : each_term[i]);
-                    result += ")";
-                }
-            }
+            result = diffExpr(readExpr(term), var);
         }
 
         return result;

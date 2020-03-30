@@ -13,10 +13,12 @@ string diff(const string &term, const char &var);
 string simplifyExpr(string expr);
 /* The method finds tangent of expression */
 string tangent(string expr, double posX, const char &var);
+/* The method shows graph of the expression */
+void showGraph(const string &expr, const double &scale, const char &var);
 
 struct factor {
-    unsigned type = 0; // 0 = u, 1 = trig, 2 = log, 3 = arc, 4 = var
-    unsigned uType = 0; // 0 = u, 1 = trig, 2 = log, 3 = arc, 4 = var
+    unsigned type = 0; // 0 = u, 1 = trig, 2 = log, 3 = arc, 4 = var, 5 = n of var
+    unsigned uType = 0; // 0 = u, 1 = trig, 2 = log, 3 = arc, 4 = var, 5 = n of var
     string func = ""; // log10, asin, tan
     string n = "1";
     string u = "";
@@ -175,6 +177,18 @@ TermComponents::TermComponents(string term, char var) {
             else error("none standard arithmatic expression presented");
         }
 
+        else if (term[i] == '^') {
+            factor item;
+
+            item.type = 5;
+            checkForN(++i, item.n);
+            item.u = toString(a);
+            a = 1;
+
+            factors.push(item);
+            break;
+        }
+
         // find (type): function inside '(...)'
         else if (term[i] == '(') {
             if (term[i+1] != ')' && isNum(term[i+1])) {
@@ -257,11 +271,10 @@ array<string> readExpr(string expr) {
             terms.push(expr.slice(splitIndex, i));
             splitIndex = i + (expr[i] == '+' ? 1 : 0);
         }
-
-        if (i >= expr.length - 1) {
-            terms.push(expr.slice(splitIndex));
-        }
     }
+
+    // collect last term
+    terms.push(expr.slice(splitIndex));
 
     // check for errors
     if (leftPar != rightPar) error("no complete pair of parentheses '()'");
@@ -386,6 +399,11 @@ string diff(const string &term, const char &var) {
                     ? toCalStr(tc.a)
                     : toCalStr(tc.a * numSubN) + string(var) + subN;
             } break;
+            case 5: {
+                string chainDiff = diff(tc.factors[0].n, var);
+                result = "(" + chainDiff + ")" + tc.factors[0].u + "^(" + tc.factors[0].n + ")";
+            }
+            default: error();
         }
     }
 
@@ -394,14 +412,54 @@ string diff(const string &term, const char &var) {
 
 
 string tangent(string expr, double posX, const char &var) {
-    // string slopeFunc = diffExpr(readExpr(expr), var);
-    // dobule slope = evalExpr(readExpr(slopeFunc), posX);
+    string slopeFunc = diffExpr(readExpr(expr), var);
+    dobule slope = evalExpr(readExpr(slopeFunc), posX, var);
 
-    //tangent = m(x1)(x-x1) + y1;
-    // string x1 = posX < 0 ? "-" : "";
-    // x1 += toString(posX);
+    // tangent = m(x1)(x-x1) + y1;
+    string x1 = posX < 0 ? "-" : "";
+    x1 += toString(posX);
+    x1 = (x1[0] == '-' ? "-" : "+") + x1;
 
-    // return slope + "(" + string(var) + x1 + ")" + evalExpr(readExpr(expr), posX);
+    return toString(slope) + "(" + string(var) + x1 + ")" + evalExpr(readExpr(expr), posX);
+}
+
+void showGraph(const string &expr, const double &scale, const char &var) {
+    const unsigned short h = 101, w = 101;
+    char graph[h][w] = {};
+
+    array<string> read = readExpr(expr);
+
+    for (unsigned short i = 0; i < w; i++) {
+        double y = evalExpr(read, i/scale, var);
+        if (y > -50/scale && y < 50/scale) {
+            graph[int(y)][i] = '*';
+        }
+    }
+
+    for (unsigned short row = 0; row < h; row++) {
+        std::cout << '\t';
+        for (unsigned short cell = 0; cell < w; cell++) {
+            if (row == 50 && cell == 50) {
+                if (graph[row][cell] == '*') std::cout << '*'
+                else std::cout << '|';
+            }
+            else if (cell == 50) {
+                if (graph[row][cell] == '*') std::cout << '*'
+                else std::cout << '|';
+            }
+            else if (row == 50) {
+                if (graph[row][cell] == '*') std::cout << '*'
+                else std::cout << '-';
+            }
+            else {
+                std::cout << ' ';
+            }
+        }
+
+        if (row == 50) std::cout << " " << var;
+
+        std::cout << '\n';
+    }
 }
 
 #endif
