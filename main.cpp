@@ -90,27 +90,35 @@ int main() {
             } break;
             case 3: { // Implicit Derivative
                 unsigned short choice;
-                string impl_expr, pre_expr, post_expr;
+                string expr, pre_expr, post_expr;
 
                 std::cout << "Please enter new expresion : "; // xy = ysin(x)
-                getline(std::cin, impl_expr);
-                sscanf(impl_expr, "%[^=] %s=%s", pre_expr, post_expr);
+                getline(std::cin, expr);
+                sscanf(expr, "%[^=] %s=%s", pre_expr, post_expr);
 
                 array<string> pre_term = readExpr(pre_expr);   //xy
                 array<string> post_term = readExpr(post_expr); //ysin(x)
+
+                string pre_equation, post_equation;
 
                 std::cout << "[1] to find dy/dx \t[2] to find dx/dy";
                 std::cin >> choice;
 
                 switch (choice) {
                     case 1: { //dy/dx
-                        result = "dy/dx = ";
-                        for (unsigned short i = 0; i < pre_term.length; i++) result += implFunc(pre_term[i], 'x');
-                        for (unsigned i = 0; i < post_term.length; i++) result += implFunc(post_term[i], 'x');
+                        for (unsigned short i = 0; i < pre_term.length; i++) 
+                            pre_equation += implDiff(pre_term[i], 'x');
+                        for (unsigned i = 0; i < post_term.length; i++) 
+                            post_equation += implDiff(post_term[i], 'x');
+                        std::cout << "dy/dx = " << reFormat(pre_equation, post_equation);
+
                     }
                     case 2: { //dx/dy
-                        result = "dx/dy = ";
-                        for (unsigned short i = 0; i < terms.length; i++) result += implFunc(terms[i], 'y');
+                        for (unsigned short i = 0; i < pre_term.length; i++) 
+                            pre_equation += implDiff(pre_term[i], 'y');
+                        for (unsigned short i = 0; i < post_term.length; i++) 
+                            post_equation += implDiff(post_term[i], 'y');
+                        std::cout << "dx/dy = " << reFormat(pre_equation, post_equation);
                     }
                 }
             } break;
