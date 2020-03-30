@@ -70,7 +70,7 @@ int main()
         std::cin >> option;
         std::cin.ignore();
 
-        if (option == 5)
+        if (option == 8)
             break;
         std::cout << "The result is...\n\n";
 
