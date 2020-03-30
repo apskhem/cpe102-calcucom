@@ -1,12 +1,13 @@
 #ifndef MAX_MIN_H
 #define MAX_MIN_H
 
-double x_one(double, double);					//ax+b
-double xp(double, double, double);				//-b+sqrt(b^2-4ac)/2a
-double xn(double, double, double);				//-b-sqrt(b^2-4ac)/2a
-double SDforx3(double, double, double, double); //ax^3+bx^2+cx+d
+double x_one(double, double);						   //ax+b
+double xp(double, double, double);					   //-b+sqrt(b^2-4ac)/2a
+double xn(double, double, double);					   //-b-sqrt(b^2-4ac)/2a
+array<double> SDforx3(double, double, double, double); //ax^3+bx^2+cx+d
+array<double> critical_x(string);
 
-double max_min(string equation)
+array<double> critical_x(string equation)
 {
 	int option;
 	array<string> term = readExpr(equation);
@@ -59,7 +60,7 @@ double max_min(string equation)
 		{
 			string power = term[i].slice(term[i].length - 2, term[i].length);
 
-			if(power == "^3")
+			if (power == "^3")
 				a3 = parseNum(term[i]);
 			else if (power == "^2")
 				b3 = parseNum(term[i]);
@@ -69,26 +70,8 @@ double max_min(string equation)
 				d3 = parseNum(term[i]);
 		}
 
-		x_value.push((a3, b3, c3, d3));
+		x_value = SDforx3(a3, b3, c3, d3);
 	}
-
-	system("pause");
-	system("cls");
-
-	cout << " _______   ___     ___        ____         ___     ___    ___   ___     " << endl;
-	cout << "[__   __] [   ]   [   ]      [    ]       [   ]   [   ]  [   ] [   ]    " << endl;
-	cout << "   [ ]    [   ]___[   ]     [  []  ]      [    ]  [   ]  [   ][   ]     " << endl;
-	cout << "   [ ]    [           ]    [  [__]  ]     [     ] [   ]  [      ]       " << endl;
-	cout << "   [ ]    [    ___    ]   [  ______  ]    [   ][ ][   ]  [      ]       " << endl;
-	cout << "   [ ]    [   ]   [   ]  [  ]      [  ]   [   ] [     ]  [   ][   ]     " << endl;
-	cout << "   [_]    [___]   [___] [__]        [__]  [___]  [____]  [___] [___]    " << endl;
-	cout << "       	          __       __	    _________     __       __               " << endl;
-	cout << "                 [  ]     [  ]     [  _____  ]   [  ]     [  ]	     	   " << endl;
-	cout << "                  [  ]   [  ]     [  ]     [  ]  [  ]     [  ]		       " << endl;
-	cout << "                   [  ] [  ]	  [  ]     [  ]  [  ]     [  ]			   " << endl;
-	cout << "                     [  ]  	  [  ]     [  ]  [  ]     [  ]		       " << endl;
-	cout << "                     [  ]         [  ]_____[  ]  [  ]_____[  ]              " << endl;
-	cout << "                     [__]	   [_________]    [_________]               " << endl;
 }
 
 double x_one(double A1, double B1)
@@ -96,6 +79,7 @@ double x_one(double A1, double B1)
 	double ans;
 	ans = (-1 * B1) / A1;
 }
+
 double xp(double A, double B, double C)
 {
 	double ans1;
@@ -114,8 +98,9 @@ double xn(double D, double E, double F)
 	return ans2;
 }
 
-double SDforx3(double A3, double B3, double C3, double D3)
+array<double> SDforx3(double A3, double B3, double C3, double D3)
 {
+	array<double> ans;
 	double sum3 = 1;
 	double count1 = 0;
 	double count2 = 0;
@@ -155,19 +140,16 @@ double SDforx3(double A3, double B3, double C3, double D3)
 	}
 
 	if (count1 == 999)
-	{
-		cout << "x :" << count2 * (-1) << ",";
-	}
-	else if (count2 == -999)
-	{
+		count2 *= -1;
+	
 
-		cout << "x :" << count1 * (-1) << ",";
-	}
+	else if (count2 == -999)
+		count1 *= -1;
+	
 	else if (count1 == 999 && count2 == -999)
 	{
-		cout << "--------------------";
-		cout << "    CANNOT FIND     ";
-		cout << "--------------------";
+		//cout << "    CANNOT FIND     ";
+
 	}
 
 	if (count1 == 999)
@@ -178,8 +160,11 @@ double SDforx3(double A3, double B3, double C3, double D3)
 		double xot1 = xp(num1, num2, num3);
 		double xot2 = xn(num1, num2, num3);
 
-		cout << "x :" << count1 << "," << xot1 << "," << xot2 << endl;
+		ans.push(count1);
+		ans.push(xot1);
+		ans.push(xot2);
 	}
+
 	else
 	{
 		double num1 = A3;
@@ -189,8 +174,11 @@ double SDforx3(double A3, double B3, double C3, double D3)
 		double xot1 = xp(num1, num2, num3);
 		double xot2 = xn(num1, num2, num3);
 
-		cout << "x :" << count2 << "," << xot1 << "," << xot2 << endl;
+		ans.push(count2);
+		ans.push(xot1);
+		ans.push(xot2);
 	}
 }
+
 
 #endif

@@ -1,6 +1,7 @@
 #include <iostream>
 
-void error(const char * msg) {
+void error(const char *msg)
+{
     std::cout << "Bad arithmetic expression: " << msg << ".\n\n";
     throw 0;
 }
@@ -13,7 +14,8 @@ void error(const char * msg) {
 // #include "engine.lim.h"
 #include "engine.max_min.h"
 
-int main() {
+int main()
+{
     /* parts of user input variables */
     string expr = "";
     char var = 'x';
@@ -46,88 +48,126 @@ int main() {
     system("pause");
     system("cls");
 
-
     std::cout << "\nEnter f(x) = ";
     getline(std::cin, expr);
 
-    while (true) {
-        if (isFirstPass) {
+    while (true)
+    {
+        if (isFirstPass)
+        {
             std::cout << "Press 'enter' to continue...";
 
             getline(std::cin, blank);
             std::cout << "------------------------------------------\n";
         }
 
-        std::cout << "Mode: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n";
+        std::cout << "Mode: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n[4]to find Max-Min value of function";
 
-        if (isFirstPass) std::cout << "\t[4] to try a new expression.\n\t[5] to end the program.\n";
+        if (isFirstPass)
+            std::cout << "\t[4] to try a new expression.\n\t[5] to end the program.\n";
 
         std::cout << "=>\t";
         std::cin >> option;
         std::cin.ignore();
 
-        if (option == 5) break;
+        if (option == 5)
+            break;
         std::cout << "The result is...\n\n";
 
-        switch (option) {
-            case 1: { // Evaluation
-                array<string> termOps = readExprOps(expr); //-(3x^2)
+        switch (option)
+        {
+        case 1:
+        { // Evaluation
+            double x;
+            std::cout << "Please enter x value to evaluate : ";
+            std::cin >> x;
 
-                double x; //3x^2 + 2x^3 + 3x^5
-                std::cout << "Please enter x value to evaluate : ";
-                std::cin >> x;
+            std::cout << "f(" << x << ") = " << evalExpr(readExpr(expr), x, var);
+        }
+        break;
+        case 2:
+        { // Derivative
+            numberOfDiff++;
+            expr = simplifyExpr(diffExpr(readExpr(expr), var));
 
-                std::cout << "f(" << x << ") = " << evalExpr(readExpr(expr), x, var);
-            } break;
-            case 2: { // Derivative
-                numberOfDiff++;
-                expr = simplifyExpr(diffExpr(readExpr(expr), var));
+            if (numberOfDiff < 4)
+                std::cout << "f" << string("'").repeat(numberOfDiff) << "(x) = ";
+            else
+                std::cout << "f(" << numberOfDiff << ")(x) = ";
+        }
+        break;
+        case 3:
+        { // Implicit Derivative
+            unsigned short choice;
+            string expr, pre_expr, post_expr;
 
-                if (numberOfDiff < 4)
-                    std::cout << "f" << string("'").repeat(numberOfDiff) << "(x) = ";
-                else
-                    std::cout << "f(" << numberOfDiff << ")(x) = ";
-            } break;
-            case 3: { // Implicit Derivative
-                unsigned short choice;
-                string expr, pre_expr, post_expr;
+            std::cout << "Please enter new expresion : "; // xy = ysin(x)
+            getline(std::cin, expr);
+            sscanf(expr, "%[^=] %s=%s", pre_expr, post_expr);
 
-                std::cout << "Please enter new expresion : "; // xy = ysin(x)
-                getline(std::cin, expr);
-                sscanf(expr, "%[^=] %s=%s", pre_expr, post_expr);
+            array<string> pre_term = readExpr(pre_expr);   //xy
+            array<string> post_term = readExpr(post_expr); //ysin(x)
 
-                array<string> pre_term = readExpr(pre_expr);   //xy
-                array<string> post_term = readExpr(post_expr); //ysin(x)
+            string pre_equation, post_equation;
 
-                string pre_equation, post_equation;
+            std::cout << "[1] to find dy/dx \t[2] to find dx/dy";
+            std::cin >> choice;
 
-                std::cout << "[1] to find dy/dx \t[2] to find dx/dy";
-                std::cin >> choice;
+            switch (choice)
+            {
+            case 1:
+            { //dy/dx
+                for (unsigned i = 0; i < pre_term.length; i++)
+                    pre_equation += implDiff(pre_term[i], 'x');
+                for (unsigned i = 0; i < post_term.length; i++)
+                    post_equation += implDiff(post_term[i], 'x');
+                std::cout << "dy/dx = " << reFormat(pre_equation, post_equation);
+            }
+            case 2:
+            { //dx/dy
+                for (unsigned i = 0; i < pre_term.length; i++)
+                    pre_equation += implDiff(pre_term[i], 'y');
+                for (unsigned i = 0; i < post_term.length; i++)
+                    post_equation += implDiff(post_term[i], 'y');
+                std::cout << "dx/dy = " << reFormat(pre_equation, post_equation);
+            }
+            }
+        }
+        break;
+        case 4:
+        {
+            string equation;
+            array<double> x_value = critical_x(equation);
+            array<double> y_value;
+            array<string> x_y_pt;
+            double max = 0, min = 9999;
+            unsigned max_idx = 0, min_idx = 0;
 
-                switch (choice) {
-                    case 1: { //dy/dx
-                        for (unsigned  i = 0; i < pre_term.length; i++) 
-                            pre_equation += implDiff(pre_term[i], 'x');
-                        for (unsigned i = 0; i < post_term.length; i++) 
-                            post_equation += implDiff(post_term[i], 'x');
-                        std::cout << "dy/dx = " << reFormat(pre_equation, post_equation);
+            for (unsigned i = 0; i < x_value.length; i++)
+            {
+                double critical_y = evalExpr(readExpr(equation), x_value[i], 'x');
+                y_value.push(critical_y);
 
-                    }
-                    case 2: { //dx/dy
-                        for (unsigned  i = 0; i < pre_term.length; i++) 
-                            pre_equation += implDiff(pre_term[i], 'y');
-                        for (unsigned  i = 0; i < post_term.length; i++) 
-                            post_equation += implDiff(post_term[i], 'y');
-                        std::cout << "dx/dy = " << reFormat(pre_equation, post_equation);
-                    }
+                if (critical_y > max)
+                {
+                    max = critical_y;
+                    max_idx = i;
                 }
-            } break;
-            case 4: {
-                std::cout << "Enter f(x) = ";
-                getline(std::cin, expr);
-                continue;
-            } break;
-            default: error();
+                if (critical_y < min)
+                {
+                    min = critical_y;
+                    min_idx = i;
+                }
+            }
+            for (unsigned i = 0; i < x_value.length; i++)
+            {
+                x_y_pt.push("(" + toCalStr(x_value[i]) + "," + toCalStr(y_value[i]) + ")");
+            }
+            std::cout <<"On "<<x_y_pt[max_idx]<<" is the Maximize value = " << max << "\n";
+            std::cout <<"On "<<x_y_pt[min_idx]<<" is the Minimize value = " << min << "\n";
+        }
+        default:
+            error();
         }
 
         std::cout << expr << "\n\n";
