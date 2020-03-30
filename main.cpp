@@ -1,8 +1,16 @@
 #include <iostream>
 
-void error(const char *msg)
-{
-    std::cout << "Bad arithmetic expression: " << msg << ".\n\n";
+void error(const char *msg, const unsigned cond=1) {
+    switch (cond) {
+        case 1: std::cout << "Bad arithmetic expression: "; break;
+        case 2: std::cout << "Lack of features: "; break;
+        case 3: std::cout << "Exceed program's limitation: "; break;
+        case 4: std::cout << "Wrong user input: "; break;
+        case 5: std::cout << "Systematic fault: "; break;
+    };
+
+    std::cout << msg << ".\n\n";
+    
     throw 0;
 }
 
@@ -10,9 +18,8 @@ void error(const char *msg)
 #include "klib.string.h"
 #include "klib.number.h"
 #include "engine.base.h"
-#include "engine.eval.h"
 // #include "engine.lim.h"
-#include "engine.max_min.h"
+// #include "engine.max_min.h"
 
 string numOfDiff(const unsigned &num);
 
@@ -49,100 +56,101 @@ int main() {
     system("pause");
     system("cls");
 
-    std::cout << "Press 'enter' to continue...";
+    std::cout << "Press 'enter' to start...";
     getline(std::cin, blank);
 
     // run first menu
     std::cout << "\nIndependent variable (single character)\n";
     std::cout << "=>\t";
     std::cin >> var;
+    std::cin.ignore();
     std::cout << "Enter f(" << var << ") = ";
     getline(std::cin, expr);
 
-    while (true)
-    {
-        if (isFirstPass)
-        {
+    while (true) {
+
+        if (isFirstPass) {
             std::cout << "Press 'enter' to continue...";
             getline(std::cin, blank);
-            std::cout << "------------------------------------------\n";
+            std::cout << "\n------------------------------------------\n";
         }
 
-        std::cout << "Mode: \t[1] Evaluate the expression.";
+        std::cout << "Mode: \t[1] Evaluate the expression.\n";
         std::cout << "\t[2] Derivative the expression.\n";
         std::cout << "\t[3] Implicit derivative the expression.\n";
-        std::cout << "\t[5] Find relative min/max\n";
-        std::cout << "\t[6] Show Graph\n";
+        std::cout << "\t[4] Find tangent.\n";
+        std::cout << "\t[5] Find relative min/max.\n";
+        std::cout << "\t[6] Show graph.\n";
         std::cout << "\t[7] Try a new expression.\n";
         std::cout << "\t[8] End program.\n";
-        std::cout << "Mode: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n\t[4] to find Max-Min value of function\n\t[5] to find limit of function\n";
-
-        if (isFirstPass)
+        std::cout << "=>\t";
+        std::cin >> option;
+        std::cin.ignore();
 
         if (option == 8) break;
-        std::cout << "The result is...\n\n";
 
         switch (option) {
             case 1: { // evaluation
                 double evalValue;
-                std::cout << "Please enter value of " << var << " to evaluate the expression.\n";
+                std::cout << "Enter value of " << var << " to evaluate the expression.\n";
                 std::cout << "=>\t";
                 std::cin >> evalValue;
+                std::cin.ignore();
 
-                std::cout << "f(" << evalValue << ") = " << evalExpr(readExpr(expr), evalValue, var) << endl;
+                std::cout << "The result is...\n\n";
+
+                std::cout << "f(" << evalValue << ") = " << evalExpr(readExpr(expr), evalValue, var) << '\n';
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
             case 2: { // derivative
                 numberOfDiff++;
-                expr = simplifyExpr(diffExpr(readExpr(expr), var));
+                expr = diffExpr(readExpr(expr), var);
+                if (!expr.length) expr = "0";
+
+                std::cout << "The result is...\n\n";
 
                 std::cout << "f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
             case 3: { // implicit Derivative
-                unsigned short choice;
-                string impl_expr, pre_expr, post_expr;
-
-                std::cout << "Please enter new expresion : "; // xy = ysin(x)
+                unsigned short mode;
+                string impl_expr;
+                std::cout << "Enter implicit expresion [left=right].\n";
+                std::cout << "=>\t";
                 getline(std::cin, impl_expr);
-                sscanf(impl_expr, "%[^=] %s=%s", pre_expr, post_expr);
+                std::cin.ignore();
 
-                array<string> pre_term = readExpr(pre_expr);   //xy
-                array<string> post_term = readExpr(post_expr); //ysin(x)
+                if (impl_expr.search("=") == -1) error("no presence of [left=right] expression");
 
-                std::cout << "[1] to find dy/d" << var << "\n\t[2] to find d" << var << "/dy";
-                std::cin >> choice;
-                string preResult;
+                impl_expr = impl_expr.replace(" ", "").toLowerCase();
 
-                if (choice == 1) {
-                    for (unsigned short i = 0; i < pre_term.length; i++) preResult += implDiff(pre_term[i], var);
-                    for (unsigned short i = 0; i < post_term.length; i++) preResult += implDiff(post_term[i], var);
+                string leftExpr = impl_expr.split("=")[0];
+                string rightExpr = impl_expr.split("=")[1];
 
-                    std::cout << "dy/d" << var << " = " << preResult;
-                }
-                else if (choice == 2) {
-                    preResult = "dx/dy = ";
-                    for (unsigned short i = 0; i < terms.length; i++) preResult += implDiff(terms[i], 'y');
+                string result = implExprDiff(readExpr(leftExpr), readExpr(rightExpr), var);
 
-                    std::cout << "d" << var << "/dy = " << preResult;
-                }
+                std::cout << "The result is...\n\n";
+
+                std::cout << "dy/d" << var << " = " << result;
             } break;
             case 4: { // find tangent
                 double pos;
-                std::cout << "Enter the position to find tangent of the expression.";
+                std::cout << "Enter the position to find tangent of the expression.\n";
                 std::cout << "=>\t";
                 std::cin >> pos;
+                std::cin.ignore();
                 
-                std::cout << "tangent(x) = " << tangent(expr, pos, var);
+                std::cout << "tangent(x) = " << tangent(expr, pos, var) << " @ " << var << " = " << pos << '\n';
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             }
             case 5: { // find relative min/max
-
+                //
             } break;
             case 6: { // show graph
                 double scale;
-                std::cout << "Enter graph scale [-50, 50] (1)";
+                std::cout << "Enter graph scale [-50, 50] in scale 1.\n";
                 std::cout << "=>\t";
                 std::cin >> scale;
+                std::cin.ignore();
                 showGraph(expr, scale, var);
 
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
@@ -153,7 +161,7 @@ int main() {
                 numberOfDiff = 0;
                 continue;
             } break;
-            default: error();
+            default: error("out of selection scope", 4);
         }
 
         std::cout << expr << "\n\n";
@@ -165,7 +173,7 @@ int main() {
 }
 
 string numOfDiff(const unsigned &num) {
-    if (numberOfDiff == 0) return "";
-    else if (numberOfDiff < 4) return string("'").repeat(numberOfDiff);
-    else "(" + toString(num) + ")";
+    if (num == 0) return "";
+    else if (num < 4) return string("'").repeat(num);
+    else return "(" + toString(num) + ")";
 }

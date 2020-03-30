@@ -31,6 +31,10 @@ double parseNum(string t, const unsigned start, unsigned end) {
     if (!(t[0] >= 46 && t[0] <= 57) && t[0] != '-') return 0;
     if (t[0] == '-' && !(t[1] >= 46 && t[1] <= 57)) return -1;
 
+    // also check for e
+    if (t[0] == 'e') return 2.71828182845904523;
+    else if (t[0] == '-' && t[1] == 'e') return -2.71828182845904523;
+
     // parsing string
     for (unsigned i = start; i < end; i++) {
         if (t[i] >= 46 && t[i] <= 57 && t[i] != '.') {

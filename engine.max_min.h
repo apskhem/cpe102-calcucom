@@ -182,5 +182,4 @@ array<double> SDforx3(double A3, double B3, double C3, double D3)
 	return ans;
 }
 
-
 #endif

@@ -1,13 +1,13 @@
 #ifndef DERIVATIVE_H
 #define DERIVATIVE_H
 
-/* The mothod throw error when the errors was occured */
-void error(const char * = "error");
+#include <cmath>
+
 /* The method splits expression into arrays of string term. */
 array<string> readExpr(string expr);
-/* The methood turns arrays of term into a new derivative expression. */
+/* The methood derivatives the expression. */
 string diffExpr(array<string> terms, const char &var);
-/* The methood turns a single term into a new derivative term. */
+/* The methood derivatives a term. */
 string diff(const string &term, const char &var);
 /* The method reforms the expression to be an clearier expression. */
 string simplifyExpr(string expr);
@@ -15,6 +15,14 @@ string simplifyExpr(string expr);
 string tangent(string expr, double posX, const char &var);
 /* The method shows graph of the expression */
 void showGraph(const string &expr, const double &scale, const char &var);
+/* The method evaluates the expression. */
+double evalExpr(array<string> terms, const double &value, const char &var);
+/* The method evaluates a term. */
+double eval(string term, const double &value, const char &var);
+/* The method implicitly derivatives the expression. */
+string implExprDiff(array<string> rightTerms, array<string> leftTerms, const char &var);
+
+const double PI = 3.14159265358979323846;
 
 struct factor {
     unsigned type = 0; // 0 = u, 1 = trig, 2 = log, 3 = arc, 4 = var, 5 = n of var
@@ -82,18 +90,8 @@ TermComponents::TermComponents(string term, char var) {
     src = term;
     a = parseNum(term) == 0 ? 1 : parseNum(term);
     for (unsigned short i = 0; i < term.length; i++) {
-        // find (type): position and #of x
-        if (term[i] == var) {
-            factor item;
-            item.type = 4;
-            item.u = var;
-            if(!checkForN(++i, item.n)) i--;
-
-            factors.push(item);
-        }
-
         // find (type): trigonometric function.
-        else if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 5 < term.length) {
+        if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 5 < term.length) {
             string tfunc = term.slice(i, i + 3);
 
             if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot") {
@@ -177,13 +175,32 @@ TermComponents::TermComponents(string term, char var) {
             else error("none standard arithmatic expression presented");
         }
 
+        // find (type): var
+        else if (term[i] >= 97 && term[i] <= 122) {
+            factor item;
+            item.type = 4;
+            item.u = term[i];
+            if(!checkForN(++i, item.n)) i--;
+
+            factors.push(item);
+        }
+
+        // find (type): function a^u
         else if (term[i] == '^') {
+
+            if (factors.length) error("there's support only a single factor of a^u in a signle term", 3);
+
             factor item;
 
             item.type = 5;
             checkForN(++i, item.n);
-            item.u = toString(a);
-            a = 1;
+
+            if (term[i-1] == 'e')
+                item.u = "e";
+            else {
+                item.u = toString(a);
+                a = 1;
+            }
 
             factors.push(item);
             break;
@@ -204,8 +221,15 @@ TermComponents::TermComponents(string term, char var) {
 
         // find (type): division
         else if (term[i] == ')' && term[i+1] == '/') {
+            if (divIndex.length) error("there's support only a single '/' (division) in a signle term", 3);
+
             divIndex.push(factors.length);
         }
+    }
+
+    for (unsigned short i = 0; i < factors.length; i++) {
+        if (factors[i].n.includes(var) && factors[i].u.includes(var))
+            error("there's no support for calculation of u^u", 2);
     }
 }
 
@@ -285,21 +309,25 @@ array<string> readExpr(string expr) {
 string diffExpr(array<string> terms, const char &var) {
     string result = "";
     for (unsigned i = 0; i < terms.length; i++) {
-        if (i > 0 && diff(terms[i], var)[0] != '-')
-            result += "+";
+        string preResult = diff(terms[i], var);
 
-        result += diff(terms[i], var);
+        if (preResult.length && preResult != "0") {
+            if (i > 0 && preResult[0] != '-') result += "+";
+
+            result += preResult;
+        }
     }
+
     return result;
 }
 
 string diff(const string &term, const char &var) {
     TermComponents tc(term, var);
 
-    if (!tc.factors.length && tc.a == 1) return ""; // only c
-    else if (!tc.factors.length) return tc.a;
+    if (!tc.factors.length) return "0"; // only c
+    else if (tc.factors.length == 1 && tc.factors[0].type == 4) return toString(tc.a);
 
-    string result = tc.a;
+    string result = "";
 
     if (tc.factors.length > 1) { 
         if (tc.divIndex.length) {
@@ -366,7 +394,7 @@ string diff(const string &term, const char &var) {
                 string chainDiff = diff(tc.factors[0].u, var);
 
                 if (tc.factors[0].func.length > 2) { // log...
-                    string logbase = tc.factors[0].func.slice(3) == "" ? "10" : tc.factors[0].func.slice(3);
+                    string logbase = tc.factors[0].func.length == 3 ? "10" : tc.factors[0].func.slice(3);
 
                     result = hasSignOrVar(chainDiff, var)
                         ? toCalStr(tc.a) + "(" + chainDiff + ")/((" + tc.factors[0].u + ")ln" + logbase + ")"
@@ -399,11 +427,14 @@ string diff(const string &term, const char &var) {
                     ? toCalStr(tc.a)
                     : toCalStr(tc.a * numSubN) + string(var) + subN;
             } break;
-            case 5: {
+            case 5: { // CASE a^(u)
                 string chainDiff = diff(tc.factors[0].n, var);
-                result = "(" + chainDiff + ")" + tc.factors[0].u + "^(" + tc.factors[0].n + ")";
+
+                result = tc.factors[0].u == "e"
+                    ? "(" + chainDiff + ")" + tc.factors[0].u + "^(" + tc.factors[0].n + ")"
+                    : "(" + chainDiff + ")(ln" + tc.factors[0].u + ")" + tc.factors[0].u + "^(" + tc.factors[0].n + ")";
             }
-            default: error();
+            default: error("fault at 'diff' function", 5);
         }
     }
 
@@ -413,53 +444,165 @@ string diff(const string &term, const char &var) {
 
 string tangent(string expr, double posX, const char &var) {
     string slopeFunc = diffExpr(readExpr(expr), var);
-    dobule slope = evalExpr(readExpr(slopeFunc), posX, var);
+    double slope = evalExpr(readExpr(slopeFunc), posX, var);
 
     // tangent = m(x1)(x-x1) + y1;
-    string x1 = posX < 0 ? "-" : "";
-    x1 += toString(posX);
-    x1 = (x1[0] == '-' ? "-" : "+") + x1;
+    double c = posX * slope + evalExpr(readExpr(expr), posX, var);
+    
+    string cStr = "";
+    if (c != 0) cStr = (c < 0 ? "-" : "+") + toString(c);
 
-    return toString(slope) + "(" + string(var) + x1 + ")" + evalExpr(readExpr(expr), posX);
+    if (slope == 0 && !cStr.length) return "0";
+    else if (slope == 0 && cStr.length) return cStr.slice(1);
+    else return toString(slope) + string(var) + cStr;
 }
 
 void showGraph(const string &expr, const double &scale, const char &var) {
-    const unsigned short h = 101, w = 101;
-    char graph[h][w] = {};
+    const unsigned short h = 65, w = 65, mid = 32;
 
     array<string> read = readExpr(expr);
 
+    char graph[h][w] = {};
+
     for (unsigned short i = 0; i < w; i++) {
-        double y = evalExpr(read, i/scale, var);
-        if (y > -50/scale && y < 50/scale) {
-            graph[int(y)][i] = '*';
-        }
+        int y = evalExpr(read, (i/scale)-mid, var) + mid;
+
+        if (y >= 0 && y <= h) graph[y][i] = '*';
     }
 
-    for (unsigned short row = 0; row < h; row++) {
-        std::cout << '\t';
-        for (unsigned short cell = 0; cell < w; cell++) {
-            if (row == 50 && cell == 50) {
-                if (graph[row][cell] == '*') std::cout << '*'
-                else std::cout << '|';
-            }
-            else if (cell == 50) {
-                if (graph[row][cell] == '*') std::cout << '*'
-                else std::cout << '|';
-            }
-            else if (row == 50) {
-                if (graph[row][cell] == '*') std::cout << '*'
-                else std::cout << '-';
+    for (unsigned short row = h-1; row >= 1; row--) { // loop y
+        std::cout << "\t\t";
+        for (unsigned short col = 0; col < w; col++) { // loop x
+            if (graph[row][col] == '*') {
+                std::cout << '*';
             }
             else {
-                std::cout << ' ';
+                if (row == mid && col == mid) std::cout << '+';
+                else if (col == mid) std::cout << '|';
+                else if (row == mid) std::cout << '-';
+                else std::cout << ' ';
             }
         }
 
-        if (row == 50) std::cout << " " << var;
+        if (row == mid) std::cout << ' ' << var;
 
         std::cout << '\n';
     }
+}
+
+double evalExpr(array<string> terms, const double &value, const char &var) {
+    double result = 0;
+    for (unsigned i = 0; i < terms.length; i++) {
+        result += eval(terms[i], value, var);
+    }
+    return result;
+}
+
+double eval(string term, const double &value, const char &var) {
+    TermComponents tc(term, var);
+
+    if (!tc.factors.length) {
+        if (tc.a) return tc.a;
+        else return 0;
+    }
+
+    double result = tc.a;
+    unsigned divPlace = 0;
+
+    for (unsigned short i = 0; i < tc.factors.length; i++) {
+        double preResult;
+
+        switch (tc.factors[i].type) {
+            case 0: {
+                double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
+                double n = evalExpr(readExpr(tc.factors[i].n), value, var);
+
+                preResult = pow(chainEval, n);
+            } break;
+            case 1: {
+                double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
+
+                if (tc.factors[i].func == "sin")
+                    preResult = sin(chainEval * PI / 180);
+                else if (tc.factors[i].func == "cos")
+                    preResult = cos(chainEval * PI / 180);
+                else if (tc.factors[i].func == "tan")
+                    preResult = tan(chainEval * PI / 180);
+                else if (tc.factors[i].func == "csc")
+                    preResult = 1/sin(chainEval * PI / 180);
+                else if (tc.factors[i].func == "sec")
+                    preResult = 1/cos(chainEval * PI / 180);
+                else if (tc.factors[i].func == "cot")
+                    preResult = 1/tan(chainEval * PI / 180);
+            } break;
+            case 2: {
+                double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
+                double logbase = tc.factors[i].func.length == 3 ? 10 : parseNum(tc.factors[i].func.slice(3));
+
+                preResult = tc.factors[i].func.length > 2 ? log(chainEval)/log(logbase) : log(chainEval);
+            } break;
+            case 3: {
+                double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
+
+                if (tc.factors[i].func == "sin")
+                    preResult = asin(chainEval);
+                else if (tc.factors[i].func == "cos")
+                    preResult = acos(chainEval);
+                else if (tc.factors[i].func == "tan")
+                    preResult = atan(chainEval);
+                else if (tc.factors[i].func == "csc")
+                    preResult = 1/asin(chainEval);
+                else if (tc.factors[i].func == "sec")
+                    preResult = 1/acos(chainEval);
+                else if (tc.factors[i].func == "cot")
+                    preResult = 1/atan(chainEval);
+            } break;
+            case 4: {
+                double n = evalExpr(readExpr(tc.factors[i].n), value, var);
+
+                preResult = pow(value, n);
+            } break;
+            case 5: {
+                double n = evalExpr(readExpr(tc.factors[i].n), value, var);
+
+                preResult = pow(parseNum(tc.factors[i].u), n);
+            } break;
+            default: error("fault at 'eval' function");
+        }
+
+        // sum the result
+        if (tc.divIndex.length && tc.divIndex[divPlace] == i) {
+            result /= preResult;
+            divPlace++;
+        }
+        else {
+            result *= preResult;
+        }
+    }
+
+    return result;
+}
+
+string implExprDiff(array<string> leftTerms, array<string> rightTerms, const char &var) {
+    string result = "";
+    array<string> forms = leftTerms;
+
+    // construct new form left = 0
+    for (unsigned short i = 0; i < rightTerms.length-1; i++) {
+        if (rightTerms[i][0] == '-')
+            forms.push(rightTerms[i].slice(1));
+        else
+            forms.push("-" + rightTerms[i]);
+    }
+
+    string dUpper, dLower;
+    
+    dUpper = diffExpr(forms, var);
+    dLower = diffExpr(forms, 'y');
+
+    result = "-(" + dUpper + ")/(" + dLower + ")";
+
+    return result;
 }
 
 #endif

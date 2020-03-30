@@ -28,6 +28,8 @@ int main() {
     return 0;
 }
 
+// prohibited character = a, l, s, c, t
+
 TO DO LIST
 - Basic Derivative
 - Evaluation
