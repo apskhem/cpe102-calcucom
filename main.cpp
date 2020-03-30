@@ -106,7 +106,7 @@ int main() {
 
                 switch (choice) {
                     case 1: { //dy/dx
-                        for (unsigned short i = 0; i < pre_term.length; i++) 
+                        for (unsigned  i = 0; i < pre_term.length; i++) 
                             pre_equation += implDiff(pre_term[i], 'x');
                         for (unsigned i = 0; i < post_term.length; i++) 
                             post_equation += implDiff(post_term[i], 'x');
@@ -114,9 +114,9 @@ int main() {
 
                     }
                     case 2: { //dx/dy
-                        for (unsigned short i = 0; i < pre_term.length; i++) 
+                        for (unsigned  i = 0; i < pre_term.length; i++) 
                             pre_equation += implDiff(pre_term[i], 'y');
-                        for (unsigned short i = 0; i < post_term.length; i++) 
+                        for (unsigned  i = 0; i < post_term.length; i++) 
                             post_equation += implDiff(post_term[i], 'y');
                         std::cout << "dx/dy = " << reFormat(pre_equation, post_equation);
                     }
