@@ -10,19 +10,24 @@ string implDiff(string, const char &);
 
 const double PI = 3.14159265358979323846;
 
-double evalExpr(array<string> terms, const double &value, const char &var) {
+double evalExpr(array<string> terms, const double &value, const char &var)
+{
     double result = 0;
-    for (unsigned i = 0; i < terms.length; i++) {
+    for (unsigned i = 0; i < terms.length; i++)
+    {
         result += eval(terms[i], value, var);
     }
     return result;
 }
 
-double eval(string term, const double &value, const char &var) {
+double eval(string term, const double &value, const char &var)
+{
     TermComponents tc(term, var);
 
-    if (!tc.factors.length && tc.a) return tc.a;
-    else if (!tc.factors.length && !tc.a) return 0;
+    if (!tc.factors.length && tc.a)
+        return tc.a;
+    else if (!tc.factors.length && !tc.a)
+        return 0;
 
     double result = tc.a;
     unsigned divPlace = 0;
@@ -128,7 +133,7 @@ array<string> readImplExpr(string term)
             else if (term[i] == ')')
                 rightPar++;
 
-            if ((term[i] == 's' || term[i] == 'c' || term[i] == 't' || a[i] == 'l') && leftPar == rightPar)
+            if ((term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l') && leftPar == rightPar)
             {
                 i += 3; //skip in(
                 leftPar++;
@@ -237,6 +242,7 @@ string implDiff(string term, char var) // xy , ysin(x) , (x+y)^2
                 }
             }
         }
+        return result;
     }
 
     else if (var == 'y')
@@ -289,9 +295,68 @@ string implDiff(string term, char var) // xy , ysin(x) , (x+y)^2
         {
             result = diffExpr(readExpr(term), var);
         }
-
-        return result;
     }
+}
+
+string reFormat(string pre, string post)
+{
+
+    array<string> pre_equation = readExpr(pre);
+    array<string> post_equation = readExpr(post);
+    array<string> hasIDX;
+    array<string> noIDX;
+    string pre_result, post_result, result;
+
+    for (unsigned i = 0; i < pre_equation.length; i++)
+    {
+        if (pre_equation[i].includes("dy/dx"))
+            hasIDX.push(pre_equation[i]);
+        else
+        {
+            pre_equation[i] = "-" + pre_equation[i];
+            noIDX.push(pre_equation[i]);
+        }
+    }
+
+    for (unsigned i = 0; i < post_equation.length; i++)
+    {
+        if (post_equation[i].includes("dy/dx"))
+        {
+            post_equation[i] = "-" + post_equation[i];
+            hasIDX.push(post_equation[i]);
+        }
+        else
+            noIDX.push(post_equation[i]);
+    }
+
+    unsigned start = 0;
+    unsigned idx = 0;
+
+    for (unsigned list = 0; list < hasIDX.length; list++)
+    {
+
+        for (unsigned i = 0; i < hasIDX[list].length; i++)
+        {
+            if (list > 0 && hasIDX[list][0] != '-')
+                pre_result += "+";
+            if (hasIDX[i] == '(' && hasIDX[i + 1] == 'd')
+                break;
+            idx++;
+        }
+        pre_result += hasIDX[list].slice(start, idx);
+    }
+
+    for (unsigned list = 0; list < noIDX.length; list++)
+    {
+        if (list > 0 && noIDX[list][0] != '-')
+            post_result += "+";
+
+        post_result += noIDX[list];
+    }
+
+    result = post_result + "/" + pre_result;
+
+    return result;
 }
 
 #endif

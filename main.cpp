@@ -1,6 +1,7 @@
 #include <iostream>
 
-void error(const char * msg) {
+void error(const char *msg)
+{
     std::cout << "Bad arithmetic expression: " << msg << ".\n\n";
     throw 0;
 }
@@ -11,7 +12,7 @@ void error(const char * msg) {
 #include "engine.base.h"
 #include "engine.eval.h"
 // #include "engine.lim.h"
-// #include "engine.mhee.h"
+#include "engine.max_min.h"
 
 string numOfDiff(const unsigned &num);
 
@@ -58,8 +59,10 @@ int main() {
     std::cout << "Enter f(" << var << ") = ";
     getline(std::cin, expr);
 
-    while (true) {
-        if (isFirstPass) {
+    while (true)
+    {
+        if (isFirstPass)
+        {
             std::cout << "Press 'enter' to continue...";
             getline(std::cin, blank);
             std::cout << "------------------------------------------\n";
@@ -68,15 +71,13 @@ int main() {
         std::cout << "Mode: \t[1] Evaluate the expression.";
         std::cout << "\t[2] Derivative the expression.\n";
         std::cout << "\t[3] Implicit derivative the expression.\n";
-        std::cout << "\t[4] Find tangent\n";
         std::cout << "\t[5] Find relative min/max\n";
         std::cout << "\t[6] Show Graph\n";
         std::cout << "\t[7] Try a new expression.\n";
         std::cout << "\t[8] End program.\n";
+        std::cout << "Mode: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n\t[4] to find Max-Min value of function\n\t[5] to find limit of function\n";
 
-        std::cout << "=>\t";
-        std::cin >> option;
-        std::cin.ignore();
+        if (isFirstPass)
 
         if (option == 8) break;
         std::cout << "The result is...\n\n";
