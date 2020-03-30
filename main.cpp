@@ -61,10 +61,10 @@ int main()
             std::cout << "------------------------------------------\n";
         }
 
-        std::cout << "Mode: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n[4]to find Max-Min value of function";
+        std::cout << "Mode: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n[4] to find Max-Min value of function";
 
         if (isFirstPass)
-            std::cout << "\t[4] to try a new expression.\n\t[5] to end the program.\n";
+            std::cout << "\t[5] to try a new expression.\n\t[6] to show a graph \t[7] to end the program.\n";
 
         std::cout << "=>\t";
         std::cin >> option;
@@ -136,8 +136,7 @@ int main()
         break;
         case 4:
         {
-            string equation;
-            array<double> x_value = critical_x(equation);
+            array<double> x_value = critical_x(expr);
             array<double> y_value;
             array<string> x_y_pt;
             double max = 0, min = 9999;
@@ -145,7 +144,7 @@ int main()
 
             for (unsigned i = 0; i < x_value.length; i++)
             {
-                double critical_y = evalExpr(readExpr(equation), x_value[i], 'x');
+                double critical_y = evalExpr(readExpr(expr), x_value[i], 'x');
                 y_value.push(critical_y);
 
                 if (critical_y > max)
@@ -166,6 +165,17 @@ int main()
             std::cout <<"On "<<x_y_pt[max_idx]<<" is the Maximize value = " << max << "\n";
             std::cout <<"On "<<x_y_pt[min_idx]<<" is the Minimize value = " << min << "\n";
         }
+        case 5: {
+                std::cout << "Enter f(x) = ";
+                getline(std::cin, expr);
+                continue;
+            } break;
+        case 6: {
+                /*
+                graph here
+                */
+               
+        } break;
         default:
             error();
         }
