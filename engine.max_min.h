@@ -178,6 +178,8 @@ array<double> SDforx3(double A3, double B3, double C3, double D3)
 		ans.push(xot1);
 		ans.push(xot2);
 	}
+
+	return ans;
 }
 
 

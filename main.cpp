@@ -61,10 +61,10 @@ int main()
             std::cout << "------------------------------------------\n";
         }
 
-        std::cout << "Mode: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n[4] to find Max-Min value of function";
+        std::cout << "Mode: \t[1] to evaluate the result.\n\t[2] to derivative the function.\n\t[3] Implicit Function\n\t[4] to find Max-Min value of function\n\t[5] to find limit of function";
 
         if (isFirstPass)
-            std::cout << "\t[5] to try a new expression.\n\t[6] to show a graph \t[7] to end the program.\n";
+            std::cout << "\t[6] to try a new expression.\n\t[7] to show a graph \t[8] to end the program.\n";
 
         std::cout << "=>\t";
         std::cin >> option;
@@ -162,20 +162,36 @@ int main()
             {
                 x_y_pt.push("(" + toCalStr(x_value[i]) + "," + toCalStr(y_value[i]) + ")");
             }
-            std::cout <<"On "<<x_y_pt[max_idx]<<" is the Maximize value = " << max << "\n";
-            std::cout <<"On "<<x_y_pt[min_idx]<<" is the Minimize value = " << min << "\n";
+            std::cout << "On " << x_y_pt[max_idx] << " is the Maximize value = " << max << "\n";
+            std::cout << "On " << x_y_pt[min_idx] << " is the Minimize value = " << min << "\n";
         }
-        case 5: {
-                std::cout << "Enter f(x) = ";
-                getline(std::cin, expr);
-                continue;
-            } break;
-        case 6: {
-                /*
+        case 5:
+        {
+            double x;
+            std::cout << "Enter x to approach = ";
+            std::cin >> x;
+            
+            /*
+
+            something about a limit
+            */
+            
+        }
+        break;
+        case 6:
+        {
+            std::cout << "Enter f(x) = ";
+            getline(std::cin, expr);
+            continue;
+        }
+        break;
+        case 7:
+        {
+            /*
                 graph here
                 */
-               
-        } break;
+        }
+        break;
         default:
             error();
         }
