@@ -167,12 +167,8 @@ array<double> SDforx3(double A3, double B3, double C3, double D3)
 		ans.push(xot2);
 	}
 	
-	
-		if (count1 == 999 && count2 == -999)
-	{
-		cout << "    CANNOT FIND     ";
-
-	}
+	if (count1 == 999 && count2 == -999)
+		error("CANNOT FIND");
 
 	return ans;
 }
