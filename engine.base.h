@@ -328,7 +328,7 @@ string diff(const string &term, const char &var) {
     TermComponents tc(term, var);
 
     if (!tc.factors.length) return "#"; // only c
-    else if (tc.factors.length == 1 && tc.factors[0].type == 4 && tc.factors[0].n = "1") return toString(tc.a); // only ax^1
+    else if (tc.factors.length == 1 && tc.factors[0].type == 4 && tc.factors[0].n == "1") return toString(tc.a); // only ax^1
 
     string result = "";
 

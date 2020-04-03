@@ -144,7 +144,7 @@ int main() {
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             }
             case 5: { // find relative min/max
-                findRelativeMinMax(expr, var);
+                findRelativeMinMax(readExpr(expr), var);
 
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
