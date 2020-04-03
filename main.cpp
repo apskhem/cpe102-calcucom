@@ -19,7 +19,7 @@ void error(const char *msg, const unsigned cond=1) {
 #include "klib.number.h"
 #include "engine.base.h"
 // #include "engine.lim.h"
-// #include "engine.max_min.h"
+#include "engine.max_min.h"
 
 string numOfDiff(const unsigned &num);
 
