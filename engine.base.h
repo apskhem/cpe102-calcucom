@@ -22,6 +22,8 @@ double eval(string term, const double &value, const char &var);
 /* The method implicitly derivatives the expression. */
 string implExprDiff(array<string> rightTerms, array<string> leftTerms, const char &var);
 
+string findRelativeMinMax(array<string> terms, const char &var);
+
 const double PI = 3.14159265358979323846;
 
 struct factor {
@@ -311,21 +313,22 @@ string diffExpr(array<string> terms, const char &var) {
     for (unsigned i = 0; i < terms.length; i++) {
         string preResult = diff(terms[i], var);
 
-        if (preResult.length && preResult != "0") {
+        if (preResult.includes("#")) continue;
+        else {
             if (i > 0 && preResult[0] != '-') result += "+";
 
             result += preResult;
         }
     }
 
-    return result;
+    return (!result.length ? "0" : result);
 }
 
 string diff(const string &term, const char &var) {
     TermComponents tc(term, var);
 
-    if (!tc.factors.length) return "0"; // only c
-    else if (tc.factors.length == 1 && tc.factors[0].type == 4) return toString(tc.a);
+    if (!tc.factors.length) return "#"; // only c
+    else if (tc.factors.length == 1 && tc.factors[0].type == 4 && tc.factors[0].n = "1") return toString(tc.a); // only ax^1
 
     string result = "";
 
@@ -333,7 +336,7 @@ string diff(const string &term, const char &var) {
         if (tc.divIndex.length) {
             string dividend = tc.factors[0].compress(), divisor = tc.factors[1].compress();
 
-            result += "((" + divisor + ")(" + diffExpr(readExpr(dividend), var) + ")-(" + dividend + ")(" + diffExpr(readExpr(divisor), var) + "))/(" + divisor + ")^2";
+            result = "((" + divisor + ")(" + diffExpr(readExpr(dividend), var) + ")-(" + dividend + ")(" + diffExpr(readExpr(divisor), var) + "))/(" + divisor + ")^2";
         }
         else {
             for (unsigned i = 0; i < tc.factors.length; i++) {
@@ -350,16 +353,16 @@ string diff(const string &term, const char &var) {
     else if (tc.factors.length == 1) {
         switch (tc.factors[0].type) {
             case 0: {
-                string chainDiff = diff(tc.factors[0].u, var);
+                string chainDiff = diffExpr(readExpr(tc.factors[0].u), var);
                 string subN = "";
                 double numSubN = tc.factors[0].subtractN(subN);
 
-                result = subN == "1"
+                result = numSubN == 2
                     ? toCalStr(tc.a * 2) + "(" + tc.factors[0].u + ")(" + chainDiff + ")"
                     : toCalStr(tc.a * numSubN) + "(" + tc.factors[0].u + ")" + subN + "(" + chainDiff + ")";
             } break;
             case 1: {
-                string chainDiff = diff(tc.factors[0].u, var);
+                string chainDiff = diffExpr(readExpr(tc.factors[0].u), var);
                 string diffTrigon1, diffTrigon2;
 
                 if (tc.factors[0].func == "cos" || tc.factors[0].func == "cot" || tc.factors[0].func == "csc") tc.a *= -1;
@@ -391,7 +394,7 @@ string diff(const string &term, const char &var) {
                 }
             } break;
             case 2: {
-                string chainDiff = diff(tc.factors[0].u, var);
+                string chainDiff = diffExpr(readExpr(tc.factors[0].u), var);
 
                 if (tc.factors[0].func.length > 2) { // log...
                     string logbase = tc.factors[0].func.length == 3 ? "10" : tc.factors[0].func.slice(3);
@@ -407,7 +410,7 @@ string diff(const string &term, const char &var) {
                 }
             } break;
             case 3: {
-                string chainDiff = diff(tc.factors[0].u, var);
+                string chainDiff = diffExpr(readExpr(tc.factors[0].u), var);
 
                 if (tc.factors[0].func == "cos" || tc.factors[0].func == "cot" || tc.factors[0].func == "csc") tc.a *= -1;
 
@@ -420,15 +423,18 @@ string diff(const string &term, const char &var) {
                 else if (tc.factors[0].func == "sec" || tc.factors[0].func == "csc") result += "(|" + tc.factors[0].u + "|((" + tc.factors[0].u + ")^2-1)^(1/2))";
             } break;
             case 4: { // CASE: ax^n or ax^(n)
-                string subN = "";
-                double numSubN = tc.factors[0].subtractN(subN);
+                if (tc.factors[0].u == string(var)) {
+                    string subN = "";
+                    double numSubN = tc.factors[0].subtractN(subN);
 
-                result = numSubN == 1
-                    ? toCalStr(tc.a)
-                    : toCalStr(tc.a * numSubN) + string(var) + subN;
+                    result = numSubN == 1
+                        ? toCalStr(tc.a)
+                        : toCalStr(tc.a * numSubN) + string(var) + subN;
+                }
+                else result = "#";
             } break;
             case 5: { // CASE a^(u)
-                string chainDiff = diff(tc.factors[0].n, var);
+                string chainDiff = diffExpr(readExpr(tc.factors[0].n), var);
 
                 result = tc.factors[0].u == "e"
                     ? "(" + chainDiff + ")" + tc.factors[0].u + "^(" + tc.factors[0].n + ")"
@@ -438,7 +444,7 @@ string diff(const string &term, const char &var) {
         }
     }
 
-    return result;
+    return (!result.length ? "#" : result);
 }
 
 
@@ -603,6 +609,51 @@ string implExprDiff(array<string> leftTerms, array<string> rightTerms, const cha
     result = "-(" + dUpper + ")/(" + dLower + ")";
 
     return result;
+}
+
+string findRelativeMinMax(array<string> terms, const char &var) {
+
+    array<string> diffedTerms = readExpr(diffExpr(terms, var));
+
+    array<factor> factors;
+    double a = 0, b = 0, c = 0;
+    
+    for (unsigned short i = 0; i < diffedTerms.length-1; i++) {
+        TermComponents tc(diffedTerms[i], var);
+
+        // checks tc
+        if (tc.factors.length != 1 && tc.factors.length != 0) error("only one factor per term in this mode is allowed");
+
+        if (tc.factors[i].n != "1" || tc.factors[i].n != "2") error("power of n in this mode is maximum at 3", 3);
+
+        if (!tc.factors.length) c = tc.a;
+        else if (tc.factors[i].n == "1") b = tc.a;
+        else if (tc.factors[i].n == "2") a = tc.a;
+
+        factors.push(tc.factors[i]);
+    }
+
+    if (b*b-4*a*c < 0) error("imagine number is not allowed in this mode", 2);
+
+    double c1 = (-b - sqrt(b*b-4*a*c)) / (2*a);
+    double c2 = (-b + sqrt(b*b-4*a*c)) / (2*a);
+
+    double p1 = evalExpr(terms, c1, var);
+    double p2 = evalExpr(terms, c2, var);
+
+    if (p1 > p2) { // swap
+        double temp_c = c1;
+        double temp_p = p1;
+
+        c1 = c2;
+        c2 = temp_c;
+
+        p1 = p2;
+        p2 = temp_p;
+    }
+
+    std::cout << "relative min is [" <<  p1 << ", " << c2 << "]\n";
+    std::cout << "relative max is [" <<  p2 << ", " << c1 << "]\n";
 }
 
 #endif

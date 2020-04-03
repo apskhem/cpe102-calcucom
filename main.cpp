@@ -99,7 +99,7 @@ int main() {
 
                 std::cout << "The result is...\n\n";
 
-                std::cout << "f(" << evalValue << ") = " << evalExpr(readExpr(expr), evalValue, var) << '\n';
+                std::cout << "f" << numOfDiff(numberOfDiff) << "(" << evalValue << ") = " << evalExpr(readExpr(expr), evalValue, var) << '\n';
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
             case 2: { // derivative
@@ -111,7 +111,7 @@ int main() {
 
                 std::cout << "f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
-            case 3: { // implicit Derivative
+            case 3: { // implicit derivative
                 unsigned short mode;
                 string impl_expr;
                 std::cout << "Enter implicit expresion [left=right].\n";
@@ -126,11 +126,12 @@ int main() {
                 string leftExpr = impl_expr.split("=")[0];
                 string rightExpr = impl_expr.split("=")[1];
 
-                string result = implExprDiff(readExpr(leftExpr), readExpr(rightExpr), var);
-
                 std::cout << "The result is...\n\n";
 
-                std::cout << "dy/d" << var << " = " << result;
+                std::cout << "dy/d" << var << " = " << implExprDiff(readExpr(leftExpr), readExpr(rightExpr), var) << "\n\n";
+
+                 isFirstPass = true;
+                 continue;
             } break;
             case 4: { // find tangent
                 double pos;
@@ -143,7 +144,9 @@ int main() {
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             }
             case 5: { // find relative min/max
-                //
+                findRelativeMinMax(expr, var);
+
+                std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
             case 6: { // show graph
                 double scale;
@@ -158,6 +161,7 @@ int main() {
             case 7: { // new expression
                 std::cout << "Enter f(" << var << ") = ";
                 getline(std::cin, expr);
+                std::cout << "\n\n";
                 numberOfDiff = 0;
                 continue;
             } break;
