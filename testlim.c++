@@ -93,10 +93,17 @@ double Analys(string &eqation, string &a, string &b,double x)
             b += eqation[j];
         }
     }
-        if(evalExpr(readExpr(a),x,'x')==NAN && evalExpr(readExpr(b),x,'x')==NAN){
-                ;  //เคส NAN - NAN
-        }
 
+        int posln=a.search("ln");
+        int posln2=b.search("ln");
+
+        if(eqation[posln]=='ln' && eqation[posln2]=='ln'){
+
+        if(evalExpr(readExpr(a),x,'x')==NAN && evalExpr(readExpr(b),x,'x')==NAN){
+
+            return  log (evalExpr(readExpr(a),x,'x') /evalExpr(readExpr(b),x,'x')) ;  //เคส NAN - NAN
+        }
+        }
 }
 
 
@@ -120,6 +127,7 @@ double Analys(string &eqation, string &a, string &b,double x)
                 || evalExpr(readExpr(b),x,'x')==NAN 
                     && evalExpr(readExpr(a),x,'x')==0){
 
+                
                 ;  //เคส NAN * 0 หรือ 0*NAN
         }
     }
