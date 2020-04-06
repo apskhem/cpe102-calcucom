@@ -240,7 +240,7 @@ string TermComponents::itemInsidePar(unsigned short &i) {
     while (i < src.length) {
         if (src[i] == '(') l++;
         else if (src[i] == ')' && l == ++r) {
-            if (i - start == 1) error("no element inside parentheses '(...)'");
+            if (i - start < 1) error("no element inside parentheses '(...)'");
             return src.slice(start, i);
         }
         i++;
@@ -438,7 +438,7 @@ string diff(const string &term, const char &var) {
 
                 result = tc.factors[0].u == "e"
                     ? "(" + chainDiff + ")" + tc.factors[0].u + "^(" + tc.factors[0].n + ")"
-                    : "(" + chainDiff + ")(ln" + tc.factors[0].u + ")" + tc.factors[0].u + "^(" + tc.factors[0].n + ")";
+                    : "(" + chainDiff + ")ln(" + tc.factors[0].u + ")" + tc.factors[0].u + "^(" + tc.factors[0].n + ")";
             }
             default: error("fault at 'diff' function", 5);
         }
