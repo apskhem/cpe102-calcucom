@@ -105,49 +105,4 @@ double eval(string term, const double &value, const char &var) {
     return result;
 }
 
-string findRelativeMinMax(array<string> terms, const char &var) {
-
-    array<string> diffedTerms = readExpr(diffExpr(terms, var));
-
-    array<factor> factors;
-    double a = 0, b = 0, c = 0;
-    
-    for (unsigned short i = 0; i < diffedTerms.length-1; i++) {
-        TermComponents tc(diffedTerms[i], var);
-
-        // checks tc
-        if (tc.factors.length != 1 && tc.factors.length != 0) error("only one factor per term in this mode is allowed");
-
-        if (tc.factors[i].n != "1" || tc.factors[i].n != "2") error("power of n in this mode is maximum at 3", 3);
-
-        if (!tc.factors.length) c = tc.a;
-        else if (tc.factors[i].n == "1") b = tc.a;
-        else if (tc.factors[i].n == "2") a = tc.a;
-
-        factors.push(tc.factors[i]);
-    }
-
-    if (b*b-4*a*c < 0) error("imagine number is not allowed in this mode", 2);
-
-    double c1 = (-b - sqrt(b*b-4*a*c)) / (2*a);
-    double c2 = (-b + sqrt(b*b-4*a*c)) / (2*a);
-
-    double p1 = evalExpr(terms, c1, var);
-    double p2 = evalExpr(terms, c2, var);
-
-    if (p1 > p2) { // swap
-        double temp_c = c1;
-        double temp_p = p1;
-
-        c1 = c2;
-        c2 = temp_c;
-
-        p1 = p2;
-        p2 = temp_p;
-    }
-
-    std::cout << "relative min is [" <<  p1 << ", " << c2 << "]\n";
-    std::cout << "relative max is [" <<  p2 << ", " << c1 << "]\n";
-}
-
 #endif
