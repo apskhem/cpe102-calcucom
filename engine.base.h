@@ -146,7 +146,7 @@ TermComponents::TermComponents(string term, char var) {
                 else {
                     item.type = 2;
                     item.func = "ln";
-                    item.u = itemInsidePar(++i);
+                    item.u = itemInsidePar(i);
                 }
             }
             else error("none standard arithmatic expression presented");
@@ -401,12 +401,12 @@ string diff(const string &term, const char &var) {
 
                     result = hasSignOrVar(chainDiff, var)
                         ? toCalStr(tc.a) + "(" + chainDiff + ")/((" + tc.factors[0].u + ")ln" + logbase + ")"
-                        : toCalStr(tc.a * parseNum(chainDiff)) + "/((" + tc.factors[0].u + ")ln" + logbase + ")";
+                        : toString(tc.a * parseNum(chainDiff)) + "/((" + tc.factors[0].u + ")ln" + logbase + ")";
                 }
                 else { // ln...
                     result = hasSignOrVar(chainDiff, var)
                         ? toCalStr(tc.a) + "(" + chainDiff + ")/(" + tc.factors[0].u + ")"
-                        : toCalStr(tc.a * parseNum(chainDiff)) + "/(" + tc.factors[0].u + ")";
+                        : toString(tc.a * parseNum(chainDiff)) + "/(" + tc.factors[0].u + ")";
                 }
             } break;
             case 3: {
@@ -416,7 +416,7 @@ string diff(const string &term, const char &var) {
 
                 result = hasSignOrVar(chainDiff, var)
                     ? toCalStr(tc.a) + "(" + chainDiff + ")/"
-                    : toCalStr(tc.a * parseNum(chainDiff)) + ")/";
+                    : toString(tc.a * parseNum(chainDiff)) + "/";
 
                 if (tc.factors[0].func == "sin" || tc.factors[0].func == "cos") result += "((1-(" + tc.factors[0].u + ")^2)^(1/2))";
                 else if (tc.factors[0].func == "tan" || tc.factors[0].func == "cot") result += "(1-(" + tc.factors[0].u + ")^2)";
