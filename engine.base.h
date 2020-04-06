@@ -22,7 +22,6 @@ double eval(string term, const double &value, const char &var);
 /* The method implicitly derivatives the expression. */
 string implExprDiff(array<string> rightTerms, array<string> leftTerms, const char &var);
 
-string findRelativeMinMax(array<string> terms, const char &var);
 
 const double PI = 3.14159265358979323846;
 const double e = 2.71828;

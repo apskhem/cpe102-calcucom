@@ -3,7 +3,6 @@
 
 #include <cmath>
 
-string findRelativeMinMax(array<string> terms, const char &var);
 /* The method evaluates the expression. */
 double evalExpr(array<string> terms, const double &value, const char &var);
 /* The method evaluates a term. */
