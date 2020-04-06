@@ -53,6 +53,7 @@ string findRelativeMinMax(array<string> terms, const char &var) {
     std::cout << "relative max is [" <<  p2 << ", " << c1 << "]\n";
 }
 
+
 array<double> critical_x(string equation)
 {
 	int option;
