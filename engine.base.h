@@ -25,6 +25,7 @@ string implExprDiff(array<string> rightTerms, array<string> leftTerms, const cha
 string findRelativeMinMax(array<string> terms, const char &var);
 
 const double PI = 3.14159265358979323846;
+const double e = 2.71828;
 
 struct factor {
     unsigned type = 0; // 0 = u, 1 = trig, 2 = log, 3 = arc, 4 = var, 5 = n of var
