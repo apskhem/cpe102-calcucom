@@ -18,7 +18,6 @@ void error(const char *msg, const unsigned cond=1) {
 #include "klib.string.h"
 #include "klib.number.h"
 #include "engine.base.h"
-#incldue "engine.evaluation.h"
 // #include "engine.lim.h"
 #include "engine.max_min.h"
 
