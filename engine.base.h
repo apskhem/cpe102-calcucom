@@ -21,6 +21,7 @@ double evalExpr(array<string> terms, const double &value, const char &var);
 double eval(string term, const double &value, const char &var);
 /* The method implicitly derivatives the expression. */
 string implExprDiff(array<string> rightTerms, array<string> leftTerms, const char &var);
+array<string> readImplExpr(string term);
 
 
 const double PI = 3.14159265358979323846;
@@ -336,7 +337,7 @@ string diff(const string &term, const char &var) {
         if (tc.divIndex.length) {
             string dividend = tc.factors[0].compress(), divisor = tc.factors[1].compress();
 
-            result = "((" + divisor + ")(" + diffExpr(readExpr(dividend), var) + ")-(" + dividend + ")(" + diffExpr(readExpr(divisor), var) + "))/(" + divisor + ")^2";
+            result = "((" + divisor + ")(" + diffExpr(readImplExpr(dividend), var) + ")-(" + dividend + ")(" + diffExpr(readImplExpr(divisor), var) + "))/(" + divisor + ")^2";
         }
         else {
             for (unsigned i = 0; i < tc.factors.length; i++) {
@@ -344,7 +345,7 @@ string diff(const string &term, const char &var) {
 
                 for (unsigned j = 0; j < tc.factors.length; j++) {
                     result += "(";
-                    result += i == j ? diffExpr(readExpr(tc.factors[i].compress()), var) : tc.factors[i].compress();
+                    result += i == j ? diffExpr(readImplExpr(tc.factors[i].compress()), var) : tc.factors[i].compress();
                     result += ")";
                 }
             }
@@ -494,6 +495,87 @@ void showGraph(const string &expr, const double &scale, const char &var) {
 
         std::cout << '\n';
     }
+}
+
+array<string> readImplExpr(string term)
+{
+    array<string> each_term;
+    bool x_y_idx = 0, func_idx = 0;
+
+    for (unsigned i = 0; i < term.length; i++)
+    {
+        if (term[i] == 'x' || term[i] == 'y')
+        {
+            x_y_idx = true;
+            break;
+        }
+        else if (term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l' || term[i] == '^')
+        {
+            func_idx = true;
+            break;
+        }
+    }
+    if (func_idx = true)
+    {
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for (unsigned i = 0; i < term.length; i++)
+        {
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l') && leftPar == rightPar)
+            {
+                i += 3; //skip in(
+                leftPar++;
+                while (term[i] != ')')
+                    i++;
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1;
+            }
+
+            else if (term[i] == '^')
+            {
+                unsigned stop = i;
+
+                if (term[i] != 'x' || term[i] != 'y' || term[i] != ')')
+                {
+                    while (isNum(term[++i]))
+                        stop++;
+                }
+                each_term.push(term.slice(start, stop + 1));
+                start = stop + 1;
+            }
+
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i));
+        }
+    }
+    else if (x_y_idx = true)
+    {
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for (unsigned i = 0; i < term.length; i++)
+        {
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 'x' || term[i] == 'y') && term[i + 1] != '^' && leftPar == rightPar)
+            {
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1;
+            }
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i));
+        }
+    }
+    return each_term;
 }
 
 double evalExpr(array<string> terms, const double &value, const char &var) {
