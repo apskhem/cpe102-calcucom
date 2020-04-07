@@ -222,6 +222,18 @@ TermComponents::TermComponents(string term, char var) {
             else error("no element inside parentheses '(...)'");
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
         // find (type): division
         else if (term[i] == ')' && term[i+1] == '/') {
             if (divIndex.length) error("there's support only a single '/' (division) in a signle term", 3);
@@ -229,6 +241,20 @@ TermComponents::TermComponents(string term, char var) {
             divIndex.push(factors.length);
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     for (unsigned short i = 0; i < factors.length; i++) {
         if (factors[i].n.includes(var) && factors[i].u.includes(var))
@@ -325,6 +351,76 @@ string diffExpr(array<string> terms, const char &var) {
     return (!result.length ? "0" : result);
 }
 
+array<string> readImplExpr(string term){
+
+    array<string> each_term;
+    bool x_y_idx = 0, func_idx = 0;
+
+    for (unsigned i = 0; i < term.length; i++){
+        if (term[i] == 'x' || term[i] == 'y'){
+            x_y_idx = true;
+            break;
+        }
+        else if (term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l' || term[i] == '^'){
+            func_idx = true;
+            break;
+        }
+    }
+    if (func_idx == true){
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for (unsigned i = 0; i < term.length; i++){
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l') && leftPar == rightPar){
+                i += 3;
+                leftPar++;
+                while (term[i] != ')')
+                    i++;
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1 ;
+            }
+
+            else if (term[i] == '^'){
+                unsigned stop = i;
+
+                if (term[i] != 'x' || term[i] != 'y' || term[i] != ')'){
+                    while (isNum(term[++i]))
+                        stop++;
+                }
+                each_term.push(term.slice(start, stop + 1));
+                start = stop + 1;
+            }
+
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i + 1));
+        }
+    }
+    else if (x_y_idx == true){
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for (unsigned i = 0; i < term.length; i++){
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 'x' || term[i] == 'y') && term[i + 1] != '^' && leftPar == rightPar){
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1;
+            }
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i + 1));
+        }
+    }
+    return each_term;
+}
+
 string diff(const string &term, const char &var) {
     TermComponents tc(term, var);
 
@@ -337,15 +433,25 @@ string diff(const string &term, const char &var) {
         if (tc.divIndex.length) {
             string dividend = tc.factors[0].compress(), divisor = tc.factors[1].compress();
 
-            result = "((" + divisor + ")(" + diffExpr(readImplExpr(dividend), var) + ")-(" + dividend + ")(" + diffExpr(readImplExpr(divisor), var) + "))/(" + divisor + ")^2";
+            std::cout<<dividend<<"\n";
+            std::cout<<divisor<<"\n";
+
+            result = "((" + divisor + ")(" + diffExpr(readExpr(dividend), var) + ")-(" + dividend + ")(" + diffExpr(readExpr(divisor), var) + "))/(" + divisor + ")^2";
         }
+
         else {
-            for (unsigned i = 0; i < tc.factors.length; i++) {
+            array<string> each_term = readImplExpr(term);
+            std::cout<<"this is multiple"<<"\n"; //***************dont forget to erase
+
+            for (unsigned i = 0; i < each_term.length; i++) {
+                std::cout<<tc.factors[i].compress()<<"\n";
+                std::cout<<each_term[i]<<"\n";
+                
                 if (i > 0) result += "+";
 
-                for (unsigned j = 0; j < tc.factors.length; j++) {
+                for (unsigned j = 0; j < each_term.length; j++) {
                     result += "(";
-                    result += i == j ? diffExpr(readImplExpr(tc.factors[i].compress()), var) : tc.factors[i].compress();
+                    result += i == j ? diff(each_term[j], var) : each_term[j];
                     result += ")";
                 }
             }
@@ -495,87 +601,6 @@ void showGraph(const string &expr, const double &scale, const char &var) {
 
         std::cout << '\n';
     }
-}
-
-array<string> readImplExpr(string term)
-{
-    array<string> each_term;
-    bool x_y_idx = 0, func_idx = 0;
-
-    for (unsigned i = 0; i < term.length; i++)
-    {
-        if (term[i] == 'x' || term[i] == 'y')
-        {
-            x_y_idx = true;
-            break;
-        }
-        else if (term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l' || term[i] == '^')
-        {
-            func_idx = true;
-            break;
-        }
-    }
-    if (func_idx = true)
-    {
-        unsigned start = 0;
-        unsigned leftPar = 0, rightPar = 0;
-
-        for (unsigned i = 0; i < term.length; i++)
-        {
-            if (term[i] == '(')
-                leftPar++;
-            else if (term[i] == ')')
-                rightPar++;
-
-            if ((term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l') && leftPar == rightPar)
-            {
-                i += 3; //skip in(
-                leftPar++;
-                while (term[i] != ')')
-                    i++;
-                each_term.push(term.slice(start, i + 1));
-                start = i + 1;
-            }
-
-            else if (term[i] == '^')
-            {
-                unsigned stop = i;
-
-                if (term[i] != 'x' || term[i] != 'y' || term[i] != ')')
-                {
-                    while (isNum(term[++i]))
-                        stop++;
-                }
-                each_term.push(term.slice(start, stop + 1));
-                start = stop + 1;
-            }
-
-            if (i == term.length - 1)
-                each_term.push(term.slice(start, i));
-        }
-    }
-    else if (x_y_idx = true)
-    {
-        unsigned start = 0;
-        unsigned leftPar = 0, rightPar = 0;
-
-        for (unsigned i = 0; i < term.length; i++)
-        {
-            if (term[i] == '(')
-                leftPar++;
-            else if (term[i] == ')')
-                rightPar++;
-
-            if ((term[i] == 'x' || term[i] == 'y') && term[i + 1] != '^' && leftPar == rightPar)
-            {
-                each_term.push(term.slice(start, i + 1));
-                start = i + 1;
-            }
-            if (i == term.length - 1)
-                each_term.push(term.slice(start, i));
-        }
-    }
-    return each_term;
 }
 
 double evalExpr(array<string> terms, const double &value, const char &var) {
