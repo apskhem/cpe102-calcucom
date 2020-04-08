@@ -92,6 +92,7 @@ class TermComponents {
 TermComponents::TermComponents(string term, char var) {
     src = term;
     a = parseNum(term) == 0 ? 1 : parseNum(term);
+    bool trackMinus = false;
     for (unsigned short i = 0; i < term.length; i++) {
         // find (type): trigonometric function.
         if ((term[i] == 's' || term[i] == 'c' || term[i] == 't') && i + 5 < term.length) {
@@ -211,50 +212,38 @@ TermComponents::TermComponents(string term, char var) {
 
         // find (type): function inside '(...)'
         else if (term[i] == '(') {
-            if (term[i+1] != ')' && isNum(term[i+1])) {
-                factor item;
+            factor item;
 
-                item.u = itemInsidePar(++i);
-                if(!checkForN(++i, item.n)) i--;
+            item.u = itemInsidePar(++i);
+            if(!checkForN(++i, item.n)) i--;
 
-                factors.push(item);
-            }
-            else error("no element inside parentheses '(...)'");
+            factors.push(item);
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-        // find (type): division
+        // find (spliter): division
         else if (term[i] == ')' && term[i+1] == '/') {
             if (divIndex.length) error("there's support only a single '/' (division) in a signle term", 3);
 
             divIndex.push(factors.length);
         }
+
+        // find (spliter): division
+        else if (term[i] == '/') {
+            if (divIndex.length) error("there's support only a single '/' (division) in a signle term", 3);
+
+            if (!factors.length) { // 1/u
+                trackMinus = true;
+            }
+
+            divIndex.push(factors.length);
+        }
+
+        // finalize end round
+        if (trackMinus) {
+            trackMinus = false;
+            factors[factors.length - 1].n = "-" + factors[factors.length - 1].n;
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     for (unsigned short i = 0; i < factors.length; i++) {
         if (factors[i].n.includes(var) && factors[i].u.includes(var))
@@ -349,76 +338,6 @@ string diffExpr(array<string> terms, const char &var) {
     }
 
     return (!result.length ? "0" : result);
-}
-
-array<string> readImplExpr(string term){
-
-    array<string> each_term;
-    bool x_y_idx = 0, func_idx = 0;
-
-    for (unsigned i = 0; i < term.length; i++){
-        if (term[i] == 'x' || term[i] == 'y'){
-            x_y_idx = true;
-            break;
-        }
-        else if (term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l' || term[i] == '^'){
-            func_idx = true;
-            break;
-        }
-    }
-    if (func_idx == true){
-        unsigned start = 0;
-        unsigned leftPar = 0, rightPar = 0;
-
-        for (unsigned i = 0; i < term.length; i++){
-            if (term[i] == '(')
-                leftPar++;
-            else if (term[i] == ')')
-                rightPar++;
-
-            if ((term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l') && leftPar == rightPar){
-                i += 3;
-                leftPar++;
-                while (term[i] != ')')
-                    i++;
-                each_term.push(term.slice(start, i + 1));
-                start = i + 1 ;
-            }
-
-            else if (term[i] == '^'){
-                unsigned stop = i;
-
-                if (term[i] != 'x' || term[i] != 'y' || term[i] != ')'){
-                    while (isNum(term[++i]))
-                        stop++;
-                }
-                each_term.push(term.slice(start, stop + 1));
-                start = stop + 1;
-            }
-
-            if (i == term.length - 1)
-                each_term.push(term.slice(start, i + 1));
-        }
-    }
-    else if (x_y_idx == true){
-        unsigned start = 0;
-        unsigned leftPar = 0, rightPar = 0;
-
-        for (unsigned i = 0; i < term.length; i++){
-            if (term[i] == '(')
-                leftPar++;
-            else if (term[i] == ')')
-                rightPar++;
-
-            if ((term[i] == 'x' || term[i] == 'y') && term[i + 1] != '^' && leftPar == rightPar){
-                each_term.push(term.slice(start, i + 1));
-                start = i + 1;
-            }
-            if (i == term.length - 1)
-                each_term.push(term.slice(start, i + 1));
-        }
-    }
-    return each_term;
 }
 
 string diff(const string &term, const char &var) {
@@ -694,6 +613,76 @@ double eval(string term, const double &value, const char &var) {
     }
 
     return result;
+}
+
+array<string> readImplExpr(string term){
+
+    array<string> each_term;
+    bool x_y_idx = 0, func_idx = 0;
+
+    for (unsigned i = 0; i < term.length; i++){
+        if (term[i] == 'x' || term[i] == 'y'){
+            x_y_idx = true;
+            break;
+        }
+        else if (term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l' || term[i] == '^'){
+            func_idx = true;
+            break;
+        }
+    }
+    if (func_idx == true){
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for (unsigned i = 0; i < term.length; i++){
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l') && leftPar == rightPar){
+                i += 3;
+                leftPar++;
+                while (term[i] != ')')
+                    i++;
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1 ;
+            }
+
+            else if (term[i] == '^'){
+                unsigned stop = i;
+
+                if (term[i] != 'x' || term[i] != 'y' || term[i] != ')'){
+                    while (isNum(term[++i]))
+                        stop++;
+                }
+                each_term.push(term.slice(start, stop + 1));
+                start = stop + 1;
+            }
+
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i + 1));
+        }
+    }
+    else if (x_y_idx == true){
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for (unsigned i = 0; i < term.length; i++){
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 'x' || term[i] == 'y') && term[i + 1] != '^' && leftPar == rightPar){
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1;
+            }
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i + 1));
+        }
+    }
+    return each_term;
 }
 
 string implExprDiff(array<string> leftTerms, array<string> rightTerms, const char &var) {
