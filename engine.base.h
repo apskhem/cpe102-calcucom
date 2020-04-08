@@ -360,12 +360,8 @@ string diff(const string &term, const char &var) {
 
         else {
             array<string> each_term = readImplExpr(term);
-            std::cout<<"this is multiple"<<"\n"; //***************dont forget to erase
 
-            for (unsigned i = 0; i < each_term.length; i++) {
-                std::cout<<tc.factors[i].compress()<<"\n";
-                std::cout<<each_term[i]<<"\n";
-                
+            for (unsigned i = 0; i < each_term.length; i++) {                
                 if (i > 0) result += "+";
 
                 for (unsigned j = 0; j < each_term.length; j++) {
@@ -524,6 +520,15 @@ void showGraph(const string &expr, const double &scale, const char &var) {
 
 double evalExpr(array<string> terms, const double &value, const char &var) {
     double result = 0;
+
+    //for(unsigned i = 0; i < terms.length; i++) {
+//
+    //    if(terms[i].includes("e"))
+    //        terms[i].replace("e", "2.71828").toLowerCase();
+//
+    //    std::cout<<terms[i]<<"\n";
+    //}
+    
     for (unsigned i = 0; i < terms.length; i++) {
         result += eval(terms[i], value, var);
     }
@@ -532,7 +537,7 @@ double evalExpr(array<string> terms, const double &value, const char &var) {
 
 double eval(string term, const double &value, const char &var) {
     TermComponents tc(term, var);
-
+    
     if (!tc.factors.length) {
         if (tc.a) return tc.a;
         else return 0;
