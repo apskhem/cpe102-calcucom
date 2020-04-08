@@ -21,8 +21,8 @@ double evalExpr(array<string> terms, const double &value, const char &var);
 double eval(string term, const double &value, const char &var);
 /* The method implicitly derivatives the expression. */
 string implExprDiff(array<string> rightTerms, array<string> leftTerms, const char &var);
+array<string> readImplExpr(string term);
 
-string findRelativeMinMax(array<string> terms, const char &var);
 
 const double PI = 3.14159265358979323846;
 const double e = 2.71828;
@@ -147,7 +147,7 @@ TermComponents::TermComponents(string term, char var) {
                 else {
                     item.type = 2;
                     item.func = "ln";
-                    item.u = itemInsidePar(++i);
+                    item.u = itemInsidePar(i);
                 }
             }
             else error("none standard arithmatic expression presented");
@@ -222,6 +222,18 @@ TermComponents::TermComponents(string term, char var) {
             else error("no element inside parentheses '(...)'");
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
         // find (type): division
         else if (term[i] == ')' && term[i+1] == '/') {
             if (divIndex.length) error("there's support only a single '/' (division) in a signle term", 3);
@@ -229,6 +241,20 @@ TermComponents::TermComponents(string term, char var) {
             divIndex.push(factors.length);
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     for (unsigned short i = 0; i < factors.length; i++) {
         if (factors[i].n.includes(var) && factors[i].u.includes(var))
@@ -325,6 +351,76 @@ string diffExpr(array<string> terms, const char &var) {
     return (!result.length ? "0" : result);
 }
 
+array<string> readImplExpr(string term){
+
+    array<string> each_term;
+    bool x_y_idx = 0, func_idx = 0;
+
+    for (unsigned i = 0; i < term.length; i++){
+        if (term[i] == 'x' || term[i] == 'y'){
+            x_y_idx = true;
+            break;
+        }
+        else if (term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l' || term[i] == '^'){
+            func_idx = true;
+            break;
+        }
+    }
+    if (func_idx == true){
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for (unsigned i = 0; i < term.length; i++){
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l') && leftPar == rightPar){
+                i += 3;
+                leftPar++;
+                while (term[i] != ')')
+                    i++;
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1 ;
+            }
+
+            else if (term[i] == '^'){
+                unsigned stop = i;
+
+                if (term[i] != 'x' || term[i] != 'y' || term[i] != ')'){
+                    while (isNum(term[++i]))
+                        stop++;
+                }
+                each_term.push(term.slice(start, stop + 1));
+                start = stop + 1;
+            }
+
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i + 1));
+        }
+    }
+    else if (x_y_idx == true){
+        unsigned start = 0;
+        unsigned leftPar = 0, rightPar = 0;
+
+        for (unsigned i = 0; i < term.length; i++){
+            if (term[i] == '(')
+                leftPar++;
+            else if (term[i] == ')')
+                rightPar++;
+
+            if ((term[i] == 'x' || term[i] == 'y') && term[i + 1] != '^' && leftPar == rightPar){
+                each_term.push(term.slice(start, i + 1));
+                start = i + 1;
+            }
+            if (i == term.length - 1)
+                each_term.push(term.slice(start, i + 1));
+        }
+    }
+    return each_term;
+}
+
 string diff(const string &term, const char &var) {
     TermComponents tc(term, var);
 
@@ -337,15 +433,25 @@ string diff(const string &term, const char &var) {
         if (tc.divIndex.length) {
             string dividend = tc.factors[0].compress(), divisor = tc.factors[1].compress();
 
+            std::cout<<dividend<<"\n";
+            std::cout<<divisor<<"\n";
+
             result = "((" + divisor + ")(" + diffExpr(readExpr(dividend), var) + ")-(" + dividend + ")(" + diffExpr(readExpr(divisor), var) + "))/(" + divisor + ")^2";
         }
+
         else {
-            for (unsigned i = 0; i < tc.factors.length; i++) {
+            array<string> each_term = readImplExpr(term);
+            std::cout<<"this is multiple"<<"\n"; //***************dont forget to erase
+
+            for (unsigned i = 0; i < each_term.length; i++) {
+                std::cout<<tc.factors[i].compress()<<"\n";
+                std::cout<<each_term[i]<<"\n";
+                
                 if (i > 0) result += "+";
 
-                for (unsigned j = 0; j < tc.factors.length; j++) {
+                for (unsigned j = 0; j < each_term.length; j++) {
                     result += "(";
-                    result += i == j ? diffExpr(readExpr(tc.factors[i].compress()), var) : tc.factors[i].compress();
+                    result += i == j ? diff(each_term[j], var) : each_term[j];
                     result += ")";
                 }
             }
@@ -417,7 +523,7 @@ string diff(const string &term, const char &var) {
 
                 result = hasSignOrVar(chainDiff, var)
                     ? toCalStr(tc.a) + "(" + chainDiff + ")/"
-                    : toCalStr(tc.a * parseNum(chainDiff)) + ")/";
+                    : toString(tc.a * parseNum(chainDiff)) + "/";
 
                 if (tc.factors[0].func == "sin" || tc.factors[0].func == "cos") result += "((1-(" + tc.factors[0].u + ")^2)^(1/2))";
                 else if (tc.factors[0].func == "tan" || tc.factors[0].func == "cot") result += "(1-(" + tc.factors[0].u + ")^2)";
@@ -610,51 +716,6 @@ string implExprDiff(array<string> leftTerms, array<string> rightTerms, const cha
     result = "-(" + dUpper + ")/(" + dLower + ")";
 
     return result;
-}
-
-string findRelativeMinMax(array<string> terms, const char &var) {
-
-    array<string> diffedTerms = readExpr(diffExpr(terms, var));
-
-    array<factor> factors;
-    double a = 0, b = 0, c = 0;
-    
-    for (unsigned short i = 0; i < diffedTerms.length-1; i++) {
-        TermComponents tc(diffedTerms[i], var);
-
-        // checks tc
-        if (tc.factors.length != 1 && tc.factors.length != 0) error("only one factor per term in this mode is allowed");
-
-        if (tc.factors[i].n != "1" || tc.factors[i].n != "2") error("power of n in this mode is maximum at 3", 3);
-
-        if (!tc.factors.length) c = tc.a;
-        else if (tc.factors[i].n == "1") b = tc.a;
-        else if (tc.factors[i].n == "2") a = tc.a;
-
-        factors.push(tc.factors[i]);
-    }
-
-    if (b*b-4*a*c < 0) error("imagine number is not allowed in this mode", 2);
-
-    double c1 = (-b - sqrt(b*b-4*a*c)) / (2*a);
-    double c2 = (-b + sqrt(b*b-4*a*c)) / (2*a);
-
-    double p1 = evalExpr(terms, c1, var);
-    double p2 = evalExpr(terms, c2, var);
-
-    if (p1 > p2) { // swap
-        double temp_c = c1;
-        double temp_p = p1;
-
-        c1 = c2;
-        c2 = temp_c;
-
-        p1 = p2;
-        p2 = temp_p;
-    }
-
-    std::cout << "relative min is [" <<  p1 << ", " << c2 << "]\n";
-    std::cout << "relative max is [" <<  p2 << ", " << c1 << "]\n";
 }
 
 #endif
