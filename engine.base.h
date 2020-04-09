@@ -441,7 +441,7 @@ string diff(const string &term, const char &var) {
                     : toString(tc.a * parseNum(chainDiff)) + "/";
 
                 if (tc.factors[0].func == "sin" || tc.factors[0].func == "cos") result += "((1-(" + tc.factors[0].u + ")^2)^(1/2))";
-                else if (tc.factors[0].func == "tan" || tc.factors[0].func == "cot") result += "(1-(" + tc.factors[0].u + ")^2)";
+                else if (tc.factors[0].func == "tan" || tc.factors[0].func == "cot") result += "(1+(" + tc.factors[0].u + ")^2)";
                 else if (tc.factors[0].func == "sec" || tc.factors[0].func == "csc") result += "(|" + tc.factors[0].u + "|((" + tc.factors[0].u + ")^2-1)^(1/2))";
             } break;
             case 4: { // CASE: ax^n or ax^(n)
