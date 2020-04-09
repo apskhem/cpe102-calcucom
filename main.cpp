@@ -117,11 +117,8 @@ int main() {
                 std::cout << "Enter implicit expresion [left=right].\n";
                 std::cout << "=>\t";
                 getline(std::cin, impl_expr);
-                std::cin.ignore();
 
                 if (impl_expr.search("=") == -1) error("no presence of [left=right] expression");
-
-                impl_expr = impl_expr.replace(" ", "").toLowerCase();
 
                 string leftExpr = impl_expr.split("=")[0];
                 string rightExpr = impl_expr.split("=")[1];

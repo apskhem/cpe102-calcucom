@@ -29,7 +29,7 @@ double parseNum(string t, const unsigned start, unsigned end) {
 
     // check for number in the front
     if (!(t[0] >= 46 && t[0] <= 57) && t[0] != '-') return 0;
-    if (t[0] == '-' && !(t[1] >= 46 && t[1] <= 57)) return -1;
+    if (!(t[1] >= 46 && t[1] <= 57) && t[0] == '-') return -1;
 
     // also check for e
     if (t[0] == 'e') return 2.71828182845904523;
@@ -60,7 +60,7 @@ double parseNum(string t, const unsigned start, unsigned end) {
 }
 
 bool isNum(char t) {
-    return (t >= 46 && t <= 57);
+    return (t >= 46 && t <= 57 && t != '/');
 }
 
 bool hasSignOrVar(string expr, char var) {
