@@ -1,224 +1,153 @@
 #include <iostream>
+#include <cmath>
+#include <string>
 
-void error(const char *msg, const unsigned cond=1) {
-    switch (cond) {
-        case 1: std::cout << "Bad arithmetic expression: "; break;
-        case 2: std::cout << "Lack of features: "; break;
-        case 3: std::cout << "Exceed program's limitation: "; break;
-        case 4: std::cout << "Wrong user input: "; break;
-        case 5: std::cout << "Systematic fault: "; break;
-    };
+using namespace std;
 
-    std::cout << msg << ".\n\n";
+string assignVar(string &, string);
+void change(string &, string , string , string );
+void finddivide(string, string &, string &);
+double stodu(string );
+
+int main()
+{
+   
+    string eqation = "50*x*(2*x*x+2)^(2*x+1)/(x+9)^(20*x+30)";
+    string x; 
+    string a = "", b = "";
+
+    finddivide(eqation, a, b);
+
+    cout << "Eqation : " + a + "/" + b << endl;
+    cout << "Computing Limits" << endl;
+    cout << "-------------------------------------------" << endl;
+    cout << "PLESE Input value of x on eqation : " ;
+    cin >> x;
     
-    throw 0;
+    cout<<"When X Approach :"<<x<<"\n"<<" eqation ="<< assignVar(eqation,x)<<endl;
+
+    string Base = "", Power = "", first = "";
+    change(a, Base, Power, first);
+    assignVar(a,x);
+    //a=first+"*"+"pow(" +Base +"," +Power +")"+")";
+    cout << "Top eqation : " + a << endl;
+    change(b, Base, Power, first);
+    assignVar(b,x);
+    //b=first+"*"+"pow(" +Base +"," +Power +")"+")";
+    cout << "Bottom eqation : " + b<<endl;
+
+    
+}
+/*
+for(unsigned int i=0;i<eqation.size();++i)
+if(eqation[i]=='^'){
+}*/
+
+double stodu(string eqation ){
+  ;
 }
 
-#include "klib.array.h"
-#include "klib.string.h"
-#include "klib.number.h"
-#include "engine.base.h"
-#include "engine.max_min.h"
+void change(string &eqation, string Base, string Power, string first)
+{  
+
+    int pos = eqation.find("^");
+    int ONE = eqation.find("(");
+  
+
+    string FindP;
+    FindP += eqation.substr(pos + 1);
+    int end = pos + 1 + FindP.find(")");
+
+    first += eqation.substr(0, ONE);
 
 
+    if (eqation[pos] == '^')
+    {
+        for (unsigned int i = ONE; i <= pos - 1; ++i)
+        {
+            Base += eqation[i];
+        }
+        for (unsigned int j = pos + 1; j <= end; ++j)
+        {
+            Power += eqation[j];
+        }
+        // eqation="pow("+Base+","+Power+")";
 
-
-
-double Analys(string & ,string &,string &,double); 
-
-
-int main(){
-    double x;
-    string Eqation ="";
-    string FirstEqa="",SecondEqa="";
-    // cout<<"Input x :";
-    // cin>>x;
-    Analys(Eqation,FirstEqa,SecondEqa,x);
-
-
-
-
-
+        eqation = first + "pow(" + Base + "," + Power + ")" ;
+    
+    }
 }
-
-double Analys(string &eqation, string &a, string &b,double x)
+void finddivide(string eqation, string &a, string &b)
 {
 
-   if(evalExpr(readExpr(eqation),x,'x')<=INT_MAX){
-       return evalExpr(readExpr(eqation),x,'x');
-   }
-else
-{
-    int pos = eqation.search('/');
-    int posM = eqation.search('-');
-    int posMul = eqation.search('*');
-    int posP = eqation.search('^');
-
-    if (eqation[pos] == '/') 
+    int pos = eqation.find('/');
+    if (eqation[pos] == '/')
     {
         for (unsigned int i = 0; i < pos; ++i)
         {
             a += eqation[i];
         }
-        for (unsigned int j = pos + 1; j <= eqation.length; ++j)
-        {
-            b += eqation[j];
-        }
-            
-        if(evalExpr(readExpr(a),x,'x')<=INT_MAX && evalExpr(readExpr(b),x,'x')==0){
-                    return NAN;  //case ค่าคงที่ หาร ์ NAN
-        }
-        else if (evalExpr(readExpr(a),x,'x')==NAN && evalExpr(readExpr(b),x,'x')==NAN){
-                    if(evalExpr(readExpr(diff(a,'x')),x,'x')/ evalExpr(readExpr(diff(diff(b,'x'),'x')),x,'x')<=INT_MAX) {
-                        return evalExpr(readExpr(a),x,'x')<=INT_MAX && evalExpr(readExpr(b),x,'x');
-                    } 
-                    else
-                    {
-                        eqation = diff(a,'x')+"/"+diff(b,'x');
-                    }
-                    
-                                //case NAN หาร NAN
-            }
-        else if (evalExpr(readExpr(a),x,'x')==0 && evalExpr(readExpr(b),x,'x')==0){
-                   if(evalExpr(readExpr(diff(a,'x')),x,'x')/ evalExpr(readExpr(diff(diff(b,'x'),'x')),x,'x')<=INT_MAX) {
-                        return evalExpr(readExpr(a),x,'x')<=INT_MAX && evalExpr(readExpr(b),x,'x');
-                    } 
-                    else
-                    {
-                        eqation = diff(a,'x')+"/"+diff(b,'x');
-                    }
-                                // case 0/0
-        }
-
-
-    }
-    
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    else if (eqation[pos] != '/')
-    {
-            int posM = eqation.search('-');
-
-            if (eqation[posM] == '-')
-    {
-        for (unsigned int i = 0; i < posM; ++i)
-        {
-            a += eqation[i];
-        }
-        for (unsigned int j = posM + 1; j <= eqation.length; ++j)
+        for (unsigned int j = pos + 1; j <= eqation.size(); ++j)
         {
             b += eqation[j];
         }
     }
-
-        int posln=a.search("ln");
-        int posln2=b.search("ln");
-
-        if(eqation[posln]=='ln' && eqation[posln2]=='ln'){
-
-        if(evalExpr(readExpr(a),x,'x')==NAN && evalExpr(readExpr(b),x,'x')==NAN){
-
-
-            if(log (evalExpr(readExpr(a),x,'x') /evalExpr(readExpr(b),x,'x'))<=INT_MAX){
-            return  log (evalExpr(readExpr(a),x,'x') /evalExpr(readExpr(b),x,'x')) ; 
-            }
-            else
-            {
-                 eqation ="Not to find";
-            }  //เคส NAN - NAN
-        }
-        }
-    }
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    else if (eqation[pos] != '/' && eqation[posM] !='-')
-    {
-            int posMul = eqation.search('*');
-
-            if (eqation[posMul] == '*')
-    {
-        for (unsigned int i = 0; i < posMul; ++i)
-        {
-            a += eqation[i];
-        }
-        for (unsigned int j = posMul + 1; j <= eqation.length; ++j)
-        { 
-            b += eqation[j];
-        }
-    }
-        if(evalExpr(readExpr(a),x,'x')==NAN 
-            && evalExpr(readExpr(b),x,'x')==0
-            ||evalExpr(readExpr(b),x,'x')==NAN && evalExpr(readExpr(a),x,'x')==0){
-
-                    if(evalExpr(readExpr(a),x,'x')/evalExpr(readExpr(b),x,'x')<=INT_MAX)
-                    {
-                        return evalExpr(readExpr(a),x,'x')/evalExpr(readExpr(b),x,'x');
-                    }
-                    else if(evalExpr(readExpr(b),x,'x')/evalExpr(readExpr(a),x,'x')<=INT_MAX)
-                    {
-                       return evalExpr(readExpr(b),x,'x')/evalExpr(readExpr(a),x,'x');
-                    }
-                    else {
-                        eqation="Not to find";
-                    }
-                
-                ;  //เคส NAN * 0 หรือ 0*NAN
-        }
-
-
-    }
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    else if (eqation[pos] != '/' && eqation[posM] !='-' && eqation[posMul] !='*' )
-    {
-            int posP = eqation.search('^');
-
-            if (eqation[posP] == '^')
-    {
-        for (unsigned int i = 0; i < posP; ++i)
-        {
-            a += eqation[i];
-        }
-        for (unsigned int j = posP + 1; j <= eqation.length; ++j)
-        {
-            b += eqation[j];
-        }
-    }
-        if(evalExpr(readExpr(a),x,'x')==NAN 
-            && evalExpr(readExpr(b),x,'x')==0
-                || evalExpr(readExpr(b),x,'x')==NAN 
-                    && evalExpr(readExpr(a),x,'x')==0){
-                        
-                ;  //เคส NAN ^ 0 หรือ 0 ^ NAN
-        }
-
-        else if(evalExpr(readExpr(a),x,'x')==1
-            && evalExpr(readExpr(b),x,'x')==NAN)
-            {
-                        
-                ;  //เคส NAN ^ 0 หรือ 0 ^ NAN
-        }
-
-
-    }
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-a=""; 
-b="";
-
-if( evalExpr(readExpr(eqation),x,'x')==NAN){
-    Analys(eqation,a,b,x);
-}
-}
 }
 
-    
+string assignVar(string & eqation, string a)
+{
+
+    size_t found = eqation.find('x');
+    if (found != std::string::npos)
+    {
+        //eqation.insert(found, a);    
+    }
+    //cout << "first 'x' found at: " << found << '\n';
+
+    found = eqation.find('x', found + 1);
+    if (found != std::string::npos)
+    {
+        eqation.insert(found + 1, a);
+        eqation.erase(found,1);
+        
+    }
+    // cout << "second 'x' found at: " <<found << '\n';
+
+    found = eqation.find('x', found + 1);
+    if (found != std::string::npos)
+    {
+        eqation.insert(found+1, a);
+        eqation.erase(found,1);
+      
+    }
+    // cout << "third 'x' found at: " << found << '\n';
+
+    found = eqation.find('x', found + 1);
+    if (found != std::string::npos)
+    {
+        eqation.insert(found+1, a);
+        eqation.erase(found,1);
+        
+    }
+    // cout << "Fourth 'x' found at: " << found << '\n';
+
+    found = eqation.find('x', found + 1);
+    if (found != std::string::npos)
+    {
+        eqation.insert(found+1, a);
+        eqation.erase(found,1);
+       
+    }
+    //cout << "Fifth 'x' found at: " << found << '\n';
+     found = eqation.find('x', found + 1);
+    if (found != std::string::npos)
+    {
+        eqation.insert(found+1, a);
+        eqation.erase(found,1);
+       
+    }
+    return eqation;
+}
+
+/*for(unsigned int N=0;N<eqation.size();++N)
+if(eqation[N]=='x'){*/
