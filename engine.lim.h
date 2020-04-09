@@ -5,26 +5,26 @@ double FindLim(string &, double, string &, string &);
 
 double FindLim(string &equation, double x, string &a = "", string &b = ""){
 
-    if (evalExpr(readExpr(eqation), x, 'x') <= INT_MAX)
+    if (evalExpr(readExpr(equation), x, 'x') <= INT_MAX)
     {
-        return evalExpr(readExpr(eqation), x, 'x');
+        return evalExpr(readExpr(equation), x, 'x');
     }
     else
     {
-        int pos = eqation.search('/');
-        int posM = eqation.search('-');
-        int posMul = eqation.search('*');
-        int posP = eqation.search('^');
+        int pos = equation.search('/');
+        int posM = equation.search('-');
+        int posMul = equation.search('*');
+        int posP = equation.search('^');
 
-        if (eqation[pos] == '/')
+        if (equation[pos] == '/')
         {
             for (unsigned int i = 0; i < pos; ++i)
             {
-                a += eqation[i];
+                a += equation[i];
             }
-            for (unsigned int j = pos + 1; j <= eqation.length; ++j)
+            for (unsigned int j = pos + 1; j <= equation.length; ++j)
             {
-                b += eqation[j];
+                b += equation[j];
             }
 
             if (evalExpr(readExpr(a), x, 'x') <= INT_MAX && evalExpr(readExpr(b), x, 'x') == 0)
@@ -39,7 +39,7 @@ double FindLim(string &equation, double x, string &a = "", string &b = ""){
                 }
                 else
                 {
-                    eqation = diff(a, 'x') + "/" + diff(b, 'x');
+                    equation = diff(a, 'x') + "/" + diff(b, 'x');
                 }
 
                 //case NAN หาร NAN
@@ -52,7 +52,7 @@ double FindLim(string &equation, double x, string &a = "", string &b = ""){
                 }
                 else
                 {
-                    eqation = diff(a, 'x') + "/" + diff(b, 'x');
+                    equation = diff(a, 'x') + "/" + diff(b, 'x');
                 }
                 // case 0/0
             }
@@ -60,26 +60,26 @@ double FindLim(string &equation, double x, string &a = "", string &b = ""){
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        else if (eqation[pos] != '/')
+        else if (equation[pos] != '/')
         {
-            int posM = eqation.search('-');
+            int posM = equation.search('-');
 
-            if (eqation[posM] == '-')
+            if (equation[posM] == '-')
             {
                 for (unsigned int i = 0; i < posM; ++i)
                 {
-                    a += eqation[i];
+                    a += equation[i];
                 }
-                for (unsigned int j = posM + 1; j <= eqation.length; ++j)
+                for (unsigned int j = posM + 1; j <= equation.length; ++j)
                 {
-                    b += eqation[j];
+                    b += equation[j];
                 }
             }
 
             int posln = a.search("ln");
             int posln2 = b.search("ln");
 
-            if (eqation[posln] == 'ln' && eqation[posln2] == 'ln')
+            if (equation[posln] == 'ln' && equation[posln2] == 'ln')
             {
 
                 if (evalExpr(readExpr(a), x, 'x') == NAN && evalExpr(readExpr(b), x, 'x') == NAN)
@@ -91,7 +91,7 @@ double FindLim(string &equation, double x, string &a = "", string &b = ""){
                     }
                     else
                     {
-                        eqation = "Not to find";
+                        equation = "Not to find";
                     } //เคส NAN - NAN
                 }
             }
@@ -99,19 +99,19 @@ double FindLim(string &equation, double x, string &a = "", string &b = ""){
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        else if (eqation[pos] != '/' && eqation[posM] != '-')
+        else if (equation[pos] != '/' && equation[posM] != '-')
         {
-            int posMul = eqation.search('*');
+            int posMul = equation.search('*');
 
-            if (eqation[posMul] == '*')
+            if (equation[posMul] == '*')
             {
                 for (unsigned int i = 0; i < posMul; ++i)
                 {
-                    a += eqation[i];
+                    a += equation[i];
                 }
-                for (unsigned int j = posMul + 1; j <= eqation.length; ++j)
+                for (unsigned int j = posMul + 1; j <= equation.length; ++j)
                 {
-                    b += eqation[j];
+                    b += equation[j];
                 }
             }
             if (evalExpr(readExpr(a), x, 'x') == NAN && evalExpr(readExpr(b), x, 'x') == 0 || evalExpr(readExpr(b), x, 'x') == NAN && evalExpr(readExpr(a), x, 'x') == 0)
@@ -127,7 +127,7 @@ double FindLim(string &equation, double x, string &a = "", string &b = ""){
                 }
                 else
                 {
-                    eqation = "Not to find";
+                    equation = "Not to find";
                 }
 
                 ; //เคส NAN * 0 หรือ 0*NAN
@@ -136,43 +136,43 @@ double FindLim(string &equation, double x, string &a = "", string &b = ""){
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        else if (eqation[pos] != '/' && eqation[posM] != '-' && eqation[posMul] != '*')
+        else if (equation[pos] != '/' && equation[posM] != '-' && equation[posMul] != '*')
         {
-            int posP = eqation.search('^');
+            int posP = equation.search('^');
 
-            if (eqation[posP] == '^')
+            if (equation[posP] == '^')
             {
                 for (unsigned int i = 0; i < posP; ++i)
                 {
-                    a += eqation[i];
+                    a += equation[i];
                 }
-                for (unsigned int j = posP + 1; j <= eqation.length; ++j)
+                for (unsigned int j = posP + 1; j <= equation.length; ++j)
                 {
-                    b += eqation[j];
+                    b += equation[j];
                 }
             }
             if (evalExpr(readExpr(a), x, 'x') == NAN && evalExpr(readExpr(b), x, 'x') == 0)
             {
                 string p;
-                p = eqation.slice(0, eqation.length);
+                p = equation.slice(0, equation.length);
 
-                eqation = b + "ln(" + p + ")";
+                equation = b + "ln(" + p + ")";
             }
             else if (evalExpr(readExpr(b), x, 'x') == NAN && evalExpr(readExpr(a), x, 'x') == 0)
             {
                 string p;
-                p = eqation.slice(0, eqation.length);
+                p = equation.slice(0, equation.length);
 
-                eqation = b + "ln(" + p + ")";
+                equation = b + "ln(" + p + ")";
 
             } //เคส NAN ^ 0 หรือ 0 ^ NAN
 
             else if (evalExpr(readExpr(a), x, 'x') == 1 && evalExpr(readExpr(b), x, 'x') == NAN)
             {
                 string p;
-                p = eqation.slice(0, eqation.length);
+                p = equation.slice(0, equation.length);
 
-                eqation = b + "ln(" + p + ")";
+                equation = b + "ln(" + p + ")";
 
                 ; //เคส ค่าคงที่ ^ 0 หรือ ค่าคงที่ ^ NAN
             }
