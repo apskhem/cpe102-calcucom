@@ -18,7 +18,7 @@ void error(const char *msg, const unsigned cond=1) {
 #include "klib.string.h"
 #include "klib.number.h"
 #include "engine.base.h"
-#include "engine.lim.h"
+//#include "engine.lim.h"
 #include "engine.max_min.h"
 
 string numOfDiff(const unsigned &num);
@@ -146,15 +146,15 @@ int main() {
 
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
-            case 7: { // limit
-                double x;
-
-                std::cout << "Enter value to approach x\n";
-                std::cout << "=>\t";
-                std::cin >> x;
-
-                std::cout << "limit of f(x) = " << FindLim(expr, x);
-            } break;
+            //case 6: { // limit
+            //    double x;
+//
+            //    std::cout << "Enter value to approach x\n";
+            //    std::cout << "=>\t";
+            //    std::cin >> x;
+//
+            //    std::cout << "limit of f(x) = " << FindLim(expr, x);
+            //} break;
             case 7: { // show graph
                 double scale;
                 std::cout << "Enter graph scale [-50, 50] in scale 1.\n";

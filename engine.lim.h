@@ -1,9 +1,11 @@
 #ifndef LIM_H
 #define LIM_H
 
-double FindLim(string &, double, string &, string &);
+double FindLim(string &, double);
 
-double FindLim(string &equation, double x, string &a = "", string &b = ""){
+double FindLim(string &equation, double x){
+	
+	string a = "", b = "";
 
     if (evalExpr(readExpr(equation), x, 'x') <= INT_MAX)
     {
