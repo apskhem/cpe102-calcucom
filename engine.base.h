@@ -418,11 +418,14 @@ string diff(const string &term, const char &var) {
             } break;
             case 2: {
                 string chainDiff = diffExpr(splitTerm(tc.factors[0].u), var);
+
                 if (chainDiff == "0") return "#";
 
                 result = hasSignOrVar(chainDiff, var)
-                    ? toCalStr(tc.a) + "(" + chainDiff + ")/"
-                    : toString(tc.a * parseNum(chainDiff)) + "/";
+                    //? toCalStr(tc.a) + "(" + chainDiff + ")/"
+                    ? "(" + toCalStr(tc.a) + "(" + chainDiff + ")/"
+                    : toString(tc.a * parseNum(chainDiff)) == "" ? "1" : toString(tc.a * parseNum(chainDiff)) + "/";
+
 
                 if (tc.factors[0].func.length > 2) { // log...
                     string logbase = tc.factors[0].func.length == 3 ? "10" : tc.factors[0].func.slice(3);
@@ -443,8 +446,11 @@ string diff(const string &term, const char &var) {
 
                 if (tc.factors[0].func == "cos" || tc.factors[0].func == "cot" || tc.factors[0].func == "csc") tc.a *= -1;
 
+                if (chainDiff[0] == '+')
+                    chainDiff[0] = ' ';
+
                 result = hasSignOrVar(chainDiff, var)
-                    ? toCalStr(tc.a) + "(" + chainDiff + ")/"
+                    ? toCalStr(tc.a) + chainDiff + "/"
                     : toString(tc.a * parseNum(chainDiff)) + "/";
 
                 if (tc.factors[0].func == "sin" || tc.factors[0].func == "cos") result += "((1-(" + tc.factors[0].u + ")^2)^(1/2))";
@@ -469,9 +475,12 @@ string diff(const string &term, const char &var) {
 
                 chainDiff = splitTerm(chainDiff).length > 1 || !isAllNum(chainDiff) ? "(" + chainDiff + ")" : chainDiff;
 
+                if(chainDiff == "1")
+                    chainDiff = "";
+
                 result = tc.factors[0].u == "e"
-                    ? chainDiff + tc.factors[0].u + preN
-                    : chainDiff + "ln(" + tc.factors[0].u + ")" + tc.factors[0].u + preN;
+                    ? tc.factors[0].u + preN + chainDiff
+                    : "ln(" + tc.factors[0].u + ")" + tc.factors[0].u + preN + chainDiff;
             } break;
             default: error("fault at 'diff' function", 5);
         }
