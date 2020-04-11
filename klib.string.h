@@ -343,25 +343,14 @@ String String::operator* (const unsigned count) {
 template <class number>
 String toString(const number &n) {
     string t = std::to_string(n).c_str();
-    unsigned short dotPos = -1, lastZeroPos = -1;
-
-    for (unsigned short i = 0; i < t.length; i++) {
-        if (t[i] == '.') {
-            dotPos = i;
-            break;
-        }
-    }
+    short dotPos = t.search(".");
 
     if (dotPos == -1) return t;
-
-    for (unsigned short i = t.length-1; i >= dotPos; i--) {
-        if (t[i] != '0' || i == dotPos) lastZeroPos = i+1;
-    }
-
-    switch (lastZeroPos - dotPos) {
-        case 1: return t.slice(0, dotPos); // .0
-        case 2: return t.slice(0, dotPos+2); // .x0
-        default: return t.slice(0, dotPos+3); // .xx0
+    else {
+        string cut = t.slice(0, dotPos+3);
+        if (cut[cut.length - 1] == '0' && cut[cut.length - 2] == '0') return t.slice(0, dotPos);
+        else if (cut[cut.length - 1] == '0') return t.slice(0, dotPos+2); //.x
+        else return cut; // .xx
     }
 }
 
@@ -371,25 +360,14 @@ String toCalStr(const number &n) {
     if (n == -1) return "-";
 
     string t = std::to_string(n).c_str();
-    unsigned short dotPos = -1, lastZeroPos = -1;
-
-    for (unsigned short i = 0; i < t.length; i++) {
-        if (t[i] == '.') {
-            dotPos = i;
-            break;
-        }
-    }
+    short dotPos = t.search(".");
 
     if (dotPos == -1) return t;
-
-    for (unsigned short i = t.length-1; i >= dotPos; i--) {
-        if (t[i] != '0' || i == dotPos) lastZeroPos = i+1;
-    }
-
-    switch (lastZeroPos - dotPos) {
-        case 1: return t.slice(0, dotPos); // .0
-        case 2: return t.slice(0, dotPos+2); // .x0
-        default: return t.slice(0, dotPos+3); // .xx0
+    else {
+        string cut = t.slice(0, dotPos+3);
+        if (cut[cut.length - 1] == '0' && cut[cut.length - 2] == '0') return t.slice(0, dotPos);
+        else if (cut[cut.length - 1] == '0') return t.slice(0, dotPos+2); //.x
+        else return cut; // .xx
     }
 }
 

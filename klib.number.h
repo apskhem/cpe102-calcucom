@@ -5,6 +5,8 @@ class CalNumber {
     friend double parseNum(string, const unsigned=0, unsigned=-1);
     /* The method checks if input char is number or not. */
     friend bool isNum(char);
+
+    friend bool isAllNum(string);
     /* The methood reads expression and find '+', '-' and var. */
     bool hasSignOrVar(string, char);
 };
@@ -61,6 +63,14 @@ double parseNum(string t, const unsigned start, unsigned end) {
 
 bool isNum(char t) {
     return (t >= 46 && t <= 57 && t != '/');
+}
+
+bool isAllNum(string t) {
+    for (unsigned short i = 0; i < t.length; i++) {
+        if (!(t[i] >= 46 && t[i] <= 57 && t[i] != '/')) return false;
+    }
+
+    return true;
 }
 
 bool hasSignOrVar(string expr, char var) {

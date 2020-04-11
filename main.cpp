@@ -99,12 +99,12 @@ int main() {
 
                 std::cout << "The result is...\n\n";
 
-                std::cout << "f" << numOfDiff(numberOfDiff) << "(" << evalValue << ") = " << evalExpr(readExpr(expr), evalValue, var) << '\n';
+                std::cout << "f" << numOfDiff(numberOfDiff) << "(" << evalValue << ") = " << evalExpr(splitTerm(expr), evalValue, var) << '\n';
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
             case 2: { // derivative
                 numberOfDiff++;
-                expr = diffExpr(readExpr(expr), var);
+                expr = diffExpr(splitTerm(expr), var);
                 if (!expr.length) expr = "0";
 
                 std::cout << "The result is...\n\n";
@@ -125,7 +125,7 @@ int main() {
 
                 std::cout << "The result is...\n\n";
 
-                std::cout << "dy/d" << var << " = " << implExprDiff(readExpr(leftExpr), readExpr(rightExpr), var) << "\n\n";
+                std::cout << "dy/d" << var << " = " << implExprDiff(splitTerm(leftExpr), splitTerm(rightExpr), var) << "\n\n";
 
                  isFirstPass = true;
                  continue;
@@ -141,7 +141,7 @@ int main() {
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             }
             case 5: { // find relative min/max
-                findRelativeMinMax(readExpr(expr), var);
+                findRelativeMinMax(splitTerm(expr), var);
 
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;

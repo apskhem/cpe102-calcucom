@@ -6,58 +6,69 @@ double xp(double, double, double);					   //-b+sqrt(b^2-4ac)/2a
 double xn(double, double, double);					   //-b-sqrt(b^2-4ac)/2a
 array<double> SDforx3(double, double, double, double); //ax^3+bx^2+cx+d
 array<double> critical_x(string);
-string findRelativeMinMax(array<string> terms, const char &var);
+void findRelativeMinMax(array<string> terms, const char &var);
 
-string findRelativeMinMax(array<string> terms, const char &var) {
+void findRelativeMinMax(array<string> terms, const char &var) {
+    array<string> diffedTerms = splitTerm(diffExpr(terms, var));
 
-    array<string> diffedTerms = readExpr(diffExpr(terms, var));
-
-    array<factor> factors;
     double a = 0, b = 0, c = 0;
     
-    for (unsigned short i = 0; i < diffedTerms.length-1; i++) {
+    for (unsigned short i = 0; i < diffedTerms.length; i++) {
         TermComponents tc(diffedTerms[i], var);
 
         // checks tc
-        if (tc.factors.length != 1 && tc.factors.length != 0) error("only one factor per term in this mode is allowed");
+        if (tc.factors.length > 1) error("only one factor per term in this mode is allowed");
 
-        if (tc.factors[i].n != "1" || tc.factors[i].n != "2") error("power of n in this mode is maximum at 3", 3);
+		if (parseNum(tc.factors[0].n) > 2) error("power of n in this mode is maximum at 3", 3);
 
         if (!tc.factors.length) c = tc.a;
-        else if (tc.factors[i].n == "1") b = tc.a;
-        else if (tc.factors[i].n == "2") a = tc.a;
-
-        factors.push(tc.factors[i]);
+        else if (tc.factors[0].n == "1") b = tc.a;
+        else if (tc.factors[0].n == "2") a = tc.a;
     }
 
     if (b*b-4*a*c < 0) error("imagine number is not allowed in this mode", 2);
 
-    double c1 = (-b - sqrt(b*b-4*a*c)) / (2*a);
-    double c2 = (-b + sqrt(b*b-4*a*c)) / (2*a);
+	double c1 = 0, c2 = 0;
 
-    double p1 = evalExpr(terms, c1, var);
-    double p2 = evalExpr(terms, c2, var);
+	if (a) {
+		c1 = (-b - sqrt(b*b-4*a*c)) / (2*a);
+    	c2 = (-b + sqrt(b*b-4*a*c)) / (2*a);
 
-    if (p1 > p2) { // swap
-        double temp_c = c1;
-        double temp_p = p1;
+		double p1 = evalExpr(terms, c1, var);
+		double p2 = evalExpr(terms, c2, var);
 
-        c1 = c2;
-        c2 = temp_c;
+		if (p1 > p2) { // swap
+			double temp_c = c1;
+			double temp_p = p1;
 
-        p1 = p2;
-        p2 = temp_p;
-    }
+			c1 = c2;
+			c2 = temp_c;
 
-    std::cout << "relative min is [" <<  p1 << ", " << c2 << "]\n";
-    std::cout << "relative max is [" <<  p2 << ", " << c1 << "]\n";
+			p1 = p2;
+			p2 = temp_p;
+		}
+
+		std::cout << "relative min is [" <<  c1 << ", " << p1 << "]\n";
+		std::cout << "relative max is [" <<  c2 << ", " << p2 << "]\n";
+	}
+	else if (b) {
+		c1 = -c/b;
+
+		double p1 = evalExpr(terms, c1, var);
+
+		if (evalExpr(splitTerm(diffExpr(diffedTerms, var)), c1, var) > 0) {
+			std::cout << "relative min is [" <<  c1 << ", " << p1 << "]\n";
+		}
+		else {
+			std::cout << "relative max is [" <<  c1 << ", " << p1 << "]\n";
+		}
+	}
 }
-
 
 array<double> critical_x(string equation)
 {
 	int option;
-	array<string> term = readExpr(equation);
+	array<string> term = splitTerm(equation);
 	array<double> x_value;
 
 	for (unsigned i = 0; i < equation.length; i++)

@@ -4,7 +4,7 @@
 #include <cmath>
 
 /* The method splits expression into arrays of string term. */
-array<string> readExpr(string expr);
+array<string> splitTerm(string expr);
 /* The methood derivatives the expression. */
 string diffExpr(array<string> terms, const char &var);
 /* The methood derivatives a term. */
@@ -22,10 +22,7 @@ double eval(string term, const double &value, const char &var);
 /* The method implicitly derivatives the expression. */
 string implExprDiff(array<string> rightTerms, array<string> leftTerms, const char &var);
 
-array<string> readImplExpr(string term);
-
-string implMul(string expr, const double &mul);
-
+void mulMinusN(string &expr);
 
 const double PI = 3.14159265358979323846;
 const double e = 2.71828;
@@ -40,7 +37,7 @@ struct factor {
     /* The method subtracts power of n by -1 of any form, and returns the subtracted number. */
     double subtractN(string &receiver, const char &var='x') {
         if (n == "1") return 1;
-        unsigned short divIndex = n.search("/");
+        int divIndex = n.search("/");
 
         if (divIndex != -1) {
             double upper = parseNum(n.slice(0, divIndex));
@@ -51,7 +48,8 @@ struct factor {
         }
         else {
             if (parseNum(n)-1 != 1) {
-                receiver = "^" + toString(parseNum(n)-1);
+                if (n.includes("-")) receiver = "^(" + toString(parseNum(n)-1) + ")";
+                else receiver = "^" + toString(parseNum(n)-1);
             }
 
             return parseNum(n);
@@ -65,7 +63,7 @@ struct factor {
         if (n.includes("/")) resN = "^(" + n + ")";
         else if (n != "1") resN = "^" + n;
 
-        if (readExpr(u).length > 1 || u[0] == 'l' || u[0] == 'a' || u[0] == 's' || u[0] == 'c' || u[0] == 't') {
+        if (splitTerm(u).length > 1 || u[0] == 'l' || u[0] == 'a' || u[0] == 's' || u[0] == 'c' || u[0] == 't') {
             return "(" + u + ")" + resN;
         }
         else if (func != "") {
@@ -96,9 +94,11 @@ TermComponents::TermComponents(string term, char var) {
     src = term;
     bool trackMinus = false;
     if (term[0] == '-') a = -1;
-    for (unsigned short i = 0; i < term.length; i++) {
+    for (unsigned short i = a == -1; i < term.length; i++) {
         // find (type): c number.
         if (isNum(term[i])) {
+            if (term[i] == '0') error("lead 0 in context");
+
             unsigned startpos = i;
 
             while (isNum(term[i+1]) && i < term.length) i++;
@@ -165,7 +165,7 @@ TermComponents::TermComponents(string term, char var) {
 
             string lfunc = term.slice(startlog, i);
 
-            if (!lfunc.includes("log") || !lfunc.includes("ln")) error("none standard arithmatic expression presented");
+            if (!lfunc.includes("log") && !lfunc.includes("ln")) error("none standard arithmatic expression presented");
 
             if (term[i] == '^' && checkForN(i, item.n)) { // logb^n
                 while (term[i++] != '(');
@@ -239,8 +239,7 @@ TermComponents::TermComponents(string term, char var) {
 
         // finalize end round
         if (trackMinus && factors.length) {
-            string toFormat = factors[factors.length - 1].n;
-            factors[factors.length - 1].n = implMul(toFormat, -1);
+            mulMinusN(factors[factors.length - 1].n);
             trackMinus = false;
         }
     }
@@ -262,16 +261,14 @@ string TermComponents::itemInsidePar(unsigned short &i) {
 
 bool TermComponents::checkForN(unsigned short &i, string &receiver) {
     if (src[i] == '^') {
-        if (src[++i] == '(') {
-            receiver = itemInsidePar(++i);
-        }
+        if (src[++i] == '(') receiver = itemInsidePar(++i);
         else {
             if (src[i] == '0') error("using power of 0");
             if (src[i] == '/') error("no power of n after '^...'");
 
             unsigned startpos = i;
             if (isNum(src[i])) {
-                while (isNum(src[i])) i++;
+                while (i < src.length && isNum(src[i])) i++;
 
                 receiver = src.slice(startpos, i--);
             }
@@ -289,7 +286,7 @@ bool TermComponents::checkForN(unsigned short &i, string &receiver) {
 /* ################################ */
 /* ################################ */
 
-array<string> readExpr(string expr) {
+array<string> splitTerm(string expr) {
     array<string> terms;
 
     unsigned leftPar = 0, rightPar = 0;
@@ -353,14 +350,23 @@ string diff(const string &term, const char &var) {
             for (unsigned j = 0; j < tc.factors.length; j++) {
                 string preRes = i == j ? diff(tc.factors[j].compress(), var) : tc.factors[j].compress();
 
-                result += readExpr(preRes).length > 1 ? "(" + preRes + ")" : preRes;
+                if (preRes == "1") preRes = "";
+                else if (preRes == "-1") preRes = "-";
+
+                array<string> preTerms = splitTerm(preRes);
+
+                bool withPar = false;
+                for (unsigned short o = 0; o < preTerms.length; o++)
+                    if (preTerms[o].includes("-") || preTerms[o].includes("/")) withPar = true;
+
+                result += preTerms.length > 1 || withPar ? "(" + preRes + ")" : preRes;
             }
         }
     }
     else if (tc.factors.length == 1) {
         switch (tc.factors[0].type) {
             case 0: {
-                string chainDiff = diffExpr(readExpr(tc.factors[0].u), var);
+                string chainDiff = diffExpr(splitTerm(tc.factors[0].u), var);
                 if (chainDiff == "0") return "#";
                 string subN = "";
                 double numSubN = tc.factors[0].subtractN(subN);
@@ -370,7 +376,7 @@ string diff(const string &term, const char &var) {
                     : toCalStr(tc.a * numSubN) + "(" + tc.factors[0].u + ")" + subN + "(" + chainDiff + ")";
             } break;
             case 1: {
-                string chainDiff = diffExpr(readExpr(tc.factors[0].u), var);
+                string chainDiff = diffExpr(splitTerm(tc.factors[0].u), var);
                 if (chainDiff == "0") return "#";
                 string diffTrigon1, diffTrigon2;
 
@@ -403,24 +409,28 @@ string diff(const string &term, const char &var) {
                 }
             } break;
             case 2: {
-                string chainDiff = diffExpr(readExpr(tc.factors[0].u), var);
+                string chainDiff = diffExpr(splitTerm(tc.factors[0].u), var);
                 if (chainDiff == "0") return "#";
+
+                result = hasSignOrVar(chainDiff, var)
+                    ? toCalStr(tc.a) + "(" + chainDiff + ")/"
+                    : toString(tc.a * parseNum(chainDiff)) + "/";
 
                 if (tc.factors[0].func.length > 2) { // log...
                     string logbase = tc.factors[0].func.length == 3 ? "10" : tc.factors[0].func.slice(3);
 
-                    result = hasSignOrVar(chainDiff, var)
-                        ? toCalStr(tc.a) + "(" + chainDiff + ")/((" + tc.factors[0].u + ")ln" + logbase + ")"
-                        : toString(tc.a * parseNum(chainDiff)) + "/((" + tc.factors[0].u + ")ln" + logbase + ")";
+                    result += tc.factors[0].u.length > 1
+                        ? "((" + tc.factors[0].u + ")ln(" + logbase + "))"
+                        : "(" + tc.factors[0].u + "ln(" + logbase + "))";
                 }
                 else { // ln...
-                    result = hasSignOrVar(chainDiff, var)
-                        ? toCalStr(tc.a) + "(" + chainDiff + ")/(" + tc.factors[0].u + ")"
-                        : toString(tc.a * parseNum(chainDiff)) + "/(" + tc.factors[0].u + ")";
+                    result += tc.factors[0].u.length > 1
+                        ? "(" + tc.factors[0].u + ")"
+                        : tc.factors[0].u;
                 }
             } break;
             case 3: {
-                string chainDiff = diffExpr(readExpr(tc.factors[0].u), var);
+                string chainDiff = diffExpr(splitTerm(tc.factors[0].u), var);
                 if (chainDiff == "0") return "#";
 
                 if (tc.factors[0].func == "cos" || tc.factors[0].func == "cot" || tc.factors[0].func == "csc") tc.a *= -1;
@@ -442,33 +452,35 @@ string diff(const string &term, const char &var) {
                     : toCalStr(tc.a * numSubN) + string(var) + subN;
             } break;
             case 5: { // CASE a^(u)
-                string chainDiff = diffExpr(readExpr(tc.factors[0].n), var);
+                string chainDiff = diffExpr(splitTerm(tc.factors[0].n), var);
                 if (chainDiff == "0") return "#";
 
+                string preN = tc.factors[0].n;
+
+                preN = "^" + (tc.factors[0].n.length > 1 || tc.factors[0].n.includes("-") || tc.factors[0].n.includes("/") ? "(" + preN + ")" : preN);
+
+                chainDiff = splitTerm(chainDiff).length > 1 || !isAllNum(chainDiff) ? "(" + chainDiff + ")" : chainDiff;
+
                 result = tc.factors[0].u == "e"
-                    ? "(" + chainDiff + ")" + tc.factors[0].u + "^(" + tc.factors[0].n + ")"
-                    : "(" + chainDiff + ")ln(" + tc.factors[0].u + ")" + tc.factors[0].u + "^(" + tc.factors[0].n + ")";
+                    ? chainDiff + tc.factors[0].u + preN
+                    : chainDiff + "ln(" + tc.factors[0].u + ")" + tc.factors[0].u + preN;
             } break;
             default: error("fault at 'diff' function", 5);
         }
     }
 
     // finalize
-    if (result == "1" && tc.otherVar != "") {
-        return tc.otherVar;
-    }
-    else {
-        return ((!result.length ? "#" : result) + tc.otherVar);
-    }
+    if (result == "1" && tc.otherVar.length) return tc.otherVar;
+    else return ((!result.length ? "#" : result) + tc.otherVar);
 }
 
 
 string tangent(string expr, double posX, const char &var) {
-    string slopeFunc = diffExpr(readExpr(expr), var);
-    double slope = evalExpr(readExpr(slopeFunc), posX, var);
+    string slopeFunc = diffExpr(splitTerm(expr), var);
+    double slope = evalExpr(splitTerm(slopeFunc), posX, var);
 
     // tangent = m(x1)(x-x1) + y1;
-    double c = posX * slope + evalExpr(readExpr(expr), posX, var);
+    double c = posX * slope + evalExpr(splitTerm(expr), posX, var);
     
     string cStr = "";
     if (c != 0) cStr = (c < 0 ? "-" : "+") + toString(c);
@@ -481,7 +493,7 @@ string tangent(string expr, double posX, const char &var) {
 void showGraph(const string &expr, const double &scale, const char &var) {
     const unsigned short h = 65, w = 65, mid = 32;
 
-    array<string> read = readExpr(expr);
+    array<string> read = splitTerm(expr);
 
     char graph[h][w] = {};
 
@@ -531,13 +543,13 @@ double eval(string term, const double &value, const char &var) {
     for (unsigned short i = 0; i < tc.factors.length; i++) {
         switch (tc.factors[i].type) {
             case 0: {
-                double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
-                double n = evalExpr(readExpr(tc.factors[i].n), value, var);
+                double chainEval = evalExpr(splitTerm(tc.factors[i].u), value, var);
+                double n = evalExpr(splitTerm(tc.factors[i].n), value, var);
 
                 result *= n < 0 ? 1/pow(chainEval, n) : pow(chainEval, n);
             } break;
             case 1: {
-                double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
+                double chainEval = evalExpr(splitTerm(tc.factors[i].u), value, var);
 
                 if (tc.factors[i].func == "sin")
                     result *= sin(chainEval * PI / 180);
@@ -553,13 +565,13 @@ double eval(string term, const double &value, const char &var) {
                     result *= 1/tan(chainEval * PI / 180);
             } break;
             case 2: {
-                double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
+                double chainEval = evalExpr(splitTerm(tc.factors[i].u), value, var);
                 double logbase = tc.factors[i].func.length == 3 ? 10 : parseNum(tc.factors[i].func.slice(3));
 
                 result *= tc.factors[i].func.length > 2 ? log(chainEval)/log(logbase) : log(chainEval);
             } break;
             case 3: {
-                double chainEval = evalExpr(readExpr(tc.factors[i].u), value, var);
+                double chainEval = evalExpr(splitTerm(tc.factors[i].u), value, var);
 
                 if (tc.factors[i].func == "sin")
                     result *= asin(chainEval);
@@ -575,12 +587,12 @@ double eval(string term, const double &value, const char &var) {
                     result *= 1/atan(chainEval);
             } break;
             case 4: {
-                double n = evalExpr(readExpr(tc.factors[i].n), value, var);
+                double n = evalExpr(splitTerm(tc.factors[i].n), value, var);
 
                 result *= n < 0 ? 1/pow(value, n) : pow(value, n);
             } break;
             case 5: {
-                double n = evalExpr(readExpr(tc.factors[i].n), value, var);
+                double n = evalExpr(splitTerm(tc.factors[i].n), value, var);
 
                 result *= n < 0 ? 1/pow(parseNum(tc.factors[i].u), n) : pow(parseNum(tc.factors[i].u), n);
             } break;
@@ -589,76 +601,6 @@ double eval(string term, const double &value, const char &var) {
     }
 
     return result;
-}
-
-array<string> readImplExpr(string term){
-
-    array<string> each_term;
-    bool x_y_idx = 0, func_idx = 0;
-
-    for (unsigned i = 0; i < term.length; i++){
-        if (term[i] == 'x' || term[i] == 'y'){
-            x_y_idx = true;
-            break;
-        }
-        else if (term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l' || term[i] == '^'){
-            func_idx = true;
-            break;
-        }
-    }
-    if (func_idx == true){
-        unsigned start = 0;
-        unsigned leftPar = 0, rightPar = 0;
-
-        for (unsigned i = 0; i < term.length; i++){
-            if (term[i] == '(')
-                leftPar++;
-            else if (term[i] == ')')
-                rightPar++;
-
-            if ((term[i] == 's' || term[i] == 'c' || term[i] == 't' || term[i] == 'l') && leftPar == rightPar){
-                i += 3;
-                leftPar++;
-                while (term[i] != ')')
-                    i++;
-                each_term.push(term.slice(start, i + 1));
-                start = i + 1 ;
-            }
-
-            else if (term[i] == '^'){
-                unsigned stop = i;
-
-                if (term[i] != 'x' || term[i] != 'y' || term[i] != ')'){
-                    while (isNum(term[++i]))
-                        stop++;
-                }
-                each_term.push(term.slice(start, stop + 1));
-                start = stop + 1;
-            }
-
-            if (i == term.length - 1)
-                each_term.push(term.slice(start, i + 1));
-        }
-    }
-    else if (x_y_idx == true){
-        unsigned start = 0;
-        unsigned leftPar = 0, rightPar = 0;
-
-        for (unsigned i = 0; i < term.length; i++){
-            if (term[i] == '(')
-                leftPar++;
-            else if (term[i] == ')')
-                rightPar++;
-
-            if ((term[i] == 'x' || term[i] == 'y') && term[i + 1] != '^' && leftPar == rightPar){
-                each_term.push(term.slice(start, i + 1));
-                start = i + 1;
-            }
-            if (i == term.length - 1)
-                each_term.push(term.slice(start, i + 1));
-        }
-    }
-    return each_term;
 }
 
 string implExprDiff(array<string> leftTerms, array<string> rightTerms, const char &var) {
@@ -683,36 +625,18 @@ string implExprDiff(array<string> leftTerms, array<string> rightTerms, const cha
     return result;
 }
 
-string implMul(string expr, const double &mul) {
-    array<string> terms = readExpr(expr);
-    string result = "";
+void mulMinusN(string &expr) {
+    array<string> terms = splitTerm(expr);
+    string res = "";
 
     for (unsigned short i = 0; i < terms.length; i++) {
-        
-        // check if term[i] contians non number char
-        unsigned nonNumberPos = 0;
-        for (unsigned short j = 0; j < terms[i].length; j++) {
-            if (terms[i][j] >= 97 && terms[i][j] <= 122) {
-                nonNumberPos = j;
-                break;
-            }
-        }
-
-        string preRes;
-        if (nonNumberPos) {
-            preRes += toCalStr(mul * parseNum(terms[i])) + terms[i].slice(nonNumberPos);
-        }
-        else {
-            preRes += toString(mul * parseNum(terms[i]));
-        }
-
-        if (i != 0 && preRes[0] != '-') {
-            result += "+" + preRes;
-        }
-        else result += preRes;
+        if (terms[i][0] == '-' && i == 0) res += terms[i];
+        else if (terms[i][0] != '-' && i == 0) res += "-" + terms[i];
+        else if (terms[i][0] == '-') res += "+" + terms[i];
+        else res += "-" + terms[i];
     }
 
-    return result;
+    expr = res;
 }
 
 #endif
