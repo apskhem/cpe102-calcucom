@@ -113,7 +113,6 @@ TermComponents::TermComponents(string term, char var) {
             }
             else {
                 a *= trackMinus ? 1/parseNum(term.slice(startpos, i+1)) : parseNum(term.slice(startpos, i+1));
-                trackMinus = false;
             }
         }
 
@@ -129,7 +128,6 @@ TermComponents::TermComponents(string term, char var) {
             }
             else {
                 a *= trackMinus ? 1/2.71828182845904523 : 2.71828182845904523;
-                trackMinus = false;
             }
         }
 
@@ -240,8 +238,9 @@ TermComponents::TermComponents(string term, char var) {
         // finalize end round
         if (trackMinus && factors.length) {
             mulMinusN(factors[factors.length - 1].n);
-            trackMinus = false;
         }
+
+        trackMinus = false;
     }
 }
 
@@ -294,7 +293,7 @@ array<string> splitTerm(string expr) {
     // pre-reading process
     expr = expr.replace(" ", "").toLowerCase();
 
-    if (expr == "") error("no input expression");
+    if (!expr.length) error("no input expression");
 
     // reading equation process
     unsigned splitIndex = 0;
@@ -325,7 +324,7 @@ string diffExpr(array<string> terms, const char &var) {
 
         if (preResult.includes("#"));
         else {
-            if (i > 0 && preResult[0] != '-') result += "+";
+            if (i > 0 && preResult[0] != '-' && result.length) result += "+";
 
             result += preResult;
         }
@@ -344,23 +343,32 @@ string diff(const string &term, const char &var) {
     string result = "";
 
     if (tc.factors.length > 1) { 
-        for (unsigned i = 0; i < tc.factors.length; i++) {                
-            if (i > 0) result += "+";
+        for (unsigned i = 0; i < tc.factors.length; i++) {  
+            string termRes = "";
+            double diffA = 1;
 
             for (unsigned j = 0; j < tc.factors.length; j++) {
                 string preRes = i == j ? diff(tc.factors[j].compress(), var) : tc.factors[j].compress();
 
-                if (preRes == "1") preRes = "";
-                else if (preRes == "-1") preRes = "-";
-
                 array<string> preTerms = splitTerm(preRes);
+
+                if (i == j) {
+                    diffA = parseNum(preRes);
+                    if (!diffA) diffA = 1;
+                    if (preRes == "1" || preRes == "-1") preRes = "";
+                }
 
                 bool withPar = false;
                 for (unsigned short o = 0; o < preTerms.length; o++)
-                    if (preTerms[o].includes("-") || preTerms[o].includes("/")) withPar = true;
+                    withPar = preTerms[o].length > 1 && preTerms[o].includes("-") || preTerms[o].includes("/");
 
-                result += preTerms.length > 1 || withPar ? "(" + preRes + ")" : preRes;
+                termRes += preTerms.length > 1 || withPar ? "(" + preRes + ")" : preRes;
             }
+
+            // finalize terms
+            if (i > 0 && tc.a * diffA > 0) result += "+";
+
+            result += toCalStr(tc.a * diffA) + termRes;
         }
     }
     else if (tc.factors.length == 1) {

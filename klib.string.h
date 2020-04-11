@@ -357,7 +357,7 @@ String toString(const number &n) {
 template <class number>
 String toCalStr(const number &n) {
     if (n == 1) return "";
-    if (n == -1) return "-";
+    else if (n == -1) return "-";
 
     string t = std::to_string(n).c_str();
     short dotPos = t.search(".");

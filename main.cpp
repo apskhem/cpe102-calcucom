@@ -64,6 +64,15 @@ int main() {
     std::cout << "=>\t";
     std::cin >> var;
     std::cin.ignore();
+
+    // check var corrections
+    switch (var) {
+        case 'a': case 'l': case 's': case 'c': case 't': case 'e':
+        error("var must not contain with 'a', 'l', 's', 'c', 't', 'e'");
+    }
+
+    if (isNum(var)) error("var must be a-z only");
+
     std::cout << "Enter f(" << var << ") = ";
     getline(std::cin, expr);
 
@@ -146,10 +155,10 @@ int main() {
 
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
-            case 7: { // limit
+            case 6: { // limit
                 double x;
 
-                std::cout << "Enter value to approach x\n";
+                std::cout << "Enter value to approach " << var << "\n";
                 std::cout << "=>\t";
                 std::cin >> x;
 
@@ -168,7 +177,7 @@ int main() {
             case 8: { // new expression
                 std::cout << "Enter f(" << var << ") = ";
                 getline(std::cin, expr);
-                std::cout << "\n\n";
+                std::cout << "\n";
                 numberOfDiff = 0;
                 continue;
             } break;
