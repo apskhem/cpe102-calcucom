@@ -155,15 +155,15 @@ int main() {
 
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
-            case 6: { // limit
-                double x;
-
-                std::cout << "Enter value to approach " << var << "\n";
-                std::cout << "=>\t";
-                std::cin >> x;
-
-                std::cout << "limit of f(x) = " << FindLim(expr, x);
-            } break;
+            //case 6: { // limit
+            //    double x;
+//
+            //    std::cout << "Enter value to approach " << var << "\n";
+            //    std::cout << "=>\t";
+            //    std::cin >> x;
+//
+            //    std::cout << "limit of f(x) = " << FindLim(expr, x);
+            //} break;
             case 7: { // show graph
                 double scale;
                 std::cout << "Enter graph scale [-50, 50] in scale 1.\n";
