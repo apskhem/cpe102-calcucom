@@ -64,6 +64,7 @@ struct factor {
         else if (n != "1") resN = "^" + n;
 
         if (splitTerm(u).length > 1 || (type == 0 && n != "1")) return "(" + u + ")" + resN;
+        else if (func.length && n != "1") return "(" + func + "(" + u + "))" + resN;
         else if (func.length) return func + "(" + u + ")";
         else return u + resN;
     }
@@ -520,7 +521,7 @@ string diff(const string &term, const char &var) {
 
     // finalize
     if (result == "1" && tc.otherVar.length) return tc.otherVar;
-    else return ((!result.length ? "#" : result) + tc.otherVar);
+    else return (!result.length ? "#" : result) + tc.otherVar;
 }
 
 
