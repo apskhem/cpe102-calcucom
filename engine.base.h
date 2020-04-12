@@ -398,7 +398,7 @@ string diff(const string &term, const char &var) {
         string preRes = "";
         string chainDiff = "";
 
-        if (tc.factors[0].type != 4) {
+        if (tc.factors[0].type != 4 && tc.factors[0].type != 5) {
             chainDiff = diffExpr(splitTerm(tc.factors[0].u), var);
             if (chainDiff == "0" || chainDiff.includes("#")) return "#";
 
@@ -407,7 +407,7 @@ string diff(const string &term, const char &var) {
                 tc.a *= preTc.a;
                 chainDiff = preTc.compressAll();
             }
-            else chainDiff = "(" + chainDiff + ")";
+            else chainDiff = " (" + chainDiff + ")";
         }
 
         // redering result by cases
@@ -510,10 +510,9 @@ string diff(const string &term, const char &var) {
                 }
                 else chainDiff = "(" + chainDiff + ")";
 
-                result += toCalStr(tc.a);
-                result += tc.factors[0].u == "e"
+                result += toCalStr(tc.a) + (tc.factors[0].u == "e"
                     ? "e" + preN + chainDiff
-                    : "ln(" + tc.factors[0].u + ")" + tc.factors[0].u + preN + chainDiff;
+                    : "ln(" + tc.factors[0].u + ")" + tc.factors[0].u + preN + chainDiff);
             } break;
             default: error("fault at 'diff' function", 5);
         }
