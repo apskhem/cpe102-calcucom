@@ -1,16 +1,20 @@
 #ifndef LIM_H
 #define LIM_H
 
-double FindLim(string &, double, const string & = "", const string & = "");
+double FindLim(string &, double);
 
-double FindLim(string &equation, double x, const string &a, const string &b){
+double FindLim(string &equation, double x)
 
-    if (evalExpr(splitTerm(equation), x, 'x') <= INT_MAX)
+{
+
+    if (evalExpr(readExpr(equation), x, 'x') <= INT_MAX)
     {
-        return evalExpr(splitTerm(equation), x, 'x');
+        return evalExpr(readExpr(equation), x, 'x');
     }
     else
     {
+        string a ="";
+        string b ="";
         int pos = equation.search('/');
         int posM = equation.search('-');
         int posMul = equation.search('*');
@@ -27,15 +31,15 @@ double FindLim(string &equation, double x, const string &a, const string &b){
                 b += equation[j];
             }
 
-            if (evalExpr(splitTerm(a), x, 'x') <= INT_MAX && evalExpr(splitTerm(b), x, 'x') == 0)
+            if (evalExpr(readExpr(a), x, 'x') <= INT_MAX && evalExpr(readExpr(b), x, 'x') == 0)
             {
                 return NAN; //case ค่าคงที่ หาร ์ NAN
             }
-            else if (evalExpr(splitTerm(a), x, 'x') == NAN && evalExpr(splitTerm(b), x, 'x') == NAN)
+            else if (evalExpr(readExpr(a), x, 'x') == NAN && evalExpr(readExpr(b), x, 'x') == NAN)
             {
-                if (evalExpr(splitTerm(diff(a, 'x')), x, 'x') / evalExpr(splitTerm(diff(diff(b, 'x'), 'x')), x, 'x') <= INT_MAX)
+                if (evalExpr(readExpr(diff(a, 'x')), x, 'x') / evalExpr(readExpr(diff(diff(b, 'x'), 'x')), x, 'x') <= INT_MAX)
                 {
-                    return evalExpr(splitTerm(a), x, 'x') <= INT_MAX && evalExpr(splitTerm(b), x, 'x');
+                    return evalExpr(readExpr(a), x, 'x') <= INT_MAX && evalExpr(readExpr(b), x, 'x');
                 }
                 else
                 {
@@ -44,11 +48,11 @@ double FindLim(string &equation, double x, const string &a, const string &b){
 
                 //case NAN หาร NAN
             }
-            else if (evalExpr(splitTerm(a), x, 'x') == 0 && evalExpr(splitTerm(b), x, 'x') == 0)
+            else if (evalExpr(readExpr(a), x, 'x') == 0 && evalExpr(readExpr(b), x, 'x') == 0)
             {
-                if (evalExpr(splitTerm(diff(a, 'x')), x, 'x') / evalExpr(splitTerm(diff(diff(b, 'x'), 'x')), x, 'x') <= INT_MAX)
+                if (evalExpr(readExpr(diff(a, 'x')), x, 'x') / evalExpr(readExpr(diff(diff(b, 'x'), 'x')), x, 'x') <= INT_MAX)
                 {
-                    return evalExpr(splitTerm(a), x, 'x') <= INT_MAX && evalExpr(splitTerm(b), x, 'x');
+                    return evalExpr(readExpr(a), x, 'x') <= INT_MAX && evalExpr(readExpr(b), x, 'x');
                 }
                 else
                 {
@@ -79,15 +83,15 @@ double FindLim(string &equation, double x, const string &a, const string &b){
             int posln = a.search("ln");
             int posln2 = b.search("ln");
 
-            if (equation[posln] == "ln" && equation[posln2] == "ln")
+            if (equation[posln] == 'ln' && equation[posln2] == 'ln')
             {
 
-                if (evalExpr(splitTerm(a), x, 'x') == NAN && evalExpr(splitTerm(b), x, 'x') == NAN)
+                if (evalExpr(readExpr(a), x, 'x') == NAN && evalExpr(readExpr(b), x, 'x') == NAN)
                 {
 
-                    if (log(evalExpr(splitTerm(a), x, 'x') / evalExpr(splitTerm(b), x, 'x')) <= INT_MAX)
+                    if (log(evalExpr(readExpr(a), x, 'x') / evalExpr(readExpr(b), x, 'x')) <= INT_MAX)
                     {
-                        return log(evalExpr(splitTerm(a), x, 'x') / evalExpr(splitTerm(b), x, 'x'));
+                        return log(evalExpr(readExpr(a), x, 'x') / evalExpr(readExpr(b), x, 'x'));
                     }
                     else
                     {
@@ -114,23 +118,23 @@ double FindLim(string &equation, double x, const string &a, const string &b){
                     b += equation[j];
                 }
             }
-            if (evalExpr(splitTerm(a), x, 'x') == NAN && evalExpr(splitTerm(b), x, 'x') == 0 || evalExpr(splitTerm(b), x, 'x') == NAN && evalExpr(splitTerm(a), x, 'x') == 0)
+            if (evalExpr(readExpr(a), x, 'x') == NAN && evalExpr(readExpr(b), x, 'x') == 0 || evalExpr(readExpr(b), x, 'x') == NAN && evalExpr(readExpr(a), x, 'x') == 0)
             {
 
-                if (evalExpr(splitTerm(a), x, 'x') / evalExpr(splitTerm(b), x, 'x') <= INT_MAX)
+                if (evalExpr(readExpr(a), x, 'x') / evalExpr(readExpr(b), x, 'x') <= INT_MAX)
                 {
-                    return evalExpr(splitTerm(a), x, 'x') / evalExpr(splitTerm(b), x, 'x');
+                    return evalExpr(readExpr(a), x, 'x') / evalExpr(readExpr(b), x, 'x');
                 }
-                else if (evalExpr(splitTerm(b), x, 'x') / evalExpr(splitTerm(a), x, 'x') <= INT_MAX)
+                else if (evalExpr(readExpr(b), x, 'x') / evalExpr(readExpr(a), x, 'x') <= INT_MAX)
                 {
-                    return evalExpr(splitTerm(b), x, 'x') / evalExpr(splitTerm(a), x, 'x');
+                    return evalExpr(readExpr(b), x, 'x') / evalExpr(readExpr(a), x, 'x');
                 }
                 else
                 {
                     equation = "Not to find";
                 }
 
-                ; //เคส NAN * 0 หรือ 0*NAN
+                 //เคส NAN * 0 หรือ 0*NAN
             }
         }
 
@@ -151,14 +155,14 @@ double FindLim(string &equation, double x, const string &a, const string &b){
                     b += equation[j];
                 }
             }
-            if (evalExpr(splitTerm(a), x, 'x') == NAN && evalExpr(splitTerm(b), x, 'x') == 0)
+            if (evalExpr(readExpr(a), x, 'x') == NAN && evalExpr(readExpr(b), x, 'x') == 0)
             {
                 string p;
                 p = equation.slice(0, equation.length);
 
                 equation = b + "ln(" + p + ")";
             }
-            else if (evalExpr(splitTerm(b), x, 'x') == NAN && evalExpr(splitTerm(a), x, 'x') == 0)
+            else if (evalExpr(readExpr(b), x, 'x') == NAN && evalExpr(readExpr(a), x, 'x') == 0)
             {
                 string p;
                 p = equation.slice(0, equation.length);
@@ -167,7 +171,7 @@ double FindLim(string &equation, double x, const string &a, const string &b){
 
             } //เคส NAN ^ 0 หรือ 0 ^ NAN
 
-            else if (evalExpr(splitTerm(a), x, 'x') == 1 && evalExpr(splitTerm(b), x, 'x') == NAN)
+            else if (evalExpr(readExpr(a), x, 'x') == 1 && evalExpr(readExpr(b), x, 'x') == NAN)
             {
                 string p;
                 p = equation.slice(0, equation.length);
@@ -179,6 +183,9 @@ double FindLim(string &equation, double x, const string &a, const string &b){
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        if( evalExpr(readExpr(eqation),x,'x')==NAN){
+        FindLim(eqation,a,b,x);}
     }
 }
 
