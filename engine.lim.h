@@ -1,62 +1,63 @@
 #ifndef LIM_H
 #define LIM_H
 
-double FindLim(string &, double);
+double findLim(string, double, const char &);
 
-double FindLim(string &equation, double x)
-
+double findLim(string expr, double x, const char &var)
 {
+    double result = evalExpr(splitTerm(expr), x, var);
+    double NAN;
+    double INFINITY;
 
-    if (evalExpr(readExpr(equation), x, 'x') <= INT_MAX)
+    if (result <= INFINITY)
     {
-        return evalExpr(readExpr(equation), x, 'x');
+        return result;
     }
     else
     {
-        string a ="";
-        string b ="";
-        int pos = equation.search('/');
-        int posM = equation.search('-');
-        int posMul = equation.search('*');
-        int posP = equation.search('^');
+        string a = "", b = "";
+        int pos = expr.search('/');
+        int posM = expr.search('-');
+        int posMul = expr.search('*');
+        int posP = expr.search('^');
 
-        if (equation[pos] == '/')
+        double resultA = evalExpr(splitTerm(a), x, var);
+        double resultB = evalExpr(splitTerm(b), x, var);
+
+        if (expr[pos] == '/')
         {
-            for (unsigned int i = 0; i < pos; ++i)
-            {
-                a += equation[i];
-            }
-            for (unsigned int j = pos + 1; j <= equation.length; ++j)
-            {
-                b += equation[j];
-            }
+            a = expr.slice(0, pos);
+            b = expr.slice(pos+1);
 
-            if (evalExpr(readExpr(a), x, 'x') <= INT_MAX && evalExpr(readExpr(b), x, 'x') == 0)
+            if (resultA <= INT_MAX && resultB == 0)
             {
                 return NAN; //case ค่าคงที่ หาร ์ NAN
             }
-            else if (evalExpr(readExpr(a), x, 'x') == NAN && evalExpr(readExpr(b), x, 'x') == NAN)
+            else if (resultA == NAN && resultB == NAN)
             {
-                if (evalExpr(readExpr(diff(a, 'x')), x, 'x') / evalExpr(readExpr(diff(diff(b, 'x'), 'x')), x, 'x') <= INT_MAX)
+                double diffA = evalExpr(splitTerm(diff(a, var)), x, var);
+                double diffB = evalExpr(splitTerm(diff(diff(b, var), var)), x, var);
+
+                if (diffA / diffB <= INT_MAX)
                 {
-                    return evalExpr(readExpr(a), x, 'x') <= INT_MAX && evalExpr(readExpr(b), x, 'x');
+                    return resultA <= INT_MAX && resultB;
                 }
                 else
                 {
-                    equation = diff(a, 'x') + "/" + diff(b, 'x');
+                    expr = diff(a, var) + "/" + diff(b, var);
                 }
 
                 //case NAN หาร NAN
             }
-            else if (evalExpr(readExpr(a), x, 'x') == 0 && evalExpr(readExpr(b), x, 'x') == 0)
+            else if (resultA == 0 && resultB == 0)
             {
-                if (evalExpr(readExpr(diff(a, 'x')), x, 'x') / evalExpr(readExpr(diff(diff(b, 'x'), 'x')), x, 'x') <= INT_MAX)
+                if (evalExpr(splitTerm(diff(a, var)), x, var) / evalExpr(splitTerm(diff(diff(b, var), var)), x, var) <= INT_MAX)
                 {
-                    return evalExpr(readExpr(a), x, 'x') <= INT_MAX && evalExpr(readExpr(b), x, 'x');
+                    return resultA <= INT_MAX && resultB;
                 }
                 else
                 {
-                    equation = diff(a, 'x') + "/" + diff(b, 'x');
+                    expr = diff(a, var) + "/" + diff(b, var);
                 }
                 // case 0/0
             }
@@ -64,74 +65,69 @@ double FindLim(string &equation, double x)
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        else if (equation[pos] != '/')
+        else if (expr[pos] != '/')
         {
-            int posM = equation.search('-');
+            int posM = expr.search('-');
 
-            if (equation[posM] == '-')
+            if (expr[posM] == '-')
             {
                 for (unsigned int i = 0; i < posM; ++i)
                 {
-                    a += equation[i];
+                    a += expr[i];
                 }
-                for (unsigned int j = posM + 1; j <= equation.length; ++j)
+                for (unsigned int j = posM + 1; j <= expr.length; ++j)
                 {
-                    b += equation[j];
+                    b += expr[j];
                 }
             }
 
             int posln = a.search("ln");
             int posln2 = b.search("ln");
 
-            if (equation[posln] == 'ln' && equation[posln2] == 'ln')
+            if (expr[posln] == 'l' && expr[posln2] == 'l' && resultA == NAN && resultB == NAN)
             {
-
-                if (evalExpr(readExpr(a), x, 'x') == NAN && evalExpr(readExpr(b), x, 'x') == NAN)
+                if (log(resultA / resultB) <= INT_MAX)
                 {
-
-                    if (log(evalExpr(readExpr(a), x, 'x') / evalExpr(readExpr(b), x, 'x')) <= INT_MAX)
-                    {
-                        return log(evalExpr(readExpr(a), x, 'x') / evalExpr(readExpr(b), x, 'x'));
-                    }
-                    else
-                    {
-                        equation = "Not to find";
-                    } //เคส NAN - NAN
+                    return log(resultA / resultB);
                 }
+                else
+                {
+                    expr = "Not to find";
+                } //เคส NAN - NAN
             }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        else if (equation[pos] != '/' && equation[posM] != '-')
+        else if (expr[pos] != '/' && expr[posM] != '-')
         {
-            int posMul = equation.search('*');
+            int posMul = expr.search('*');
 
-            if (equation[posMul] == '*')
+            if (expr[posMul] == '*')
             {
                 for (unsigned int i = 0; i < posMul; ++i)
                 {
-                    a += equation[i];
+                    a += expr[i];
                 }
-                for (unsigned int j = posMul + 1; j <= equation.length; ++j)
+                for (unsigned int j = posMul + 1; j <= expr.length; ++j)
                 {
-                    b += equation[j];
+                    b += expr[j];
                 }
             }
-            if (evalExpr(readExpr(a), x, 'x') == NAN && evalExpr(readExpr(b), x, 'x') == 0 || evalExpr(readExpr(b), x, 'x') == NAN && evalExpr(readExpr(a), x, 'x') == 0)
+            if (resultA == NAN && resultB == 0 || resultB == NAN && resultA == 0)
             {
 
-                if (evalExpr(readExpr(a), x, 'x') / evalExpr(readExpr(b), x, 'x') <= INT_MAX)
+                if (resultA / resultB <= INT_MAX)
                 {
-                    return evalExpr(readExpr(a), x, 'x') / evalExpr(readExpr(b), x, 'x');
+                    return resultA / resultB;
                 }
-                else if (evalExpr(readExpr(b), x, 'x') / evalExpr(readExpr(a), x, 'x') <= INT_MAX)
+                else if (resultB / resultA <= INT_MAX)
                 {
-                    return evalExpr(readExpr(b), x, 'x') / evalExpr(readExpr(a), x, 'x');
+                    return resultB / resultA;
                 }
                 else
                 {
-                    equation = "Not to find";
+                    expr = "Not to find";
                 }
 
                  //เคส NAN * 0 หรือ 0*NAN
@@ -140,52 +136,45 @@ double FindLim(string &equation, double x)
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        else if (equation[pos] != '/' && equation[posM] != '-' && equation[posMul] != '*')
+        else if (expr[pos] != '/' && expr[posM] != '-' && expr[posMul] != '*')
         {
-            int posP = equation.search('^');
+            int posP = expr.search('^');
 
-            if (equation[posP] == '^')
+            if (expr[posP] == '^')
             {
                 for (unsigned int i = 0; i < posP; ++i)
-                {
-                    a += equation[i];
-                }
-                for (unsigned int j = posP + 1; j <= equation.length; ++j)
-                {
-                    b += equation[j];
-                }
+                    a += expr[i];
+                for (unsigned int j = posP + 1; j <= expr.length; ++j)
+                    b += expr[j];
             }
-            if (evalExpr(readExpr(a), x, 'x') == NAN && evalExpr(readExpr(b), x, 'x') == 0)
+            if (resultA == NAN && resultB == 0)
             {
-                string p;
-                p = equation.slice(0, equation.length);
-
-                equation = b + "ln(" + p + ")";
+                expr = b + "ln(" + expr.slice(0, expr.length) + ")";
             }
-            else if (evalExpr(readExpr(b), x, 'x') == NAN && evalExpr(readExpr(a), x, 'x') == 0)
+            else if (resultB == NAN && resultA == 0)
             {
-                string p;
-                p = equation.slice(0, equation.length);
 
-                equation = b + "ln(" + p + ")";
+                expr = b + "ln(" + expr.slice(0, expr.length) + ")";
 
             } //เคส NAN ^ 0 หรือ 0 ^ NAN
 
-            else if (evalExpr(readExpr(a), x, 'x') == 1 && evalExpr(readExpr(b), x, 'x') == NAN)
+            else if (resultA == 1 && resultB == NAN)
             {
-                string p;
-                p = equation.slice(0, equation.length);
+                expr = b + "ln(" + expr.slice(0, expr.length) + ")";
 
-                equation = b + "ln(" + p + ")";
-
-                ; //เคส ค่าคงที่ ^ 0 หรือ ค่าคงที่ ^ NAN
+                //เคส ค่าคงที่ ^ 0 หรือ ค่าคงที่ ^ NAN
             }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        if( evalExpr(readExpr(eqation),x,'x')==NAN){
-        FindLim(eqation,a,b,x);}
+        if ( evalExpr(splitTerm(expr), x, var) == NAN)
+        {
+            findLim(expr, x, var);
+        } 
+
+        // if( evalExpr(readExpr(eqation),x,'x')==NAN){
+        // FindLim(eqation,a,b,x);}
     }
 }
 

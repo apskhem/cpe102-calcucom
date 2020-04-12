@@ -9,8 +9,6 @@ array<string> splitTerm(string expr);
 string diffExpr(array<string> terms, const char &var);
 /* The methood derivatives a term. */
 string diff(const string &term, const char &var);
-/* The method reforms the expression to be an clearier expression. */
-string simplifyExpr(string expr);
 /* The method finds tangent of expression */
 string tangent(string expr, double posX, const char &var);
 /* The method shows graph of the expression */
@@ -63,9 +61,9 @@ struct factor {
         if (n.includes("/") || n.includes("-")) resN = "^(" + n + ")";
         else if (n != "1") resN = "^" + n;
 
-        if (splitTerm(u).length > 1 || (type == 0 && n != "1")) return "(" + u + ")" + resN;
-        else if (func.length && n != "1") return "(" + func + "(" + u + "))" + resN;
+        if (func.length && n != "1") return "(" + func + "(" + u + "))" + resN;
         else if (func.length) return func + "(" + u + ")";
+        else if (splitTerm(u).length > 1 || (type == 0 && n != "1")) return "(" + u + ")" + resN;
         else return u + resN;
     }
 };
@@ -96,7 +94,7 @@ TermComponents::TermComponents(string term, char var) {
     for (unsigned short i = a == -1; i < term.length; i++) {
         // find (type): c number.
         if (isNum(term[i])) {
-            if (term[i] == '0') error("lead 0 in context");
+            if (term[i] == '0' && term[i+1] != '.') error("lead 0 in context");
 
             unsigned startpos = i;
 
@@ -118,11 +116,9 @@ TermComponents::TermComponents(string term, char var) {
 
         // find (type): e number.
         else if (term[i] == 'e') {
-            if (term[i+1] == '^') {
-                factor item;
-
+            factor item;
+            if (collectN(++i, item.n)) {
                 item.type = 5;
-                collectN(++i, item.n);
                 item.u = "e";
                 factors.push(item);
             }
@@ -140,14 +136,14 @@ TermComponents::TermComponents(string term, char var) {
                 factor item;
 
                 i += 3; // skip 'sin...'
-                if (collectN(i, item.n)) { // find: a*sin^n(u)
+                if (collectN(i, item.n)) { // find: a*sin^n(u) d
                     while (term[i++] != '(');
                     item.u = tfunc + "(" + collectParEl(i) + ")";
                 }
                 else { // find: a*sin(u) or a*sin^1(u)
                     item.type = 1;
                     item.func = tfunc;
-                    item.u = collectParEl(++i);
+                    item.u = collectParEl(i+=2);
                 }
 
                 factors.push(item);
@@ -181,20 +177,20 @@ TermComponents::TermComponents(string term, char var) {
 
         // find (type): inverse trigon function
         else if (term[i] == 'a') {
-            string tfunc = term.slice(i+1, i+4);
+            string tfunc = term.slice(i, i+4);
 
-            if (tfunc == "sin" || tfunc == "cos" || tfunc == "tan" || tfunc == "csc" || tfunc == "sec" || tfunc == "cot")  {
+            if (tfunc == "asin" || tfunc == "acos" || tfunc == "atan" || tfunc == "acsc" || tfunc == "asec" || tfunc == "acot")  {
                 factor item;
 
                 i += 4; // skip 'asin...'
                 if (collectN(i, item.n)) { // find: a*sin^n(u)
                     while (term[i++] != '(');
-                    item.u = "a" + tfunc + "(" + collectParEl(i) + ")";
+                    item.u = tfunc + "(" + collectParEl(i) + ")";
                 }
                 else { // find: a*sin(u) or a*sin^1(u)
                     item.type = 3;
                     item.func = tfunc;
-                    item.u = collectParEl(++i);
+                    item.u = collectParEl(i+=2);
                 }
 
                 factors.push(item);
@@ -208,7 +204,7 @@ TermComponents::TermComponents(string term, char var) {
             item.type = 4;
             item.u = term[i];
 
-            if(!collectN(++i, item.n)) i--;
+            if(!collectN(++i, item.n));
             else if (item.n.includes(var) && item.u.includes(var)) error("there's no support for calculation of u^u", 2);
 
             factors.push(item);
@@ -223,9 +219,8 @@ TermComponents::TermComponents(string term, char var) {
             factor item;
 
             item.u = collectParEl(++i);
-            if(!collectN(++i, item.n) && !trackDiv) {
-                i--;
-                if (splitTerm(item.u).length <= 1) {
+            if(!collectN(++i, item.n)) {
+                if (splitTerm(item.u).length <= 1 && !trackDiv && term[i+1] != '/') {
                     TermComponents preTc(item.u, var);
                     a *= preTc.a;
 
@@ -289,6 +284,7 @@ bool TermComponents::collectN(unsigned short &i, string &receiver) {
         return true;
     }
 
+    i--;
     return false;
 }
 
@@ -350,8 +346,6 @@ string diffExpr(array<string> terms, const char &var) {
         }
     }
 
-    result = result.replace("(1)", "");
-
     return (!result.length ? "0" : result);
 }
 
@@ -387,7 +381,7 @@ string diff(const string &term, const char &var) {
 
             // finalize terms
             if (!skipZero) {
-                if (i > 0 && tc.a * diffA > 0) result += "+";
+                if (i > 0 && tc.a * diffA > 0 && result.length) result += "+";
 
                 result += toCalStr(tc.a * diffA) + termRes;
             }
@@ -407,7 +401,7 @@ string diff(const string &term, const char &var) {
                 tc.a *= preTc.a;
                 chainDiff = preTc.compressAll();
             }
-            else chainDiff = " (" + chainDiff + ")";
+            else chainDiff = "(" + chainDiff + ")";
         }
 
         // redering result by cases
@@ -479,15 +473,18 @@ string diff(const string &term, const char &var) {
 
             } break;
             case 3: {
-                if (tc.factors[0].func == "cos" || tc.factors[0].func == "cot" || tc.factors[0].func == "csc") tc.a *= -1;
+                if (tc.factors[0].func == "acos" || tc.factors[0].func == "acot" || tc.factors[0].func == "acsc") tc.a *= -1;
 
                 result = !chainDiff.length && tc.a == 1
                     ? toString(tc.a) + "/"
                     : toCalStr(tc.a) + chainDiff + "/";
 
-                if (tc.factors[0].func == "sin" || tc.factors[0].func == "cos") result += "((1-(" + tc.factors[0].u + ")^2)^(1/2))";
-                else if (tc.factors[0].func == "tan" || tc.factors[0].func == "cot") result += "(1+(" + tc.factors[0].u + ")^2)";
-                else if (tc.factors[0].func == "sec" || tc.factors[0].func == "csc") result += "(|" + tc.factors[0].u + "|((" + tc.factors[0].u + ")^2-1)^(1/2))";
+                if (tc.factors[0].u.length == 1 || isAllNum(tc.factors[0].u)) preRes = tc.factors[0].u;
+                else preRes = "(" + tc.factors[0].u + ")";
+
+                if (tc.factors[0].func == "asin" || tc.factors[0].func == "acos") result += "((1-" + preRes + "^2)^(1/2))";
+                else if (tc.factors[0].func == "atan" || tc.factors[0].func == "acot") result += "(1+" + preRes + "^2)";
+                else if (tc.factors[0].func == "asec" || tc.factors[0].func == "acsc") result += "(|" + tc.factors[0].u + "|(" + preRes + "^2-1)^(1/2))";
             } break;
             case 4: { // CASE: ax^n or ax^(n)
                 string subN = "";
@@ -619,17 +616,17 @@ double eval(string term, const double &value, const char &var) {
             case 3: {
                 double chainEval = evalExpr(splitTerm(tc.factors[i].u), value, var);
 
-                if (tc.factors[i].func == "sin")
+                if (tc.factors[i].func == "asin")
                     result *= asin(chainEval);
-                else if (tc.factors[i].func == "cos")
+                else if (tc.factors[i].func == "acos")
                     result *= acos(chainEval);
-                else if (tc.factors[i].func == "tan")
+                else if (tc.factors[i].func == "atan")
                     result *= atan(chainEval);
-                else if (tc.factors[i].func == "csc")
+                else if (tc.factors[i].func == "acsc")
                     result *= 1/asin(chainEval);
-                else if (tc.factors[i].func == "sec")
+                else if (tc.factors[i].func == "asec")
                     result *= 1/acos(chainEval);
-                else if (tc.factors[i].func == "cot")
+                else if (tc.factors[i].func == "acot")
                     result *= 1/atan(chainEval);
             } break;
             case 4: {
