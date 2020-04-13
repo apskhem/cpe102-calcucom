@@ -234,7 +234,7 @@ TermComponents::TermComponents(string term, char var) {
         // find (type): abs
         else if (term[i] == '|') {
             factor item;
-            unsigned startpos = i+1;
+            unsigned startpos = ++i;
 
             while (term[i] != '|') i++;
 
@@ -315,7 +315,7 @@ string TermComponents::compressAll() {
 array<string> splitTerm(string expr) {
     array<string> terms;
 
-    unsigned leftPar = 0, rightPar = 0;
+    unsigned leftPar = 0, rightPar = 0, abs = 0;
 
     // reading equation process
     unsigned splitIndex = 0;
@@ -323,8 +323,9 @@ array<string> splitTerm(string expr) {
     for (unsigned i = (expr[0] == '+' || expr[0] == '-'); i < expr.length; i++) {
         if (expr[i] == '(') leftPar++;
         else if (expr[i] == ')') rightPar++;
+        else if (expr[i] == '|') abs++;
 
-        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar) {
+        if ((expr[i] == '+' || expr[i] == '-') && expr[i - 1] != '^' && leftPar == rightPar && abs % 2 == 0) {
             terms.push(expr.slice(splitIndex, i));
             splitIndex = i + (expr[i] == '+' ? 1 : 0);
         }
@@ -492,9 +493,7 @@ string diff(const string &term, const char &var) {
 
                 if (tc.factors[0].func == "asin" || tc.factors[0].func == "acos") result += "((1-" + preRes + "^2)^(1/2))";
                 else if (tc.factors[0].func == "atan" || tc.factors[0].func == "acot") result += "(1+" + preRes + "^2)";
-                else if (tc.factors[0].func == "asec" || tc.factors[0].func == "acsc") result += "(" + preRes + "(" + preRes + "^2-1)^(1/2))";
-
-                // else if (tc.factors[0].func == "asec" || tc.factors[0].func == "acsc") result += "(|" + tc.factors[0].u + "|(" + preRes + "^2-1)^(1/2))";
+                else if (tc.factors[0].func == "asec" || tc.factors[0].func == "acsc") result += "(|" + tc.factors[0].u + "|(" + preRes + "^2-1)^(1/2))";
             } break;
             case 4: { // CASE: ax^n or ax^(n)
                 string subN = "";
@@ -512,16 +511,31 @@ string diff(const string &term, const char &var) {
                     ? "(" + tc.factors[0].n + ")"
                     : tc.factors[0].n);
 
+                bool hasNone1N = false;
                 if (splitTerm(chainDiff).length <= 1) {
                     TermComponents preTc(chainDiff, var);
                     tc.a *= preTc.a;
                     chainDiff = preTc.compressAll();
+
+                    hasNone1N = preTc.factors.length && preTc.factors[0].n != "1";
                 }
                 else chainDiff = "(" + chainDiff + ")";
 
+                preRes = hasNone1N ? "(" + tc.factors[0].u + preN + ")" : tc.factors[0].u + preN;
+
                 result += toCalStr(tc.a) + (tc.factors[0].u == "e"
-                    ? chainDiff + "e" + preN
-                    : chainDiff + "ln(" + tc.factors[0].u + ")" + tc.factors[0].u + preN);
+                    ? chainDiff + preRes
+                    : chainDiff + "ln(" + tc.factors[0].u + ")" + preRes);
+            } break;
+            case 6: {
+                if (splitTerm(tc.factors[0].u).length <= 1) {
+                    TermComponents preTc(tc.factors[0].u, var);
+                    tc.a /= preTc.a;
+                    preRes = preTc.compressAll();
+                }
+                else preRes = "(" + tc.factors[0].u + ")";
+
+                result = chainDiff + preRes + "/|" + tc.factors[0].u + "|";
             } break;
             default: error("fault at 'diff' function", 5);
         }
@@ -548,6 +562,7 @@ string tangent(string expr, double posX, const char &var) {
     else return toString(slope) + string(var) + cStr;
 }
 
+// 1 > zoom out, 1 < zoom in;
 void showGraph(const string &expr, const double &scale, const char &var) {
     const unsigned short h = 65, w = 65, mid = 32;
 
@@ -558,27 +573,38 @@ void showGraph(const string &expr, const double &scale, const char &var) {
     for (unsigned short i = 0; i < w; i++) {
         int y = evalExpr(read, (i/scale)-mid, var) + mid;
 
-        if (y >= 0 && y <= h) graph[y][i] = '*';
+        if (y >= 0 && y <= h) graph[y][i] = 'o';
     }
 
+    std::cout << "\t\t";
+    for (unsigned short i = 0; i < 67; i++ ) std::cout << '#';
+    std::cout << "\n";
+
     for (unsigned short row = h-1; row >= 1; row--) { // loop y
-        std::cout << "\t\t";
+        std::cout << "\t\t#";
         for (unsigned short col = 0; col < w; col++) { // loop x
-            if (graph[row][col] == '*') {
-                std::cout << '*';
+            if (graph[row][col] == 'o') {
+                std::cout << 'o';
             }
             else {
                 if (row == mid && col == mid) std::cout << '+';
-                else if (col == mid) std::cout << '|';
+                else if (col == mid) std::cout << '-';
                 else if (row == mid) std::cout << '-';
                 else std::cout << ' ';
             }
         }
 
-        if (row == mid) std::cout << ' ' << var;
+        if (row == mid) {
+            std::cout << "# " << var << "\n";
+            continue;
+        }
 
-        std::cout << '\n';
+        std::cout << "#\n";
     }
+
+    std::cout << "\t\t";
+    for (unsigned short i = 0; i < 67; i++ ) std::cout << '#';
+    std::cout << "\n";
 }
 
 double evalExpr(array<string> terms, const double &value, const char &var) {
@@ -649,6 +675,11 @@ double eval(string term, const double &value, const char &var) {
                 double n = evalExpr(splitTerm(tc.factors[i].n), value, var);
 
                 result *= n < 0 ? 1/pow(parseNum(tc.factors[i].u), -n) : pow(parseNum(tc.factors[i].u), n);
+            } break;
+            case 6: {
+                double n = evalExpr(splitTerm(tc.factors[i].n), value, var);
+
+                result *= n < 0 ? 1/pow(abs(parseNum(tc.factors[i].u)), -n) : pow(abs(parseNum(tc.factors[i].u)), n);
             } break;
             default: error("fault at 'eval' function");
         }

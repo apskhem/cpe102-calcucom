@@ -129,7 +129,6 @@ int main() {
                 std::cout << "f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
             case 3: { // implicit derivative
-                unsigned short mode;
                 string impl_expr;
                 std::cout << "Enter implicit expresion [left=right].\n";
                 std::cout << "=>\t";
