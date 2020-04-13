@@ -24,6 +24,7 @@ void error(const char *msg, const unsigned cond=1) {
 string numOfDiff(const unsigned &num);
 
 int main() {
+    system("Color F0");
     /* parts of user input variables */
     string expr = "";
     char var;
