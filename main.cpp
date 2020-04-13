@@ -114,6 +114,11 @@ int main() {
             } break;
             case 2: { // derivative
                 numberOfDiff++;
+                
+                // pre-reading process
+                expr = expr.replace(" ", "").replace("*", "").toLowerCase();
+                if (!expr.length) error("no input expression");
+
                 expr = diffExpr(splitTerm(expr), var);
                 if (!expr.length) expr = "0";
 

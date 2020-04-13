@@ -27,7 +27,6 @@ const double e = 2.71828;
 
 struct factor {
     unsigned type = 0; // 0 = u, 1 = trig, 2 = log, 3 = arc, 4 = var, 5 = n of var
-    unsigned uType = 0; // 0 = u, 1 = trig, 2 = log, 3 = arc, 4 = var, 5 = n of var
     string func = ""; // log10, asin, tan
     string n = "1";
     string u = "";
@@ -78,8 +77,6 @@ class TermComponents {
         TermComponents(string term, char var);
         /* The method compresses all factors into one string */
         string compressAll();
-        /* The method merges same factor into one */
-        string compareMerge();
     private:
         /* the start position of 'i' should be the position of '(' + 1 */
         string collectParEl(unsigned short &i);
@@ -306,11 +303,6 @@ array<string> splitTerm(string expr) {
 
     unsigned leftPar = 0, rightPar = 0;
 
-    // pre-reading process
-    expr = expr.replace(" ", "").toLowerCase();
-
-    if (!expr.length) error("no input expression");
-
     // reading equation process
     unsigned splitIndex = 0;
 
@@ -419,7 +411,9 @@ string diff(const string &term, const char &var) {
                 }
                 else preRes += "(" + tc.factors[0].u + ")" + subN;
 
-                result = toCalStr(tc.a) + preRes + chainDiff;
+                result = tc.factors[0].n == "1"
+                    ? toCalStr(tc.a) + chainDiff
+                    : toCalStr(tc.a) + preRes + chainDiff;
             } break;
             case 1: {
                 string diffTrigon1, diffTrigon2;
@@ -468,7 +462,7 @@ string diff(const string &term, const char &var) {
                 }
 
                 result = !chainDiff.length && tc.a == 1
-                    ? toString(tc.a) + "/" + preRes
+                    ? "1/" + preRes
                     : toCalStr(tc.a) + chainDiff + "/" + preRes;
 
             } break;
@@ -484,7 +478,9 @@ string diff(const string &term, const char &var) {
 
                 if (tc.factors[0].func == "asin" || tc.factors[0].func == "acos") result += "((1-" + preRes + "^2)^(1/2))";
                 else if (tc.factors[0].func == "atan" || tc.factors[0].func == "acot") result += "(1+" + preRes + "^2)";
-                else if (tc.factors[0].func == "asec" || tc.factors[0].func == "acsc") result += "(|" + tc.factors[0].u + "|(" + preRes + "^2-1)^(1/2))";
+                else if (tc.factors[0].func == "asec" || tc.factors[0].func == "acsc") result += "(" + preRes + "(" + preRes + "^2-1)^(1/2))";
+
+                // else if (tc.factors[0].func == "asec" || tc.factors[0].func == "acsc") result += "(|" + tc.factors[0].u + "|(" + preRes + "^2-1)^(1/2))";
             } break;
             case 4: { // CASE: ax^n or ax^(n)
                 string subN = "";
@@ -508,8 +504,8 @@ string diff(const string &term, const char &var) {
                 else chainDiff = "(" + chainDiff + ")";
 
                 result += toCalStr(tc.a) + (tc.factors[0].u == "e"
-                    ? "e" + preN + chainDiff
-                    : "ln(" + tc.factors[0].u + ")" + tc.factors[0].u + preN + chainDiff);
+                    ? chainDiff + "e" + preN
+                    : chainDiff + "ln(" + tc.factors[0].u + ")" + tc.factors[0].u + preN);
             } break;
             default: error("fault at 'diff' function", 5);
         }
@@ -581,7 +577,6 @@ double eval(string term, const double &value, const char &var) {
     if (!tc.factors.length) return tc.a;
 
     double result = tc.a;
-    unsigned divPlace = 0;
 
     for (unsigned short i = 0; i < tc.factors.length; i++) {
         switch (tc.factors[i].type) {
