@@ -18,12 +18,13 @@ void error(const char *msg, const unsigned cond=1) {
 #include "klib.string.h"
 #include "klib.number.h"
 #include "engine.base.h"
-#include "engine.lim.h"
+//#include "engine.lim.h"
 #include "engine.max_min.h"
 
 string numOfDiff(const unsigned &num);
 
 int main() {
+    system("Color F0");
     /* parts of user input variables */
     string expr = "";
     char var;
@@ -56,8 +57,7 @@ int main() {
     system("pause");
     system("cls");
 
-    std::cout << "Press 'enter' to start...";
-    getline(std::cin, blank);
+   
 
     // run first menu
     std::cout << "\nIndependent variable (single character)\n";
@@ -97,7 +97,15 @@ int main() {
         std::cin >> option;
         std::cin.ignore();
 
-        if (option == 9) break;
+        if (option == 9) {
+        	
+        	std::cout<<"\n";
+        	std::cout<<"\t|||||||||   |||   |||      |||      |||||  |||   ||| |||         |||   |||    ||||||    |||  |||         \n";
+        	std::cout<<"\t   |||      |||||||||     |||||     |||||| |||   |||||            ||| |||    |||  |||   |||  |||         \n";
+        	std::cout<<"\t   |||      |||||||||    ||| |||    ||| ||||||   |||||              |||      |||  |||   |||  |||         \n";
+        	std::cout<<"\t   |||      |||   |||   |||   |||   |||  |||||   ||| |||            |||       ||||||     ||||||          \n";
+        	break;
+		}
 
         switch (option) {
             case 1: { // evaluation
@@ -160,14 +168,14 @@ int main() {
 
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
-            case 6: { // limit
-                double limPoint;
-                std::cout << "Enter value to approach " << var << "\n";
-                std::cout << "=>\t";
-                std::cin >> limPoint;
-
-                std::cout << "limit of f(x) = " << findLim(expr, limPoint, var);
-            } break;
+            //case 6: { // limit
+            //    double limPoint;
+            //    std::cout << "Enter value to approach " << var << "\n";
+            //    std::cout << "=>\t";
+            //    std::cin >> limPoint;
+//
+            //    std::cout << "limit of f(x) = " << findLim(expr, limPoint, var);
+            //} break;
             case 7: { // show graph
                 double scale;
                 std::cout << "Enter graph scale [-50, 50] in scale 1.\n";
