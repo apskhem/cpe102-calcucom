@@ -18,7 +18,7 @@ void error(const char *msg, const unsigned cond=1) {
 #include "klib.string.h"
 #include "klib.number.h"
 #include "engine.base.h"
-#include "engine.lim.h"
+//#include "engine.lim.h"
 #include "engine.max_min.h"
 
 string numOfDiff(const unsigned &num);
@@ -98,10 +98,11 @@ int main() {
 
         if (option == 9) {
         	
-        	cout<<"|||||||||   |||   |||      |||      |||||  |||   ||| |||         |||   |||    ||||||    |||  |||         "
-        	cout<<"   |||      |||||||||     |||||     |||||| |||   |||||            ||| |||    |||  |||   |||  |||         "
-        	cout<<"   |||      |||||||||    ||| |||    ||| ||||||   |||||              |||      |||  |||   |||  |||         "
-        	cout<<"   |||      |||   |||   |||   |||   |||  |||||   ||| |||            |||       ||||||     ||||||          "
+        	std::cout<<"\n";
+        	std::cout<<"\t|||||||||   |||   |||      |||      |||||  |||   ||| |||         |||   |||    ||||||    |||  |||         \n";
+        	std::cout<<"\t   |||      |||||||||     |||||     |||||| |||   |||||            ||| |||    |||  |||   |||  |||         \n";
+        	std::cout<<"\t   |||      |||||||||    ||| |||    ||| ||||||   |||||              |||      |||  |||   |||  |||         \n";
+        	std::cout<<"\t   |||      |||   |||   |||   |||   |||  |||||   ||| |||            |||       ||||||     ||||||          \n";
         	break;
 		}
 
@@ -161,14 +162,14 @@ int main() {
 
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
-            case 6: { // limit
-                double limPoint;
-                std::cout << "Enter value to approach " << var << "\n";
-                std::cout << "=>\t";
-                std::cin >> limPoint;
-
-                std::cout << "limit of f(x) = " << findLim(expr, limPoint, var);
-            } break;
+            //case 6: { // limit
+            //    double limPoint;
+            //    std::cout << "Enter value to approach " << var << "\n";
+            //    std::cout << "=>\t";
+            //    std::cin >> limPoint;
+//
+            //    std::cout << "limit of f(x) = " << findLim(expr, limPoint, var);
+            //} break;
             case 7: { // show graph
                 double scale;
                 std::cout << "Enter graph scale [-50, 50] in scale 1.\n";
