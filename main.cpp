@@ -56,8 +56,7 @@ int main() {
     system("pause");
     system("cls");
 
-    std::cout << "Press 'enter' to start...";
-    getline(std::cin, blank);
+   
 
     // run first menu
     std::cout << "\nIndependent variable (single character)\n";
