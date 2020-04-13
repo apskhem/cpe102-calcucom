@@ -26,7 +26,7 @@ const double PI = 3.14159265358979323846;
 const double e = 2.71828;
 
 struct factor {
-    unsigned type = 0; // 0 = u, 1 = trig, 2 = log, 3 = arc, 4 = var, 5 = n of var
+    unsigned type = 0; // 0 = u, 1 = trig, 2 = log, 3 = arc, 4 = var, 5 = n of var, 6 abs
     string func = ""; // log10, asin, tan
     string n = "1";
     string u = "";
@@ -216,18 +216,28 @@ TermComponents::TermComponents(string term, char var) {
             factor item;
 
             item.u = collectParEl(++i);
-            if(!collectN(++i, item.n)) {
-                if (splitTerm(item.u).length <= 1 && !trackDiv && term[i+1] != '/') {
-                    TermComponents preTc(item.u, var);
-                    a *= preTc.a;
+            if(!collectN(++i, item.n) && splitTerm(item.u).length <= 1 && !trackDiv && term[i+1] != '/') {
+                TermComponents preTc(item.u, var);
+                a *= preTc.a;
 
-                    for (unsigned short j = 0; j < preTc.factors.length; j++) {
-                        factors.push(preTc.factors[j]);
-                    }
+                for (unsigned short j = 0; j < preTc.factors.length; j++) {
+                    factors.push(preTc.factors[j]);
                 }
-                else factors.push(item);
             }
             else factors.push(item);
+        }
+
+        // find (type): abs
+        else if (term[i] == '|') {
+            factor item;
+            unsigned startpos = i+1;
+
+            while (term[i] != '|') i++;
+
+            item.type = 6;
+            item.u = term.slice(startpos, i);
+
+            factors.push(item);
         }
 
         // find (spliter): division
@@ -647,10 +657,8 @@ string implExprDiff(array<string> leftTerms, array<string> rightTerms, const cha
 
     // construct new form left = 0
     for (unsigned short i = 0; i < rightTerms.length; i++) {
-        if (rightTerms[i][0] == '-')
-            forms.push(rightTerms[i].slice(1));
-        else
-            forms.push("-" + rightTerms[i]);
+        if (rightTerms[i][0] == '-') forms.push(rightTerms[i].slice(1));
+        else forms.push("-" + rightTerms[i]);
     }
 
     string dUpper, dLower;
