@@ -18,8 +18,7 @@ void findRelativeMinMax(array<string> terms, const char &var) {
 
         // checks tc
         if (tc.factors.length > 1) error("only one factor per term in this mode is allowed");
-
-		if (parseNum(tc.factors[0].n) > 2) error("power of n in this mode is maximum at 3", 3);
+		else if (tc.factors.length && parseNum(tc.factors[0].n) > 2) error("power of n in this mode is maximum at 3", 3);
 
         if (!tc.factors.length) c = tc.a;
         else if (tc.factors[0].n == "1") b = tc.a;

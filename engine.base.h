@@ -555,14 +555,14 @@ string tangent(string expr, double posX, const char &var) {
     double c = posX * slope + evalExpr(splitTerm(expr), posX, var);
     
     string cStr = "";
-    if (c != 0) cStr = (c < 0 ? "-" : "+") + toString(c);
+    if (c != 0 && c => 0) cStr = "+" + toString(c);
 
     if (slope == 0 && !cStr.length) return "0";
     else if (slope == 0 && cStr.length) return cStr.slice(1);
     else return toString(slope) + string(var) + cStr;
 }
 
-// 1 > zoom out, 1 < zoom in;
+// 1 > zoom in, 1 < zoom out;
 void showGraph(const string &expr, const double &scale, const char &var) {
     const unsigned short h = 65, w = 65, mid = 32;
 
@@ -571,7 +571,7 @@ void showGraph(const string &expr, const double &scale, const char &var) {
     char graph[h][w] = {};
 
     for (unsigned short i = 0; i < w; i++) {
-        int y = evalExpr(read, (i/scale)-mid, var) + mid;
+        int y = evalExpr(read, (i-mid)/scale, var) + mid;
 
         if (y >= 0 && y <= h) graph[y][i] = 'o';
     }

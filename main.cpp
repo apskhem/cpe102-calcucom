@@ -90,7 +90,7 @@ int main() {
         std::cout << "\t[5] Find relative min/max.\n";
         std::cout << "\t[6] Find limit.\n";
         std::cout << "\t[7] Show graph.\n";
-        std::cout << "\t[8] Try a new expression.\n";
+        std::cout << "\t[8] New expression.\n";
         std::cout << "\t[9] End program.\n";
         std::cout << "=>\t";
         std::cin >> option;
@@ -159,7 +159,7 @@ int main() {
                 
                 std::cout << "tangent(x) = " << tangent(expr, pos, var) << " @ " << var << " = " << pos << '\n';
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
-            }
+            } break;
             case 5: { // find relative min/max
                 findRelativeMinMax(splitTerm(expr), var);
 
