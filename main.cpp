@@ -24,7 +24,6 @@ void error(const char *msg, const unsigned cond=1) {
 string numOfDiff(const unsigned &num);
 
 int main() {
-    system("Color F0");
     /* parts of user input variables */
     string expr = "";
     char var;
@@ -41,7 +40,7 @@ int main() {
     std::cout << "    [   ]  [  ][  ] [   ]  [   ______   [  ]         [  ]       [ ]      [ ]   [    ]  [    ]  [   ______     \n";
     std::cout << "     [   ][  ] [  ][   ]   [   ______]  [  ]         [  ]      [ ]        [ ]  [     ][  [  ]  [   ______]    \n";
     std::cout << "      [     ]   [     ]    [  |______   [  ]______   [  ]_____  [ ]______[ ]   [  ][ ][ ][  ]  [  ]______     \n";
-    std::cout << "       [___]     [___]     [_________]  [_________]  [________]  [________]    [__] [__] [__]  [_________]    \n";
+    std::cout << "       [___]     [___]     [_________]  [_________]  [________]  [________]    [__] [__] [__]  [_________]    \n\n";
     std::cout << "                                            _____    ____                                                     \n";
     std::cout << "                                           [_   _]  [    ]                                                    \n";
     std::cout << "                                             | |    [ ][ ]                                                    \n";
@@ -52,7 +51,7 @@ int main() {
     std::cout << "    [  ]         [ ][ ]    [  ]         [  ]        [  ]   [  ]  [  ]       [ ]      [ ]   [    ]  [    ]     \n";
     std::cout << "    [  ]        [  __  ]   [  ]         [  ]        [  ]   [  ]  [  ]      [ ]        [ ]  [     ][  [  ]     \n";
     std::cout << "    [  ]_____  [  ]  [  ]  [  ]______   [  ]_____   [  ]___[  ]  [  ]_____  [ ]______[ ]   [  ][ ][ ][  ]     \n";
-    std::cout << "    [________] [__]  [__]  [_________]  [________]  [_________]  [________]  [________]    [__] [__] [__]     \n";
+    std::cout << "    [________] [__]  [__]  [_________]  [________]  [_________]  [________]  [________]    [__] [__] [__]     \n\n\n";
 
     system("pause");
     system("cls");
@@ -122,11 +121,6 @@ int main() {
             } break;
             case 2: { // derivative
                 numberOfDiff++;
-                
-                // pre-reading process
-                expr = expr.replace(" ", "").replace("*", "").toLowerCase();
-                if (!expr.length) error("no input expression");
-
                 expr = diffExpr(splitTerm(expr), var);
                 if (!expr.length) expr = "0";
 
