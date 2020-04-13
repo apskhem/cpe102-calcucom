@@ -209,6 +209,10 @@ TermComponents::TermComponents(string term, char var) {
 
         else if (term[i] >= 97 && term[i] <= 122) {
             otherVar += string(term[i]);
+            string nPlaceHolder = "";
+
+            if (collectN(++i, nPlaceHolder))
+                otherVar += "^" + nPlaceHolder;
         }
 
         // find (type): function inside '(...)'
@@ -502,6 +506,8 @@ string diff(const string &term, const char &var) {
             } break;
             case 5: { // CASE a^(u)
                 string chainDiff = diffExpr(splitTerm(tc.factors[0].n), var);
+                if (chainDiff == "0" || chainDiff.includes("#")) return "#";
+
                 string preN = "^" + (tc.factors[0].n.length > 1 || tc.factors[0].n.includes("-") || tc.factors[0].n.includes("/")
                     ? "(" + tc.factors[0].n + ")"
                     : tc.factors[0].n);

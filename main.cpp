@@ -141,13 +141,17 @@ int main() {
                 std::cout << "=>\t";
                 getline(std::cin, impl_expr);
 
-                if (impl_expr.search("=") == -1) error("no presence of [left=right] expression");
+                // pre-reading process
+                impl_expr = impl_expr.replace(" ", "").replace("*", "").toLowerCase();
+                if (!impl_expr.length) error("no input expression");
 
-                string leftExpr = impl_expr.split("=")[0];
-                string rightExpr = impl_expr.split("=")[1];
+                int midpos = impl_expr.search("=");
+                if (midpos == -1) error("no presence of [left=right] expression");
+
+                string leftExpr = impl_expr.slice(0, midpos);
+                string rightExpr = impl_expr.slice(midpos+1);
 
                 std::cout << "The result is...\n\n";
-
                 std::cout << "dy/d" << var << " = " << implExprDiff(splitTerm(leftExpr), splitTerm(rightExpr), var) << "\n\n";
 
                  isFirstPass = true;
