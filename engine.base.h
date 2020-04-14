@@ -555,7 +555,7 @@ string tangent(string expr, double posX, const char &var) {
     double c = posX * slope + evalExpr(splitTerm(expr), posX, var);
     
     string cStr = "";
-    if (c != 0 && c => 0) cStr = "+" + toString(c);
+    if (c != 0 && c >= 0) cStr = "+" + toString(c);
 
     if (slope == 0 && !cStr.length) return "0";
     else if (slope == 0 && cStr.length) return cStr.slice(1);
@@ -678,8 +678,9 @@ double eval(string term, const double &value, const char &var) {
             } break;
             case 6: {
                 double n = evalExpr(splitTerm(tc.factors[i].n), value, var);
+                double chainEval = evalExpr(splitTerm(tc.factors[i].u), value, var);
 
-                result *= n < 0 ? 1/pow(abs(parseNum(tc.factors[i].u)), -n) : pow(abs(parseNum(tc.factors[i].u)), n);
+                result *= n < 0 ? 1/pow(abs(chainEval), -n) : pow(abs(chainEval), n);
             } break;
             default: error("fault at 'eval' function");
         }

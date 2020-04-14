@@ -18,7 +18,7 @@ void error(const char *msg, const unsigned cond=1) {
 #include "klib.string.h"
 #include "klib.number.h"
 #include "engine.base.h"
-//#include "engine.lim.h"
+// #include "engine.lim.h"
 #include "engine.max_min.h"
 
 string numOfDiff(const unsigned &num);
@@ -88,15 +88,15 @@ int main() {
         std::cout << "\t[3] Implicit derivative the expression.\n";
         std::cout << "\t[4] Find tangent.\n";
         std::cout << "\t[5] Find relative min/max.\n";
-        std::cout << "\t[6] Find limit.\n";
-        std::cout << "\t[7] Show graph.\n";
-        std::cout << "\t[8] New expression.\n";
-        std::cout << "\t[9] End program.\n";
+        // std::cout << "\t[6] Find limit.\n";
+        std::cout << "\t[6] Show graph.\n";
+        std::cout << "\t[7] New expression.\n";
+        std::cout << "\t[8] End program.\n";
         std::cout << "=>\t";
         std::cin >> option;
         std::cin.ignore();
 
-        if (option == 9) {
+        if (option == 8) {
         	
         	std::cout<<"\n";
         	std::cout<<"\t|||||||||   |||   |||      |||      |||||  |||   ||| |||         |||   |||    ||||||    |||  |||         \n";
@@ -165,15 +165,15 @@ int main() {
 
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
-            //case 6: { // limit
-            //    double limPoint;
-            //    std::cout << "Enter value to approach " << var << "\n";
-            //    std::cout << "=>\t";
-            //    std::cin >> limPoint;
-//
-            //    std::cout << "limit of f(x) = " << findLim(expr, limPoint, var);
-            //} break;
-            case 7: { // show graph
+            // case 6: { // limit
+            //     double limPoint;
+            //     std::cout << "Enter value to approach " << var << "\n";
+            //     std::cout << "=>\t";
+            //     std::cin >> limPoint;
+// 
+            //     std::cout << "limit of f(x) = " << findLimExpr(splitTerm(expr), limPoint, var);
+            // } break;
+            case 6: { // show graph
                 double scale;
                 std::cout << "Enter graph scale [-50, 50] in scale 1.\n";
                 std::cout << "=>\t";
@@ -183,7 +183,7 @@ int main() {
 
                 std::cout << "of f" << numOfDiff(numberOfDiff) << "(" << var << ") = ";
             } break;
-            case 8: { // new expression
+            case 7: { // new expression
                 std::cout << "Enter f(" << var << ") = ";
                 getline(std::cin, expr);
                 std::cout << "\n";
